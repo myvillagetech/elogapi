@@ -11,6 +11,9 @@ export class OrganizationSchemaCreator {
 
     @Prop()
     shortName : string
+
+    @Prop()
+    isActive : boolean
 }
 
 export type OrganizationDocument = OrganizationSchemaCreator & Document;

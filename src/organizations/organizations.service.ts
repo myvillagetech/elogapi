@@ -1,9 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { MODEL_ENUMS } from 'src/shared/enums/model.enums';
 import { UserDocument } from 'src/users/schemas/user.schemas';
 import { UsersService } from 'src/users/users.service';
+import { OrganizationSearchCriteriaDto } from './dto/organization.searchCriteria.dto';
 import { OrganizationDto } from './dto/organizations.dto';
 import { OrganizationDocument } from './schemas/organizations.schema';
 
@@ -31,7 +32,6 @@ export class OrganizationsService {
 
     async getAllOrganizations(): Promise<OrganizationDocument[]> {
         const organizations = await this.organizationsModel.find();
-        debugger;
         if (!organizations || organizations.length == 0) {
             throw new NotFoundException('organization data not found!');
         }
@@ -52,7 +52,6 @@ export class OrganizationsService {
     }
 
     async organizationTextSerach(searchString: string): Promise<OrganizationDocument[]> {
-        console.log(searchString);
         const search = searchString ? {
             $or: [
                 { organization: new RegExp(searchString.toString(), 'i') },
@@ -64,7 +63,41 @@ export class OrganizationsService {
         return results;
     }
 
+    async organizationSearchCriteria(criteria: OrganizationSearchCriteriaDto): Promise<OrganizationDocument[]> {
+        const search = { $and: [] }
 
+        if (criteria.organization) {
+            search.$and.push({
+                $or: [
+                    { organization: new RegExp(criteria.organization.toString(), 'i') },
+                    { shortName: new RegExp(criteria.organization.toString(), 'i') }
+                ]
+            })
+        }
+        if (criteria.isActive) {
+            search.$and.push(
+                { isActive: criteria.isActive },
+            )
+        }
 
+        if (criteria.type) {
+            search.$and.push(
+                { type: criteria.type === "true" ? true : false },
+            )
+        }
+
+        console.log(criteria.isActive,search);
+
+        const results = await this.organizationsModel.find(search.$and.length > 0 ? search : {});
+
+        if (!results || results.length == 0) {
+            throw new HttpException(
+                `users not found`,
+                HttpStatus.NOT_MODIFIED
+            )
+        }
+        return results;
+
+    }
 
 }

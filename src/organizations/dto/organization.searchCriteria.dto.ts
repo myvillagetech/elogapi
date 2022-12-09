@@ -5,34 +5,24 @@ import {
     IsString,
 } from 'class-validator';
 
-export class OrganizationDto{
+export class OrganizationSearchCriteriaDto{
     @IsString()
-    @IsNotEmpty()
     @ApiProperty({
         type: String
     })
     readonly type: string;
 
     @IsString()
-    @IsNotEmpty()
-    @ApiProperty({
-        type: String
-    })
-    readonly shortName: string;
-
-    @IsString()
-    @IsNotEmpty()
     @ApiProperty({
         type: String
     })
     readonly organization: string;
 
-    @IsBoolean()
-    @IsNotEmpty()
+    @IsString()
     @ApiProperty({
-        type: Boolean
+        type: String
     })
-    readonly isActive: boolean;
+    readonly isActive: string;
 
 
 }

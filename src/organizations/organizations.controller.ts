@@ -1,5 +1,6 @@
 import { Body, Controller,Post, Res, HttpStatus, Get,Put,Delete, Param, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { OrganizationSearchCriteriaDto } from './dto/organization.searchCriteria.dto';
 import { OrganizationDto } from './dto/organizations.dto';
 import { OrganizationsService } from './organizations.service';
 
@@ -29,7 +30,6 @@ export class OrganizationsController {
     @Get()
     async getAllOrganizations(@Res() response){
         try{
-            debugger;
             const organizations = await this.organizationsService.getAllOrganizations();
             return response.status(HttpStatus.OK).json({
                 message : 'Organizations Fetched Successfully',
@@ -48,7 +48,6 @@ export class OrganizationsController {
 
     @Get("/search")
     async getOrganizationsbySearch(@Res() response, @Query('searchString') searchString :string){
-        console.log(searchString);
         try{
             const organizations = await this.organizationsService.organizationTextSerach(searchString);
             return response.status(HttpStatus.OK).json({
@@ -96,6 +95,24 @@ export class OrganizationsController {
                 organizations
             })
         } catch(error){
+            return response.status(HttpStatus.BAD_REQUEST).json({
+                message : 'Faild to fetch Organizations',
+                success : false,
+                error
+            })
+        }
+    }
+
+    @Post("/searchCriteria")
+    async getAllOrganizationsBySearchCriteria(@Res() response, @Body()OrganizationSearchCriteriaDto : OrganizationSearchCriteriaDto){
+        try{
+            const organizations = await this.organizationsService.organizationSearchCriteria(OrganizationSearchCriteriaDto);
+            return response.status(HttpStatus.OK).json({
+                message : 'Organizations Fetched Successfully',
+                success : true,
+                organizations
+            })
+        }catch(error){
             return response.status(HttpStatus.BAD_REQUEST).json({
                 message : 'Faild to fetch Organizations',
                 success : false,
