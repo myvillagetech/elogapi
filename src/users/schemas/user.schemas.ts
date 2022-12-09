@@ -15,7 +15,7 @@ export class UserSchemaCreator {
     password: string
 
     @Prop()
-    organization : string
+    organization : string[]
 
     @Prop()
     department : string

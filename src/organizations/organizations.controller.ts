@@ -3,7 +3,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { OrganizationDto } from './dto/organizations.dto';
 import { OrganizationsService } from './organizations.service';
 
-@Controller('organizations')
+@Controller('/organizations')
 @ApiTags('organizations')
 export class OrganizationsController {
     constructor(private organizationsService:OrganizationsService){}
@@ -29,7 +29,28 @@ export class OrganizationsController {
     @Get()
     async getAllOrganizations(@Res() response){
         try{
-            const organizations = this.organizationsService.getAllOrganizations();
+            debugger;
+            const organizations = await this.organizationsService.getAllOrganizations();
+            return response.status(HttpStatus.OK).json({
+                message : 'Organizations Fetched Successfully',
+                success : true,
+                organizations
+            })
+
+        } catch(error){
+            return response.status(HttpStatus.BAD_REQUEST).json({
+                message : 'Faild to fetch Organizations',
+                success : false,
+                error
+            })
+        }
+    }
+
+    @Get("/search")
+    async getOrganizationsbySearch(@Res() response, @Query('searchString') searchString :string){
+        console.log(searchString);
+        try{
+            const organizations = await this.organizationsService.organizationTextSerach(searchString);
             return response.status(HttpStatus.OK).json({
                 message : 'Organizations Fetched Successfully',
                 success : true,
@@ -46,9 +67,9 @@ export class OrganizationsController {
     }
 
     @Get("/:id")
-    async getOrganizationById(@Res() response, @Param() OrganizationId : string){
+    async getOrganizationById(@Res() response, @Param('id') OrganizationId : string){
         try{
-            const organization = this.organizationsService.getOrganizationById(OrganizationId);
+            const organization = await this.organizationsService.getOrganizationById(OrganizationId);
             return response.status(HttpStatus.OK).json({
                 message : 'Organization Fetched Successfully',
                 success : true,
@@ -64,16 +85,16 @@ export class OrganizationsController {
         }
     }
 
-    @Get("/search")
-    async getOrganizationsbySearch(@Res() response, @Query('searchString') searchString){
+    @Get("/userId/:id")
+    async getOrganizationsByUserId(@Res() response, @Param('id') userId : string){
         try{
-            const organizations = this.organizationsService.organizationTextSerach(searchString);
+            const organizations = await this.organizationsService.getAllOrganizationsbyUserId(userId);
+
             return response.status(HttpStatus.OK).json({
                 message : 'Organizations Fetched Successfully',
                 success : true,
                 organizations
             })
-
         } catch(error){
             return response.status(HttpStatus.BAD_REQUEST).json({
                 message : 'Faild to fetch Organizations',
@@ -82,4 +103,6 @@ export class OrganizationsController {
             })
         }
     }
+
+    
 }

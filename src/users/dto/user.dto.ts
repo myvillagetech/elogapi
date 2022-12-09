@@ -27,12 +27,11 @@ export class UserDto{
     })
     readonly password: string;
 
-    @IsString()
     @IsNotEmpty()
     @ApiProperty({
-        type: String
+        type: Array<String>
     })
-    readonly organization: string;
+    readonly organization: string[];
 
     readonly department: string;
 

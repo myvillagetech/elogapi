@@ -30,11 +30,12 @@ export class OrganizationsService {
     }
 
     async getAllOrganizations(): Promise<OrganizationDocument[]> {
-        const userData = await this.organizationsModel.find();
-        if (!userData || userData.length == 0) {
+        const organizations = await this.organizationsModel.find();
+        debugger;
+        if (!organizations || organizations.length == 0) {
             throw new NotFoundException('organization data not found!');
         }
-        return userData;
+        return organizations;
     }
 
     async getAllOrganizationsbyUserId(userId:string): Promise<OrganizationDocument[]>{
@@ -51,6 +52,7 @@ export class OrganizationsService {
     }
 
     async organizationTextSerach(searchString: string): Promise<OrganizationDocument[]> {
+        console.log(searchString);
         const search = searchString ? {
             $or: [
                 { organization: new RegExp(searchString.toString(), 'i') },
