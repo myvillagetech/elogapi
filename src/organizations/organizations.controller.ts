@@ -1,8 +1,10 @@
 import { Body, Controller,Post, Res, HttpStatus, Get,Put,Delete, Param, Query } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { OrganizationDto } from './dto/organizations.dto';
 import { OrganizationsService } from './organizations.service';
 
 @Controller('organizations')
+@ApiTags('organizations')
 export class OrganizationsController {
     constructor(private organizationsService:OrganizationsService){}
 

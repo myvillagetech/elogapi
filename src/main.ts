@@ -12,7 +12,6 @@ async function bootstrap() {
     .setDescription('E-Log API')
     .setVersion('1.0')
     .addTag('auth')
-    .addTag('users')
     .addBearerAuth(
       { type: 'http', scheme: 'bearer', bearerFormat: 'jwt' },
       'access-token',
@@ -21,6 +20,6 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(6000);
+  await app.listen(process.env.PORT ||9000);
 }
 bootstrap();
