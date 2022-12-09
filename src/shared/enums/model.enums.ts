@@ -1,3 +1,4 @@
 export const MODEL_ENUMS = {
-    USERS : 'users'
+    USERS : 'users',
+    ORGANIZATIONS : 'organizations'
 }
