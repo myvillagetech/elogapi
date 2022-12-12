@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { MODEL_ENUMS } from 'src/shared/enums/model.enums';
@@ -110,5 +110,13 @@ export class UsersService {
             throw new NotFoundException(`user not found`);
         }
         return existingUser;
+    }
+
+    async getUsersByorganizationId(organizationId : string) :   Promise<UserDocument[]>{
+        const users = await this.usersModel.find({organization : organizationId});
+        if (!users || users.length == 0) {
+            throw new NotFoundException('users data not found!');
+        }
+        return users;
     }
 }

@@ -10,11 +10,17 @@ export class AuthController {
     constructor(private readonly authService: AuthService) { }
 
     @Post('login')
-    async login(@Body() body: LoginDto) {
+    async login(@Res() response, @Body() body: LoginDto) {
         try {
-            return await this.authService.login(body)
+            const result = await this.authService.login(body);
+            return response.status(HttpStatus.OK).json({
+                message : 'Login Successfull',
+                success : true,
+                result
+            })
+            return result
         } catch (error) {
-            throw new HttpException(error.messsage, HttpStatus.BAD_REQUEST)
+            throw new HttpException(error.messsage, HttpStatus.BAD_REQUEST,error)
         }
     }
 

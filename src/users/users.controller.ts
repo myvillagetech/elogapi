@@ -89,5 +89,24 @@ export class UsersController {
             return response.status(err.status).json(err.response);
         }
     }
+
+    @Get('organization/:id')
+    async getUsersByOrganization(@Res() response, @Param('id') organizationId : string ){
+        try{
+            const users = await this.userService.getUsersByorganizationId(organizationId);
+
+            return response.status(HttpStatus.OK).json({
+                message : 'Users fetched Successfully',
+                success : true,
+                users
+            })
+        } catch (error){
+            return response.status(HttpStatus.BAD_REQUEST).json({
+                message : 'Faild to fetch Users',
+                success : false,
+                error
+            })
+        }
+    }
 }
 
