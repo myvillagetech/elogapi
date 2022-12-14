@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { UserDto } from './dto/user.dto';
+import { response } from 'express';
+import { UpdateUserPasswordDto, UserDto } from './dto/user.dto';
 import { UsersService } from './users.service';
 
 @Controller('user')
@@ -101,6 +102,24 @@ export class UsersController {
                 users
             })
         } catch (error){
+            return response.status(HttpStatus.BAD_REQUEST).json({
+                message : 'Faild to fetch Users',
+                success : false,
+                error
+            })
+        }
+    }
+
+    @Put('admin/resetuserpassword/:id')
+    async updateUserPassword(@Res() response, @Param('id') userId : string,  @Body() newPassword: UpdateUserPasswordDto){
+        try{
+            const user = await this.userService.updateUserPassword(userId,newPassword.newPassword);
+
+            return response.status(HttpStatus.OK).json({
+                message : 'User Password updated successfully',
+                success : true,
+            })
+        }  catch (error){
             return response.status(HttpStatus.BAD_REQUEST).json({
                 message : 'Faild to fetch Users',
                 success : false,

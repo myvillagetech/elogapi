@@ -44,3 +44,12 @@ export class UserDto{
     readonly userAttributes : Object
 
 }
+
+export class UpdateUserPasswordDto{
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty({
+        type: String
+    })
+    readonly newPassword: string;
+}
