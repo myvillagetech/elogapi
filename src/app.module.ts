@@ -7,11 +7,12 @@ import { OrganizationTypeModule } from './generic/organization-type/organization
 import { MONGO_KEYS } from './config/keys.config';
 import { OrganizationsModule } from './organizations/organizations.module';
 import { UsersModule } from './users/users.module';
+import { ActivityTypeModule } from './generic/activity/activity-type/activity-type.module';
 
 
 
 @Module({
-  imports: [MongooseModule.forRoot(MONGO_KEYS.url),AuthModule,UsersModule,OrganizationsModule, OrganizationTypeModule],
+  imports: [MongooseModule.forRoot(MONGO_KEYS.url),AuthModule,UsersModule,OrganizationsModule, OrganizationTypeModule,ActivityTypeModule],
   controllers: [AppController],
   providers: [AppService],
 })
