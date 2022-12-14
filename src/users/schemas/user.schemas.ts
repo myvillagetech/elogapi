@@ -14,8 +14,8 @@ export class UserSchemaCreator {
     @Prop()
     password: string
 
-    @Prop({ _id:false, type: [OrganizationSchema] })
-    organization :Types.Array<OrganizationSchemaCreator>
+    @Prop()
+    organization : string[]
 
     @Prop()
     department : string
@@ -24,6 +24,9 @@ export class UserSchemaCreator {
         type: mongoose.Types.Map
     })
     userAttributes : Object;
+
+    @Prop()
+    roles : string[]
 }
 
 export type UserDocument = UserSchemaCreator & Document;

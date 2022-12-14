@@ -21,7 +21,7 @@ export class AuthService {
                 'A4169476C5A5889A',
                 { expiresIn: '4hr' }
             );
-            return {accessToken : accessToken}
+            return {accessToken : accessToken, role : user.roles}
 
         } else {
             throw new Error("Invaild Password");
