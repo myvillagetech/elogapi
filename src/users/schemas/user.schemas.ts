@@ -14,8 +14,10 @@ export class UserSchemaCreator {
     @Prop()
     password: string
 
-    @Prop()
-    organization : string[]
+    @Prop({
+        type : [{type : mongoose.Schema.Types.ObjectId, ref : 'organization'}]
+    })
+    organization : OrganizationSchemaCreator[]
 
     @Prop()
     department : string
