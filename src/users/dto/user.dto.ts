@@ -33,6 +33,12 @@ export class UserDto{
     })
     readonly organization: string[];
 
+    @IsNotEmpty()
+    @ApiProperty({
+        type : Array<String>
+    })
+    readonly roles: string[];
+
     readonly department: string;
 
     readonly userAttributes : Object
