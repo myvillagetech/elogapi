@@ -1,4 +1,6 @@
 export const MODEL_ENUMS = {
     USERS : 'users',
-    ORGANIZATIONS : 'organizations'
+    ORGANIZATIONS : 'organizations',
+    ORGANIZATION_TYPES : 'organizationTypes',
+    ACTION_TYPES : 'actionTypes'
 }

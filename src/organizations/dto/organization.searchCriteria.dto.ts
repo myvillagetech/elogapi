@@ -4,32 +4,25 @@ import {
     IsNotEmpty,
     IsString,
 } from 'class-validator';
+import { CriteriaWithPaginationAndSorting } from 'src/shared/DTOs/criteiaWithPaginationAndSorting';
 
-export class OrganizationDto{
+export class OrganizationSearchCriteriaDto extends CriteriaWithPaginationAndSorting{
     @IsString()
-    @IsNotEmpty()
     @ApiProperty({
         type: String
     })
     readonly type: string;
 
-    @IsNotEmpty()
-    @ApiProperty({
-        type: String
-    })
-    readonly shortName: string;
-
-    @IsNotEmpty()
+    @IsString()
     @ApiProperty({
         type: String
     })
     readonly organization: string;
 
-    @IsBoolean()
     @ApiProperty({
         type: Boolean
     })
-    readonly isActive: boolean;
+    readonly isActive: Boolean;
 
 
 }

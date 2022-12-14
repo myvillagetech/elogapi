@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import mongoose from "mongoose";
-
+import mongoose, { Types } from "mongoose";
+import { OrganizationSchema, OrganizationSchemaCreator } from "src/organizations/schemas/organizations.schema";
 
 
 @Schema()
@@ -14,8 +14,8 @@ export class UserSchemaCreator {
     @Prop()
     password: string
 
-    @Prop()
-    organization : string
+    @Prop({ _id:false, type: [OrganizationSchema] })
+    organization :Types.Array<OrganizationSchemaCreator>
 
     @Prop()
     department : string
