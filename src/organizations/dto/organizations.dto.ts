@@ -13,14 +13,12 @@ export class OrganizationDto{
     })
     readonly type: string;
 
-    @IsString()
     @IsNotEmpty()
     @ApiProperty({
         type: String
     })
     readonly shortName: string;
 
-    @IsString()
     @IsNotEmpty()
     @ApiProperty({
         type: String
@@ -28,7 +26,6 @@ export class OrganizationDto{
     readonly organization: string;
 
     @IsBoolean()
-    @IsNotEmpty()
     @ApiProperty({
         type: Boolean
     })

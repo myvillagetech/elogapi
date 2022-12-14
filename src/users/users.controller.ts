@@ -21,7 +21,7 @@ export class UsersController {
             return response.status(HttpStatus.BAD_REQUEST).json({
                 statusCode: 400,
                 message: 'Error: User not created!',
-                error: 'Bad Request',
+                error: err,
                 success : false,
             });
         }

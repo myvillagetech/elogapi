@@ -74,6 +74,7 @@ export class OrganizationsService {
                 ]
             })
         }
+
         if (criteria.isActive) {
             search.$and.push(
                 { isActive: criteria.isActive },
@@ -82,18 +83,54 @@ export class OrganizationsService {
 
         if (criteria.type) {
             search.$and.push(
-                { type: criteria.type === "true" ? true : false },
+                { type: criteria.type},
             )
         }
 
-        console.log(criteria.isActive,search);
+        let paginationProps: any = [
+            { $match: search.$and.length > 0 ? search : {} }
+        ];
 
-        const results = await this.organizationsModel.find(search.$and.length > 0 ? search : {});
+        if ((criteria.pageSize || criteria.pageSize > 0) &&
+            (criteria.pageNumber || criteria.pageNumber === 0)) {
+            paginationProps.push({
+                $skip: criteria.pageNumber * criteria.pageSize,
+            });
+            paginationProps.push({ $limit: criteria.pageSize });
+        }
+
+        let sortObject;
+        if (criteria.sortField) {
+            sortObject = {};
+            sortObject[criteria.sortField] = criteria.sortOrder;
+            paginationProps.push({ $sort: sortObject });
+        }
+
+        const results = await this.organizationsModel.aggregate([
+            {
+                $lookup: {
+                    from: MODEL_ENUMS.USERS,
+                    localField: '_id',
+                    foreignField: 'organization',
+                    as: 'users',
+                    pipeline: [{ $project: { password: 0 } }],
+                },
+            },
+            {
+                $facet: {
+                    organizations: paginationProps,
+                    metrics: [
+                        { $match: search.$and.length > 0 ? search : {} },
+                        { $count: "totalCount" },
+                    ],
+                },
+            },
+        ])
 
         if (!results || results.length == 0) {
             throw new HttpException(
-                `users not found`,
-                HttpStatus.NOT_MODIFIED
+                `Organizations not found`,
+                HttpStatus.NOT_FOUND
             )
         }
         return results;
