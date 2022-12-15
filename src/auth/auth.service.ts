@@ -10,7 +10,7 @@ export class AuthService {
     constructor(private readonly userService: UsersService) { }
 
     async login(loginDetails: LoginDto): Promise<any> {
-        const user = await this.userService.getUserByEmail(loginDetails.email);
+        const user :any = await this.userService.getUserByEmail(loginDetails.email);
         if (!user) {
             throw new Error("Invaild user details");
         }
@@ -21,7 +21,7 @@ export class AuthService {
                 'A4169476C5A5889A',
                 { expiresIn: '4hr' }
             );
-            return {accessToken : accessToken, role : user.roles}
+            return {accessToken : accessToken, role : user.roles, userId : user._id}
 
         } else {
             throw new Error("Invaild Password");
