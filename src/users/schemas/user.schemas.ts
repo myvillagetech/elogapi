@@ -4,7 +4,7 @@ import { OrganizationSchema, OrganizationSchemaCreator } from "src/organizations
 
 
 @Schema()
-export class UserSchemaCreator {
+export class UserSchemaCreator  {
     @Prop()
     email: string
 

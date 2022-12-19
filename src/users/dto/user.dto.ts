@@ -41,6 +41,9 @@ export class UserDto{
 
     readonly department: string;
 
+    @ApiProperty({
+        type: Object
+    })
     readonly userAttributes : Object
 
 }
@@ -52,4 +55,23 @@ export class UpdateUserPasswordDto{
         type: String
     })
     readonly newPassword: string;
+}
+
+export class UserUpdateDto{
+    @IsString()
+    @ApiProperty({
+        type: String
+    })
+    readonly Name: string;
+
+    @ApiProperty({
+        type: Object
+    })
+    readonly userAttributes? : Object
+
+    @ApiProperty({
+        type: Array<String>
+    })
+    readonly organization?: string[];
+
 }
