@@ -24,5 +24,9 @@ export class OrganizationSearchCriteriaDto extends CriteriaWithPaginationAndSort
     })
     readonly isActive: Boolean;
 
-
+    @IsString()
+    @ApiProperty({
+        type: String
+    })
+    readonly userId: string;
 }
