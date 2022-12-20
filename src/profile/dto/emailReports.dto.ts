@@ -3,6 +3,12 @@ import { ApiProperty } from "@nestjs/swagger";
 
 
 export class ProfileEmailReportsDto {
+
+    @ApiProperty({
+        type: Boolean
+    })
+    weeklyUsage: Boolean
+
     @ApiProperty({
         type: Boolean
     })

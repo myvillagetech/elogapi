@@ -31,6 +31,11 @@ export class ProfileEmailReports {
     @Prop({
         required: true,
     })
+    weeklyUsage: Boolean;
+
+    @Prop({
+        required: true,
+    })
     activityStatus: Boolean;
 
     @Prop({
