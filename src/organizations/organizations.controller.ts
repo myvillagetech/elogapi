@@ -1,7 +1,7 @@
 import { Body, Controller,Post, Res, HttpStatus, Get,Put,Delete, Param, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { OrganizationSearchCriteriaDto } from './dto/organization.searchCriteria.dto';
-import { OrganizationDto } from './dto/organizations.dto';
+import { OrganizationDto, updateOrganizationDto } from './dto/organizations.dto';
 import { OrganizationsService } from './organizations.service';
 
 @Controller('/organizations')
@@ -121,5 +121,38 @@ export class OrganizationsController {
         }
     }
 
-    
+    @Put("/:id")
+    async updateOrganization(@Res() response,  @Param('id') organizationId: string, @Body()organizationDetails : updateOrganizationDto){
+        try{
+            const organization = await this.organizationsService.updateOrganization(organizationId,organizationDetails);
+            return response.status(HttpStatus.OK).json({
+                message : 'Organization updated successfully',
+                success : true,
+                organization
+            })
+        }catch(error){
+            return response.status(HttpStatus.BAD_REQUEST).json({
+                message : 'Faild to update organization',
+                success : false,
+                error
+            })
+        }
+    }
+
+    @Delete("/:id")
+    async deleteOrganization(@Res() response,  @Param('id') organizationId: string){
+        try{
+            const organization = await this.organizationsService.deleteOrganization(organizationId);
+            return response.status(HttpStatus.OK).json({
+                message : 'Organization Deleted Successfully',
+                success : true,
+            })
+        }catch(error){
+            return response.status(HttpStatus.BAD_REQUEST).json({
+                message : 'Faild to delete organization',
+                success : false,
+                error
+            })
+        }
+    }
 }

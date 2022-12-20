@@ -5,7 +5,7 @@ import { MODEL_ENUMS } from 'src/shared/enums/model.enums';
 import { UserDocument } from 'src/users/schemas/user.schemas';
 import { UsersService } from 'src/users/users.service';
 import { OrganizationSearchCriteriaDto } from './dto/organization.searchCriteria.dto';
-import { OrganizationDto } from './dto/organizations.dto';
+import { OrganizationDto, updateOrganizationDto } from './dto/organizations.dto';
 import { OrganizationDocument } from './schemas/organizations.schema';
 
 @Injectable()
@@ -143,6 +143,28 @@ export class OrganizationsService {
         }
         return results;
 
+    }
+
+    async updateOrganization(organizationId : string, updateOrganizationDetails:updateOrganizationDto) : Promise<OrganizationDocument>{
+        const organization = await this.organizationsModel.findByIdAndUpdate(
+            organizationId,
+            updateOrganizationDetails,
+            { new: true},
+        );
+
+        if(!organization) {
+            throw new NotFoundException(`Organization with #${organizationId} not Found`);
+        }
+        return organization;
+    }
+
+    async deleteOrganization(organizationId : string) : Promise<String>{
+        const organization = await this.organizationsModel.findByIdAndDelete(organizationId);
+
+        if(!organization){
+            throw new NotFoundException(`Organization with #${organizationId} not Found`);
+        }
+        return `Organization with #${organizationId} is deleted`
     }
 
 }

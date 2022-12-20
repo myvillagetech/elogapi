@@ -33,3 +33,27 @@ export class OrganizationDto{
 
 
 }
+
+export class updateOrganizationDto{
+    @IsString()
+    @ApiProperty({
+        type: String
+    })
+    readonly type: string;
+
+    @ApiProperty({
+        type: String
+    })
+    readonly shortName: string;
+
+    @ApiProperty({
+        type: String
+    })
+    readonly organization: string;
+
+    @IsBoolean()
+    @ApiProperty({
+        type: Boolean
+    })
+    readonly isActive: boolean;
+}
