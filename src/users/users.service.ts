@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestj
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { MODEL_ENUMS } from 'src/shared/enums/model.enums';
-import { UserDto } from './dto/user.dto';
+import { UserDto, UserUpdateDto } from './dto/user.dto';
 import { UserDocument } from './schemas/user.schemas'
 
 @Injectable()
@@ -27,7 +27,7 @@ export class UsersService {
      * @param updateUserDTO new data to update the user
      * @returns the update user details
      */
-    async updateUser(id: string, updateUserDTO: UserDto): Promise<UserDocument> {
+    async updateUser(id: string, updateUserDTO: UserUpdateDto): Promise<UserDocument> {
         const existingUser = await this.usersModel.findByIdAndUpdate(
             id,
             updateUserDTO,

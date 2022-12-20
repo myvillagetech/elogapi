@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { MODEL_ENUMS } from 'src/shared/enums/model.enums';
 import { UserDocument } from 'src/users/schemas/user.schemas';
 import { UsersService } from 'src/users/users.service';
@@ -75,7 +75,7 @@ export class OrganizationsService {
             })
         }
 
-        if (criteria.isActive) {
+        if (criteria.isActive !== null && criteria.isActive !== undefined) {
             search.$and.push(
                 { isActive: criteria.isActive },
             )
@@ -84,6 +84,14 @@ export class OrganizationsService {
         if (criteria.type) {
             search.$and.push(
                 { type: criteria.type},
+            )
+        }
+
+        if(criteria.userId){
+            search.$and.push(
+                {
+                    "users._id" : new Types.ObjectId(criteria.userId)
+                }
             )
         }
 

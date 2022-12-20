@@ -8,11 +8,18 @@ import { MONGO_KEYS } from './config/keys.config';
 import { OrganizationsModule } from './organizations/organizations.module';
 import { UsersModule } from './users/users.module';
 import { ActivityTypeModule } from './generic/activity/activity-type/activity-type.module';
+import { ProfileModule } from './profile/profile.module';
 
 
 
 @Module({
-  imports: [MongooseModule.forRoot(MONGO_KEYS.url),AuthModule,UsersModule,OrganizationsModule, OrganizationTypeModule,ActivityTypeModule],
+  imports:  [MongooseModule.forRoot(MONGO_KEYS.url), 
+    AuthModule,
+    UsersModule,
+    OrganizationsModule, 
+    OrganizationTypeModule,
+    ActivityTypeModule,
+    ProfileModule],
   controllers: [AppController],
   providers: [AppService],
 })
