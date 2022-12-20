@@ -1,3 +1,4 @@
+import { Optional } from "@nestjs/common";
 import { ApiProperty } from "@nestjs/swagger";
 
 
@@ -16,4 +17,10 @@ export class ProfileEmailReportsDto {
         type: Boolean
     })
     sendMeEmail: Boolean;
+
+    @ApiProperty({
+        type: String,
+    })
+    @Optional()
+    _id: string;
 }

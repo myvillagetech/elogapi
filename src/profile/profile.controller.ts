@@ -1,6 +1,8 @@
 import { Body, Controller, HttpStatus, Param, Post, Put, Res, Get } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { response } from 'express';
+import { ProfileEmailReportsDto } from './dto/emailReports.dto';
+import { ProfileNotificationDto } from './dto/notifications.dto';
 import { ProfileDto } from './dto/profile.dto';
 import { ProfileService } from './profile.service';
 
@@ -119,6 +121,44 @@ export class ProfileController {
                 error: error,
                 success: false
             })
+        }
+    }
+
+    @Put('/emailReports/:userId')
+    async updateProfileEmailReports(
+        @Res() response,
+        @Body() emailReport : ProfileEmailReportsDto,
+        @Param('userId') userId : string
+    ){
+        try{
+            const profile = await this.profileService.updateEmailReports(emailReport,userId)
+            return response.status(HttpStatus.CREATED).json({
+                message : 'Email Reports updated succesfully'
+            });
+        } catch (error) {
+            return response.status(HttpStatus.BAD_REQUEST).json({
+                message: 'Error while updating Email Reports!',
+                error: 'Bad Request',
+            });
+        }
+    }
+
+    @Put('/notifications/:userId')
+    async updateProfileNotifications(
+        @Res() response,
+        @Body() notifications : ProfileNotificationDto,
+        @Param('userId') userId : string
+    ){
+        try{
+            const profile = await this.profileService.updateNotifications(notifications,userId)
+            return response.status(HttpStatus.CREATED).json({
+                message : 'Notifications updated succesfully'
+            });
+        } catch (error) {
+            return response.status(HttpStatus.BAD_REQUEST).json({
+                message: 'Error while updating Notifications!',
+                error: 'Bad Request',
+            });
         }
     }
 
