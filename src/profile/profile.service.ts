@@ -55,7 +55,7 @@ export class ProfileService {
     }
 
     async getProfileByUserID(userId : string) : Promise<ProfileDocument>{
-        const profile = await this.ProfileModel.findById({userId : userId});
+        const profile = await this.ProfileModel.findOne({userId : userId});
         if (!profile) {
             throw new NotFoundException(`Profile with ${userId} is not found`)
         }
