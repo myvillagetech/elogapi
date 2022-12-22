@@ -75,6 +75,14 @@ export class OrganizationsService {
             })
         }
 
+        if(criteria.organizationId) {
+            search.$and.push(
+                {
+                    "_id" : new Types.ObjectId(criteria.organizationId)
+                }
+            )
+        }
+
         if (criteria.isActive !== null && criteria.isActive !== undefined) {
             search.$and.push(
                 { isActive: criteria.isActive },
