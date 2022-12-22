@@ -10,9 +10,9 @@ export class ProfileEmailReportsDto {
     weeklyUsage: Boolean
 
     @ApiProperty({
-        type: Boolean
+        type: String
     })
-    activityStatus: Boolean;
+    activityStatus: string;
 
     @ApiProperty({
         type: Boolean
