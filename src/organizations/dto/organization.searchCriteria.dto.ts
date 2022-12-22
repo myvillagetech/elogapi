@@ -19,6 +19,12 @@ export class OrganizationSearchCriteriaDto extends CriteriaWithPaginationAndSort
     })
     readonly organization: string;
 
+    @IsString()
+    @ApiProperty({
+        type : String
+    })
+    readonly organizationId : string
+
     @ApiProperty({
         type: Boolean
     })
