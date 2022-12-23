@@ -86,14 +86,20 @@ export class removeUsersfromOrganizationDto{
         type : Array<string>
     })
     readonly userIds : string[];
+    @ApiProperty({
+        type: String
+    })
     readonly organizationId : string;
 }
 
 export class removeOrganizationsfromUserDto{
     @ApiProperty({
-        type : Array<string>
+        type: String
     })
     readonly userId : string;
+    @ApiProperty({
+        type : Array<string>
+    })
     readonly organizationIds : string[];
 }
 
@@ -102,6 +108,9 @@ export class addUsersToOrganizationDto{
         type : Array<string>
     })
     readonly userIds : string[];
+    @ApiProperty({
+        type: String
+    })
     readonly organizationId : string;
 }
 

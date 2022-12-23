@@ -217,7 +217,7 @@ export class UsersService {
 
     async removeUsersFormOrganization(updateDetails : removeUsersfromOrganizationDto) : Promise<any>{
         const result = await this.usersModel.updateMany(
-            {'_id ': {$in :[updateDetails.userIds]}},
+            {'_id': {$in :[updateDetails.userIds]}},
             {$pull : {'organization' : updateDetails.organizationId}}
         );
 
@@ -230,7 +230,7 @@ export class UsersService {
 
     async removeOrganizationsFormUser(updateDetails : removeOrganizationsfromUserDto) : Promise<any>{
         const result = await this.usersModel.updateOne(
-            {'_id ': updateDetails.userId},
+            {'_id': updateDetails.userId},
             {$pull : {'organization' : {$in : updateDetails.organizationIds}}}
         );
 
@@ -243,7 +243,7 @@ export class UsersService {
 
     async addUsersToOrganization(updateDetails : addUsersToOrganizationDto) : Promise<any>{
         const result = await this.usersModel.updateMany(
-            {'_id ': {$in :[updateDetails.userIds]}},
+            {'_id': {$in :[updateDetails.userIds]}},
             {$push : {'organization' : updateDetails.organizationId}}
         );
 

@@ -147,7 +147,7 @@ export class UsersController {
         }
     }
 
-    @Put("/organization/updateUserOrganizations")
+    @Put("/organization/removeUsersfromOrganization")
     async removeUsersfromOrganization(@Res()response, @Body() removeUsersfromOrganizationDto : removeUsersfromOrganizationDto){
         try{
             const result = await this.userService.removeUsersFormOrganization(removeUsersfromOrganizationDto);
@@ -164,7 +164,7 @@ export class UsersController {
         }
     }
 
-    @Put("/updateUserOrganizations")
+    @Put("/removeOrganizationsfromUser")
     async removeOrganizationsfromUser(@Res()response, @Body() removeOrganizationsfromUserDto : removeOrganizationsfromUserDto){
         try{
             const result = await this.userService.removeOrganizationsFormUser(removeOrganizationsfromUserDto);
