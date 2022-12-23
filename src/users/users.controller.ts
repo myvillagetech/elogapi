@@ -1,7 +1,8 @@
 import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { response } from 'express';
-import { UpdateUserPasswordDto, UserDto } from './dto/user.dto';
+import { UpdateUserPasswordDto, updateUsersOrganizationDto, UserDto } from './dto/user.dto';
+import { UserSearchCriteriaDto } from './dto/user.searchCriteria.dto';
 import { UsersService } from './users.service';
 
 @Controller('user')
@@ -122,6 +123,41 @@ export class UsersController {
         }  catch (error){
             return response.status(HttpStatus.BAD_REQUEST).json({
                 message : 'Faild to fetch Users',
+                success : false,
+                error
+            })
+        }
+    }
+
+    @Post("/searchCriteria")
+    async getUsersBySearchCriteria(@Res() response, @Body()usersSerachCriteria : UserSearchCriteriaDto){
+        try{
+            const users = await this.userService.usersSearchCriteria(usersSerachCriteria);
+            return response.status(HttpStatus.OK).json({
+                message : 'Users Fetched Successfully',
+                success : true,
+                users
+            })
+        }catch(error){
+            return response.status(HttpStatus.BAD_REQUEST).json({
+                message : 'Faild to fetch Users',
+                success : false,
+                error
+            })
+        }
+    }
+
+    @Put("/updateUserOrganizations")
+    async updateUserOrganizations(@Res()response, @Body() updateUsersorganizationData : updateUsersOrganizationDto){
+        try{
+            const result = await this.userService.removeOrganizationFormUsers(updateUsersorganizationData);
+            return response.status(HttpStatus.OK).json({
+                message : 'Updated users data successfully',
+                success : true,
+            })
+        }catch(error){
+            return response.status(HttpStatus.BAD_REQUEST).json({
+                message : 'Faild to update organization data of user',
                 success : false,
                 error
             })

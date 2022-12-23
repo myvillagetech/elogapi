@@ -103,6 +103,12 @@ export class OrganizationsService {
             )
         }
 
+        if(criteria.userSearch){
+            search.$and.push({
+                "users.Name" : new RegExp(criteria.userSearch.toString(), 'i')
+            })
+        }
+
         let paginationProps: any = [
             { $match: search.$and.length > 0 ? search : {} }
         ];

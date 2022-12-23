@@ -1,34 +1,25 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-    IsBoolean,
-    IsNotEmpty,
     IsString,
 } from 'class-validator';
 import { CriteriaWithPaginationAndSorting } from 'src/shared/DTOs/criteiaWithPaginationAndSorting';
 
-export class OrganizationSearchCriteriaDto extends CriteriaWithPaginationAndSorting{
+export class UserSearchCriteriaDto extends CriteriaWithPaginationAndSorting{
     @IsString()
     @ApiProperty({
         type: String
     })
     readonly type: string;
 
-    @IsString()
-    @ApiProperty({
-        type: String
-    })
-    readonly organization: string;
-
-    @IsString()
-    @ApiProperty({
-        type : String
-    })
-    readonly organizationId : string
-
     @ApiProperty({
         type: Boolean
     })
     readonly isActive: Boolean;
+
+    @ApiProperty({
+        type : String
+    })
+    readonly role : String
 
     @IsString()
     @ApiProperty({
@@ -38,7 +29,7 @@ export class OrganizationSearchCriteriaDto extends CriteriaWithPaginationAndSort
 
     @IsString()
     @ApiProperty({
-        type : String
+        type: String
     })
-    readonly userSearch : string
+    readonly user: string;
 }
