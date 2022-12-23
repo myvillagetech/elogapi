@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { response } from 'express';
-import { UpdateUserPasswordDto, updateUsersOrganizationDto, UserDto } from './dto/user.dto';
+import { addUsersToOrganizationDto, removeOrganizationsfromUserDto, removeUsersfromOrganizationDto, UpdateUserPasswordDto, UserDto } from './dto/user.dto';
 import { UserSearchCriteriaDto } from './dto/user.searchCriteria.dto';
 import { UsersService } from './users.service';
 
@@ -147,10 +147,10 @@ export class UsersController {
         }
     }
 
-    @Put("/updateUserOrganizations")
-    async updateUserOrganizations(@Res()response, @Body() updateUsersorganizationData : updateUsersOrganizationDto){
+    @Put("/organization/updateUserOrganizations")
+    async removeUsersfromOrganization(@Res()response, @Body() removeUsersfromOrganizationDto : removeUsersfromOrganizationDto){
         try{
-            const result = await this.userService.removeOrganizationFormUsers(updateUsersorganizationData);
+            const result = await this.userService.removeUsersFormOrganization(removeUsersfromOrganizationDto);
             return response.status(HttpStatus.OK).json({
                 message : 'Updated users data successfully',
                 success : true,
@@ -163,5 +163,41 @@ export class UsersController {
             })
         }
     }
+
+    @Put("/updateUserOrganizations")
+    async removeOrganizationsfromUser(@Res()response, @Body() removeOrganizationsfromUserDto : removeOrganizationsfromUserDto){
+        try{
+            const result = await this.userService.removeOrganizationsFormUser(removeOrganizationsfromUserDto);
+            return response.status(HttpStatus.OK).json({
+                message : 'Updated organizations data successfully',
+                success : true,
+            })
+        }catch(error){
+            return response.status(HttpStatus.BAD_REQUEST).json({
+                message : 'Faild to update organization data of user',
+                success : false,
+                error
+            })
+        }
+    }
+
+    @Put("/organzation/addUsersToOrganization")
+    async addUsersToOrganization(@Res()response, @Body() addUsersToOrganizationDto : addUsersToOrganizationDto){
+        try{
+            const result = await this.userService.addUsersToOrganization(addUsersToOrganizationDto);
+            return response.status(HttpStatus.OK).json({
+                message : 'Updated organizations data successfully',
+                success : true,
+            })
+        }catch(error){
+            return response.status(HttpStatus.BAD_REQUEST).json({
+                message : 'Faild to update organization data of user',
+                success : false,
+                error
+            })
+        }
+    }
+
+
 }
 

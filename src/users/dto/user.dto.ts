@@ -81,10 +81,27 @@ export class UserUpdateDto{
 
 }
 
-export class updateUsersOrganizationDto{
+export class removeUsersfromOrganizationDto{
     @ApiProperty({
         type : Array<string>
     })
     readonly userIds : string[];
     readonly organizationId : string;
 }
+
+export class removeOrganizationsfromUserDto{
+    @ApiProperty({
+        type : Array<string>
+    })
+    readonly userId : string;
+    readonly organizationIds : string[];
+}
+
+export class addUsersToOrganizationDto{
+    @ApiProperty({
+        type : Array<string>
+    })
+    readonly userIds : string[];
+    readonly organizationId : string;
+}
+
