@@ -22,6 +22,13 @@ export class UserSchemaCreator  {
     @Prop()
     department : string
 
+    @Prop(
+        {
+            default  : true
+        }
+    )
+    isActive : boolean
+
     @Prop({
         type: mongoose.Types.Map
     })

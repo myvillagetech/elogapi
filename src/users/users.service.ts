@@ -1,8 +1,9 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { MODEL_ENUMS } from 'src/shared/enums/model.enums';
-import { UserDto, UserUpdateDto } from './dto/user.dto';
+import { updateUsersOrganizationDto, UserDto, UserUpdateDto } from './dto/user.dto';
+import { UserSearchCriteriaDto } from './dto/user.searchCriteria.dto';
 import { UserDocument } from './schemas/user.schemas'
 
 @Injectable()
@@ -112,21 +113,118 @@ export class UsersService {
         return existingUser;
     }
 
-    async getUsersByorganizationId(organizationId : string) :   Promise<UserDocument[]>{
-        const users = await this.usersModel.find({organization : organizationId});
+    async getUsersByorganizationId(organizationId: string): Promise<UserDocument[]> {
+        const users = await this.usersModel.find({ organization: organizationId });
         if (!users || users.length == 0) {
             throw new NotFoundException('users data not found!');
         }
         return users;
     }
 
-    async updateUserPassword(userId : string, newPassword : string) : Promise<UserDocument>{
-        const user = await this.usersModel.findByIdAndUpdate(userId,{password : newPassword});
+    async updateUserPassword(userId: string, newPassword: string): Promise<UserDocument> {
+        const user = await this.usersModel.findByIdAndUpdate(userId, { password: newPassword });
 
-        if(!user){
+        if (!user) {
             throw new NotFoundException(`user with ${userId} is not found`)
         }
 
         return user;
+    }
+
+    async usersSearchCriteria(criteria: UserSearchCriteriaDto): Promise<UserDocument[]> {
+        const search = { $and: [] }
+
+        if (criteria.user) {
+            search.$and.push({
+                Name: new RegExp(criteria.user.toString(), 'i')
+            })
+        }
+
+        if (criteria.role) {
+            search.$and.push({
+                roles: criteria.role
+            })
+        }
+
+        if (criteria.isActive !== null && criteria.isActive !== undefined) {
+            search.$and.push(
+                { isActive: criteria.isActive },
+            )
+        }
+
+        if (criteria.userId) {
+            search.$and.push(
+                {
+                    "_id": new Types.ObjectId(criteria.userId)
+                }
+            )
+        }
+
+        if(criteria.type) {
+            search.$and.push({
+                "organizationsdata.type" : criteria.type
+            })
+        }
+
+        let paginationProps: any = [
+            { $match: search.$and.length > 0 ? search : {} }
+        ];
+
+        if ((criteria.pageSize || criteria.pageSize > 0) &&
+            (criteria.pageNumber || criteria.pageNumber === 0)) {
+            paginationProps.push({
+                $skip: criteria.pageNumber * criteria.pageSize,
+            });
+            paginationProps.push({ $limit: criteria.pageSize });
+        }
+
+        let sortObject;
+        if (criteria.sortField) {
+            sortObject = {};
+            sortObject[criteria.sortField] = criteria.sortOrder;
+            paginationProps.push({ $sort: sortObject });
+        }
+
+        const results = await this.usersModel.aggregate([
+            {
+                $lookup: {
+                    from: MODEL_ENUMS.ORGANIZATIONS,
+                    localField: 'organization',
+                    foreignField: '_id',
+                    as: 'organizationsdata',
+                },
+            },
+            {
+                $facet: {
+                    users: paginationProps,
+                    metrics: [
+                        { $match: search.$and.length > 0 ? search : {} },
+                        { $count: "totalCount" },
+                    ],
+                },
+            },
+        ])
+
+        if (!results || results.length == 0) {
+            throw new HttpException(
+                `Users not found`,
+                HttpStatus.NOT_FOUND
+            )
+        }
+        return results;
+
+    }
+
+    async removeOrganizationFormUsers(updateDetails : updateUsersOrganizationDto) : Promise<any>{
+        const result = await this.usersModel.updateMany(
+            {'_id ': {$in :[updateDetails.userIds]}},
+            {$pull : {'organization' : updateDetails.organizationId}}
+        );
+
+        if (!result) {
+            throw new NotFoundException(`users not found`)
+        }
+
+        return result;
     }
 }

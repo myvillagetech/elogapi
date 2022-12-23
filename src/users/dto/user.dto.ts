@@ -46,6 +46,11 @@ export class UserDto{
     })
     readonly userAttributes : Object
 
+    @ApiProperty({
+        type: Boolean
+    })
+    readonly isActive : Boolean
+
 }
 
 export class UpdateUserPasswordDto{
@@ -74,4 +79,12 @@ export class UserUpdateDto{
     })
     readonly organization?: string[];
 
+}
+
+export class updateUsersOrganizationDto{
+    @ApiProperty({
+        type : Array<string>
+    })
+    readonly userIds : string[];
+    readonly organizationId : string;
 }
