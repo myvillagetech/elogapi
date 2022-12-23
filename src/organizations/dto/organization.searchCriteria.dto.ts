@@ -35,4 +35,10 @@ export class OrganizationSearchCriteriaDto extends CriteriaWithPaginationAndSort
         type: String
     })
     readonly userId: string;
+
+    @IsString()
+    @ApiProperty({
+        type : String
+    })
+    readonly userSearch : string
 }
