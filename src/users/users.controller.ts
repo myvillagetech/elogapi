@@ -164,7 +164,7 @@ export class UsersController {
         }
     }
 
-    @Put("/removeOrganizationsfromUser")
+    @Put("/remove/OrganizationsfromUser")
     async removeOrganizationsfromUser(@Res()response, @Body() removeOrganizationsfromUserDto : removeOrganizationsfromUserDto){
         try{
             const result = await this.userService.removeOrganizationsFormUser(removeOrganizationsfromUserDto);
