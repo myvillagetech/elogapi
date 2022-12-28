@@ -3,5 +3,6 @@ export const MODEL_ENUMS = {
     ORGANIZATIONS : 'organizations',
     ORGANIZATION_TYPES : 'organizationTypes',
     ACTION_TYPES : 'actionTypes',
-    PROFILES : 'profiles'
+    PROFILES : 'profiles',
+    ACTIVITY_RELATED_TYPES : 'activityRelatedTypes'
 }

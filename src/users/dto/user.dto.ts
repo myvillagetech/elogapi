@@ -39,6 +39,9 @@ export class UserDto{
     })
     readonly roles: string[];
 
+    @ApiProperty({
+        type: String
+    })
     readonly department: string;
 
     @ApiProperty({
@@ -63,11 +66,10 @@ export class UpdateUserPasswordDto{
 }
 
 export class UserUpdateDto{
-    @IsString()
     @ApiProperty({
         type: String
     })
-    readonly Name: string;
+    readonly Name ?: string;
 
     @ApiProperty({
         type: Object
@@ -78,6 +80,16 @@ export class UserUpdateDto{
         type: Array<String>
     })
     readonly organization?: string[];
+
+    @ApiProperty({
+        type: Boolean
+    })
+    readonly isActive? : Boolean
+
+    @ApiProperty({
+        type: String
+    })
+    readonly department ?: string;
 
 }
 

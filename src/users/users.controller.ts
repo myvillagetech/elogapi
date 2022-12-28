@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { response } from 'express';
-import { addUsersToOrganizationDto, removeOrganizationsfromUserDto, removeUsersfromOrganizationDto, UpdateUserPasswordDto, UserDto } from './dto/user.dto';
+import { addUsersToOrganizationDto, removeOrganizationsfromUserDto, removeUsersfromOrganizationDto, UpdateUserPasswordDto, UserDto, UserUpdateDto } from './dto/user.dto';
 import { UserSearchCriteriaDto } from './dto/user.searchCriteria.dto';
 import { UsersService } from './users.service';
 
@@ -33,7 +33,7 @@ export class UsersController {
     async updateUser(
         @Res() response,
         @Param('id') userId: string,
-        @Body() userModel: UserDto,
+        @Body() userModel: UserUpdateDto,
     ) {
         try {
             const existingUser = await this.userService.updateUser(userId, userModel);
