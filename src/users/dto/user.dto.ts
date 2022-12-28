@@ -66,11 +66,10 @@ export class UpdateUserPasswordDto{
 }
 
 export class UserUpdateDto{
-    @IsString()
     @ApiProperty({
         type: String
     })
-    readonly Name: string;
+    readonly Name ?: string;
 
     @ApiProperty({
         type: Object
@@ -85,12 +84,12 @@ export class UserUpdateDto{
     @ApiProperty({
         type: Boolean
     })
-    readonly isActive : Boolean
+    readonly isActive? : Boolean
 
     @ApiProperty({
         type: String
     })
-    readonly department: string;
+    readonly department ?: string;
 
 }
 
