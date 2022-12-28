@@ -10,6 +10,7 @@ import { UsersModule } from './users/users.module';
 import { ActivityTypeModule } from './generic/activity/activity-type/activity-type.module';
 import { ProfileModule } from './profile/profile.module';
 import { ActivityRelatedTypeModule } from './generic/activity/activity-related-type/activity-related-type.module';
+import { ActivityModule } from './activity/activity.module';
 
 
 
@@ -21,7 +22,8 @@ import { ActivityRelatedTypeModule } from './generic/activity/activity-related-t
     OrganizationTypeModule,
     ActivityTypeModule,
     ActivityRelatedTypeModule,
-    ProfileModule],
+    ProfileModule,
+    ActivityModule],
   controllers: [AppController],
   providers: [AppService],
 })
