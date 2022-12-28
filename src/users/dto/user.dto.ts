@@ -39,6 +39,9 @@ export class UserDto{
     })
     readonly roles: string[];
 
+    @ApiProperty({
+        type: String
+    })
     readonly department: string;
 
     @ApiProperty({
@@ -78,6 +81,16 @@ export class UserUpdateDto{
         type: Array<String>
     })
     readonly organization?: string[];
+
+    @ApiProperty({
+        type: Boolean
+    })
+    readonly isActive : Boolean
+
+    @ApiProperty({
+        type: String
+    })
+    readonly department: string;
 
 }
 
