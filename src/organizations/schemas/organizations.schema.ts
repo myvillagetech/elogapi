@@ -2,7 +2,11 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import * as uniqueValidators from 'mongoose-unique-validator';
 
 
-@Schema()
+@Schema(
+    {
+        timestamps : true
+    }
+)
 export class OrganizationSchemaCreator {
     @Prop({ required: true})
     type  : string
