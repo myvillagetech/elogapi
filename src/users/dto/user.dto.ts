@@ -125,4 +125,14 @@ export class addUsersToOrganizationDto{
     })
     readonly organizationId : string;
 }
+export class addOrganizationsToUserDto{
+    @ApiProperty({
+        type : String
+    })
+    readonly userId : string;
+    @ApiProperty({
+        type: Array<string>
+    })
+    readonly organizationIds : string[];
+}
 

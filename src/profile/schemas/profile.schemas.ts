@@ -3,7 +3,9 @@ import * as uniqueValidators from 'mongoose-unique-validator'
 import { ProfileEmailReportsDto } from "../dto/emailReports.dto";
 
 
-@Schema({})
+@Schema(  {
+    timestamps : true
+})
 export class ProfileNotifications {
     @Prop({
         required: true,
