@@ -3,7 +3,9 @@ import mongoose, { Types } from "mongoose";
 import { OrganizationSchema, OrganizationSchemaCreator } from "src/organizations/schemas/organizations.schema";
 
 
-@Schema()
+@Schema(  {
+    timestamps : true
+})
 export class UserSchemaCreator  {
     @Prop()
     email: string

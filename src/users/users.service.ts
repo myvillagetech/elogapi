@@ -257,7 +257,7 @@ export class UsersService {
     async addOrganizationsToUsers(updateDetails:addOrganizationsToUserDto) : Promise<any>{
         const result = await this.usersModel.updateOne(
             {'_id': updateDetails.userId},
-            {$push : {'organization' : {$in : updateDetails.organizationIds}}}
+            {$push : {'organization' : updateDetails.organizationIds}}
         );
 
         if (!result) {
