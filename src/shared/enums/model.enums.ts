@@ -4,5 +4,6 @@ export const MODEL_ENUMS = {
     ORGANIZATION_TYPES : 'organizationTypes',
     ACTION_TYPES : 'actionTypes',
     PROFILES : 'profiles',
-    ACTIVITY_RELATED_TYPES : 'activityRelatedTypes'
+    ACTIVITY_RELATED_TYPES : 'activityRelatedTypes',
+    ACTIVITIES : 'activities'
 }

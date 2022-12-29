@@ -29,12 +29,12 @@ export class ActivitySchemaCreator {
     @Prop({
         required :true,
     })
-    activityType : ObjectId
+    activityType : String
 
     @Prop({
         required :true,
     })
-    activityRelatedTo : ObjectId
+    activityRelatedTo : String
 
     @Prop({
         required :true,
@@ -45,17 +45,17 @@ export class ActivitySchemaCreator {
     @Prop({
         required :true,
     })
-    activitEntryType : ObjectId
+    activitEntryType : String
 
     @Prop({
         required :true,
     })
-    activitySector : ObjectId
+    activitySector : String
 
     @Prop({
         required :true,
     })
-    activityScope : ObjectId
+    activityScope : String
 
     @Prop({
         required :true,
@@ -92,3 +92,6 @@ export class ActivitySchemaCreator {
     createdBy : UserSchemaCreator
 
 }
+
+export type ActivityDocument = ActivitySchemaCreator & Document
+export const ActivitySchema = SchemaFactory.createForClass(ActivitySchemaCreator)

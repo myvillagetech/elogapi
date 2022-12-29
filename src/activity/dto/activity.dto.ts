@@ -5,7 +5,7 @@ import {
     MaxLength,
 } from 'class-validator';
 
-export class UserDto{
+export class ActivityDto{
     @IsNotEmpty()
     @ApiProperty({
         type: String
@@ -55,9 +55,9 @@ export class UserDto{
     readonly description: string;
 
     @ApiProperty({
-        type: String
+        type: Array<String>
     })
-    readonly attachments: string;
+    readonly attachments: string[];
 
     @IsNotEmpty()
     @ApiProperty({
