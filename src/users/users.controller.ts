@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { response } from 'express';
-import { addUsersToOrganizationDto, removeOrganizationsfromUserDto, removeUsersfromOrganizationDto, UpdateUserPasswordDto, UserDto, UserUpdateDto } from './dto/user.dto';
+import { addOrganizationsToUserDto, addUsersToOrganizationDto, removeOrganizationsfromUserDto, removeUsersfromOrganizationDto, UpdateUserPasswordDto, UserDto, UserUpdateDto } from './dto/user.dto';
 import { UserSearchCriteriaDto } from './dto/user.searchCriteria.dto';
 import { UsersService } from './users.service';
 
@@ -187,6 +187,23 @@ export class UsersController {
             const result = await this.userService.addUsersToOrganization(addUsersToOrganizationDto);
             return response.status(HttpStatus.OK).json({
                 message : 'Updated organizations data successfully',
+                success : true,
+            })
+        }catch(error){
+            return response.status(HttpStatus.BAD_REQUEST).json({
+                message : 'Faild to update organization data of user',
+                success : false,
+                error
+            })
+        }
+    }
+
+    @Put("/add/UsersToOrganization")
+    async addOrganizationsToUser(@Res()response, @Body() addOrganizationsToUserDto : addOrganizationsToUserDto){
+        try{
+            const result = await this.userService.addOrganizationsToUsers(addOrganizationsToUserDto);
+            return response.status(HttpStatus.OK).json({
+                message : 'Updated User data successfully',
                 success : true,
             })
         }catch(error){

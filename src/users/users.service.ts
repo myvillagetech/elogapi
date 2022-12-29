@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestj
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { MODEL_ENUMS } from 'src/shared/enums/model.enums';
-import { addUsersToOrganizationDto, removeOrganizationsfromUserDto, removeUsersfromOrganizationDto, UserDto, UserUpdateDto } from './dto/user.dto';
+import { addOrganizationsToUserDto, addUsersToOrganizationDto, removeOrganizationsfromUserDto, removeUsersfromOrganizationDto, UserDto, UserUpdateDto } from './dto/user.dto';
 import { UserSearchCriteriaDto } from './dto/user.searchCriteria.dto';
 import { UserDocument } from './schemas/user.schemas'
 
@@ -245,6 +245,19 @@ export class UsersService {
         const result = await this.usersModel.updateMany(
             {'_id': {$in :[updateDetails.userIds]}},
             {$push : {'organization' : updateDetails.organizationId}}
+        );
+
+        if (!result) {
+            throw new NotFoundException(`users not found`)
+        }
+
+        return result;
+    }
+
+    async addOrganizationsToUsers(updateDetails:addOrganizationsToUserDto) : Promise<any>{
+        const result = await this.usersModel.updateOne(
+            {'_id': updateDetails.userId},
+            {$push : {'organization' : {$in : updateDetails.organizationIds}}}
         );
 
         if (!result) {
