@@ -249,7 +249,7 @@ export class UsersService {
 
     async addUsersToOrganization(updateDetails : addUsersToOrganizationDto) : Promise<any>{
         const result = await this.usersModel.updateMany(
-            {'_id': {$in :[updateDetails.userIds]}},
+            {'_id': updateDetails.userIds},
             {$push : {'organization' : updateDetails.organizationId}}
         );
 
