@@ -180,8 +180,10 @@ export class OrganizationsService {
             )
         }
 
+        return results;
+
         // results.metricDetails = metrics;
-        return {results,metrics };
+        // return {results,metrics };
 
     }
 
