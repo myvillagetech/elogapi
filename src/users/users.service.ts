@@ -223,7 +223,7 @@ export class UsersService {
 
     async removeUsersFormOrganization(updateDetails : removeUsersfromOrganizationDto) : Promise<any>{
         const result = await this.usersModel.updateMany(
-            {'_id': {$in :[updateDetails.userIds]}},
+            {'_id': updateDetails.userIds},
             {$pull : {'organization' : updateDetails.organizationId}}
         );
 
