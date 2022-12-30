@@ -11,6 +11,8 @@ import { ActivityTypeModule } from './generic/activity/activity-type/activity-ty
 import { ProfileModule } from './profile/profile.module';
 import { ActivityRelatedTypeModule } from './generic/activity/activity-related-type/activity-related-type.module';
 import { ActivityModule } from './activity/activity.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 
 
@@ -23,7 +25,10 @@ import { ActivityModule } from './activity/activity.module';
     ActivityTypeModule,
     ActivityRelatedTypeModule,
     ProfileModule,
-    ActivityModule],
+    ActivityModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'static'),
+    }),],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -166,6 +166,12 @@ export class UsersService {
             })
         }
 
+        if(criteria.organizationSerach) {
+            search.$and.push({
+                "organizationsdata.organization" : new RegExp(criteria.organizationSerach.toString(), 'i')
+            })
+        }
+
         let paginationProps: any = [
             { $match: search.$and.length > 0 ? search : {} }
         ];
@@ -231,7 +237,7 @@ export class UsersService {
     async removeOrganizationsFormUser(updateDetails : removeOrganizationsfromUserDto) : Promise<any>{
         const result = await this.usersModel.updateOne(
             {'_id': updateDetails.userId},
-            {$pull : {'organization' : {$in : updateDetails.organizationIds}}}
+            {$pull : {'organization' : updateDetails.organizationIds}}
         );
 
         if (!result) {
