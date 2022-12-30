@@ -130,6 +130,26 @@ export class OrganizationsService {
 
         const results = await this.organizationsModel.aggregate([
             {
+                $facet: {
+                    active: [
+                        {$match : {isActive : true}},
+                        { $count: "activeOrganizatiosns" },
+                    ],
+                    inActive: [
+                        {$match : {isActive : false}},
+                        { $count: "inActiveOrganizatiosns" },
+                    ],
+                    ministries: [
+                        {$match : {type : "63973bfb61ab6f49bfdd3c35"}},
+                        { $count: "ministriesCount" },
+                    ],
+                    associations: [
+                        {$match : {type : "63973c8961ab6f49bfdd3c38"}},
+                        { $count: "associationCount" },
+                    ]
+                }
+            },
+            {
                 $lookup: {
                     from: MODEL_ENUMS.USERS,
                     localField: '_id',
@@ -144,7 +164,7 @@ export class OrganizationsService {
                     metrics: [
                         { $match: search.$and.length > 0 ? search : {} },
                         { $count: "totalCount" },
-                    ],
+                    ]
                 },
             },
         ])
