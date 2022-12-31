@@ -137,7 +137,10 @@ export class UsersController {
             return response.status(HttpStatus.OK).json({
                 message : 'Users Fetched Successfully',
                 success : true,
-                users
+                data : {
+                    metrics : users.metrics,
+                    users : users.results[0].users
+                }
             })
         }catch(error){
             return response.status(HttpStatus.BAD_REQUEST).json({
