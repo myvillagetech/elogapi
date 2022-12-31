@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { response } from 'express';
+import { ResetPasswordDto } from './dto/resetPassword.dto';
 import { addOrganizationsToUserDto, addUsersToOrganizationDto, removeOrganizationsfromUserDto, removeUsersfromOrganizationDto, UpdateUserPasswordDto, UserDto, UserUpdateDto } from './dto/user.dto';
 import { UserSearchCriteriaDto } from './dto/user.searchCriteria.dto';
 import { UsersService } from './users.service';
@@ -111,23 +112,23 @@ export class UsersController {
         }
     }
 
-    @Put('admin/resetuserpassword/:id')
-    async updateUserPassword(@Res() response, @Param('id') userId : string,  @Body() newPassword: UpdateUserPasswordDto){
-        try{
-            const user = await this.userService.updateUserPassword(userId,newPassword.newPassword);
+    // @Put('admin/resetuserpassword/:id')
+    // async updateUserPassword(@Res() response, @Param('id') userId : string,  @Body() newPassword: UpdateUserPasswordDto){
+    //     try{
+    //         const user = await this.userService.updateUserPassword(userId,newPassword.newPassword);
 
-            return response.status(HttpStatus.OK).json({
-                message : 'User Password updated successfully',
-                success : true,
-            })
-        }  catch (error){
-            return response.status(HttpStatus.BAD_REQUEST).json({
-                message : 'Faild to fetch Users',
-                success : false,
-                error
-            })
-        }
-    }
+    //         return response.status(HttpStatus.OK).json({
+    //             message : 'User Password updated successfully',
+    //             success : true,
+    //         })
+    //     }  catch (error){
+    //         return response.status(HttpStatus.BAD_REQUEST).json({
+    //             message : 'Faild to fetch Users',
+    //             success : false,
+    //             error
+    //         })
+    //     }
+    // }
 
     @Post("/searchCriteria")
     async getUsersBySearchCriteria(@Res() response, @Body()usersSerachCriteria : UserSearchCriteriaDto){
@@ -209,6 +210,23 @@ export class UsersController {
         }catch(error){
             return response.status(HttpStatus.BAD_REQUEST).json({
                 message : 'Faild to update organization data of user',
+                success : false,
+                error
+            })
+        }
+    }
+
+    @Post('reset/Password')
+    async resetPassword(@Res() response, @Body() resetPasswordDto: ResetPasswordDto) {
+        try {
+            const result =  await this.userService.userResetPassword(resetPasswordDto);
+            return response.status(HttpStatus.OK).json({
+                message : 'Password reset successfull',
+                success : true,
+            })
+        } catch (error) {
+            return response.status(HttpStatus.BAD_REQUEST).json({
+                message : 'Faild to reset user password',
                 success : false,
                 error
             })

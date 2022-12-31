@@ -1,10 +1,13 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { MODEL_ENUMS } from 'src/shared/enums/model.enums';
 import { addOrganizationsToUserDto, addUsersToOrganizationDto, removeOrganizationsfromUserDto, removeUsersfromOrganizationDto, UserDto, UserUpdateDto } from './dto/user.dto';
 import { UserSearchCriteriaDto } from './dto/user.searchCriteria.dto';
-import { UserDocument } from './schemas/user.schemas'
+import { UserDocument } from './schemas/user.schemas';
+import * as bcrypt from 'bcrypt';
+import { ResetPasswordDto } from './dto/resetPassword.dto';
+
 
 @Injectable()
 export class UsersService {
@@ -18,8 +21,11 @@ export class UsersService {
      * @returns the new user 
      */
     async createUser(createUserDto: UserDto): Promise<UserDocument> {
+        const hasedPassword  = await this.generatePassword(createUserDto.password)
+        createUserDto.password = hasedPassword;
         const newUser = await new this.usersModel(createUserDto);
         return newUser.save();
+        
     }
 
     /**
@@ -29,6 +35,10 @@ export class UsersService {
      * @returns the update user details
      */
     async updateUser(id: string, updateUserDTO: UserUpdateDto): Promise<UserDocument> {
+        if(updateUserDTO.password){
+            const hasedPassword = await this.generatePassword(updateUserDTO.password);
+            updateUserDTO.password = hasedPassword;
+        }
         const existingUser = await this.usersModel.findByIdAndUpdate(
             id,
             updateUserDTO,
@@ -121,15 +131,15 @@ export class UsersService {
         return users;
     }
 
-    async updateUserPassword(userId: string, newPassword: string): Promise<UserDocument> {
-        const user = await this.usersModel.findByIdAndUpdate(userId, { password: newPassword });
+    // async updateUserPassword(userId: string, newPassword: string): Promise<UserDocument> {
+    //     const user = await this.usersModel.findByIdAndUpdate(userId, { password: newPassword });
 
-        if (!user) {
-            throw new NotFoundException(`user with ${userId} is not found`)
-        }
+    //     if (!user) {
+    //         throw new NotFoundException(`user with ${userId} is not found`)
+    //     }
 
-        return user;
-    }
+    //     return user;
+    // }
 
     async usersSearchCriteria(criteria: UserSearchCriteriaDto): Promise<UserDocument[]> {
         const search = { $and: [] }
@@ -271,5 +281,42 @@ export class UsersService {
         }
 
         return result;
+    }
+
+    async userResetPassword(resetPasswordDetails : ResetPasswordDto): Promise<any>{
+        const user = await this.usersModel.findById(resetPasswordDetails.userId);
+        if(!user){
+            throw new NotFoundException(`User with ${resetPasswordDetails.userId} is Not found`);
+        }
+        const verifyUser : any = await this.verifyPassword(resetPasswordDetails.oldPassword, user.password);
+        if(!verifyUser){
+            throw new BadRequestException('Invaild Password ! Please tryn again with correct password');
+        }
+        const hashedPassword = await this.generatePassword(resetPasswordDetails.newPassword);
+        const result = await this.usersModel.findByIdAndUpdate(resetPasswordDetails.userId, { password: hashedPassword })
+        return result;
+        
+    }
+
+    /**
+     * it will genrate the hashed password 
+     * @param password user Password
+     * @returns the hashed password
+     */
+    async generatePassword(password: string):Promise<any> {
+        const hash = await bcrypt.hashSync(password,10);
+        return hash;
+    }
+
+    /**
+     * this is to verify unhashed password and hashed password
+     * @param password unhased password
+     * @param hashedPassword allready hashed and stored password
+     * @returns a boolean true or false;
+     */
+    async verifyPassword(password: string, hashedPassword: string) : Promise<any> {
+
+        const result = await bcrypt.compareSync(password, hashedPassword);
+        return result
     }
 }
