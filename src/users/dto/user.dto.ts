@@ -91,6 +91,19 @@ export class UserUpdateDto{
     })
     readonly department ?: string;
 
+    @ApiProperty({
+        type : String
+    })
+    readonly email ? : string
+
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty({
+        type: String
+    })
+    readonly password?: string;
+
+
 }
 
 export class removeUsersfromOrganizationDto{

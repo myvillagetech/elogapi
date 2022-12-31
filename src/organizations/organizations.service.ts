@@ -141,11 +141,11 @@ export class OrganizationsService {
                         { $count: "inActiveOrganizatiosns" },
                     ],
                     ministries: [
-                        {$match : {type : "63973bfb61ab6f49bfdd3c35"}},
+                        {$match : {type : "63973bfb61ab6f49bfdd3c35",isActive : true}},
                         { $count: "ministriesCount" },
                     ],
                     associations: [
-                        {$match : {type : "63973c8961ab6f49bfdd3c38"}},
+                        {$match : {type : "63973c8961ab6f49bfdd3c38",isActive : true}},
                         { $count: "associationCount" },
                     ]
                 }
