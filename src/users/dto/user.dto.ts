@@ -25,7 +25,7 @@ export class UserDto{
     @ApiProperty({
         type: String
     })
-    readonly password: string;
+    password: string;
 
     @IsNotEmpty()
     @ApiProperty({
@@ -101,10 +101,11 @@ export class UserUpdateDto{
     @ApiProperty({
         type: String
     })
-    readonly password?: string;
+    password?: string;
 
 
 }
+
 
 export class removeUsersfromOrganizationDto{
     @ApiProperty({
