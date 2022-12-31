@@ -141,7 +141,7 @@ export class UsersService {
     //     return user;
     // }
 
-    async usersSearchCriteria(criteria: UserSearchCriteriaDto): Promise<UserDocument[]> {
+    async usersSearchCriteria(criteria: UserSearchCriteriaDto): Promise<any> {
         const search = { $and: [] }
 
         if (criteria.user) {
@@ -201,6 +201,37 @@ export class UsersService {
             paginationProps.push({ $sort: sortObject });
         }
 
+        const metrics = await this.usersModel.aggregate([
+            {
+                $lookup: {
+                    from: MODEL_ENUMS.ORGANIZATIONS,
+                    localField: 'organization',
+                    foreignField: '_id',
+                    as: 'organizationsdata',
+                },
+            },
+            {
+                $facet : {
+                    active : [
+                        {$match : {isActive : true}},
+                        { $count: "activeUsers" },
+                    ],
+                    inActive: [
+                        {$match : {isActive : false}},
+                        { $count: "inActiveUsers" },
+                    ],
+                    ministries: [
+                        {$match : {"organizationsdata.type" : "63973bfb61ab6f49bfdd3c35",isActive : true}},
+                        { $count: "ministriesCount" },
+                    ],
+                    associations: [
+                        {$match : {"organizationsdata.type" : "63973c8961ab6f49bfdd3c38",isActive : true}},
+                        { $count: "associationCount" },
+                    ]
+                }
+            }
+        ])
+
         const results = await this.usersModel.aggregate([
             {
                 $lookup: {
@@ -227,7 +258,7 @@ export class UsersService {
                 HttpStatus.NOT_FOUND
             )
         }
-        return results;
+        return {results,metrics};
 
     }
 
