@@ -10,6 +10,8 @@ import { UsersModule } from './users/users.module';
 import { ProfileModule } from './profile/profile.module';
 import { ActivityModule } from './activity/activity.module';
 import { ActivityMasterdataModule } from './generic/activity-masterdata/activity-masterdata.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 
 
@@ -21,7 +23,10 @@ import { ActivityMasterdataModule } from './generic/activity-masterdata/activity
     OrganizationTypeModule,
     ProfileModule,
     ActivityModule,
-    ActivityMasterdataModule],
+    ActivityMasterdataModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'static'),
+    }),],
   controllers: [AppController],
   providers: [AppService],
 })

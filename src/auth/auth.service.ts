@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { LoginDto } from './dto/login.dto';
-import { ResetPasswordDto } from './dto/resetPassword.dto';
+import { ResetPasswordDto } from '../users/dto/resetPassword.dto';
 import jwt,{sign} from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
+import { Error } from 'mongoose';
 
 @Injectable()
 export class AuthService {
@@ -14,8 +15,9 @@ export class AuthService {
         if (!user) {
             throw new Error("Invaild user details");
         }
-        // const verifyUser : any = this.verifyPassword(loginDetails.password, user.password);
-        if (user.password === loginDetails.password) {
+        const verifyUser : any = await this.verifyPassword(loginDetails.password, user.password);
+        console.log(verifyUser,loginDetails.password, user.password);
+        if (verifyUser) {
             const accessToken = sign(
                 { ...user },
                 'A4169476C5A5889A',
@@ -28,49 +30,15 @@ export class AuthService {
         }
     }
 
-    async resetPassword(
-        resetPasswordDto: ResetPasswordDto
-    ): Promise<any | undefined> {
-        const user: any = resetPasswordDto.userId ?
-            await this.userService.getUserById(resetPasswordDto.userId) :
-            await this.userService.getUserByEmail(resetPasswordDto.email);
-        if (!user) {
-            throw new Error("Invalid user details");
-        }
+    /**
+     * this is to verify unhashed password and hashed password
+     * @param password unhased password
+     * @param hashedPassword allready hashed and stored password
+     * @returns a boolean true or false;
+     */
+    async verifyPassword(password: string, hashedPassword: string) : Promise<any> {
 
-        // const hashedPassword = this.generatePassword(resetPasswordDto.newPassword);
-        // if (!this.verifyPassword(resetPasswordDto?.oldPassword,user?.password)) {
-        //     throw new Error("In correct old password");
-        // }
-
-        // if (user.password === hashedPassword) {
-        //     throw new Error("old and new passwords can not be same");
-        // }
-        // await this.userService.updateUserByEmail(user.email,
-        //     { password: hashedPassword});
-        return { messsage: 'Successfully updated' }
+        const result = await bcrypt.compareSync(password, hashedPassword);
+        return result
     }
-
-    // /**
-    //  * it will genrate the hashed password 
-    //  * @param password user Password
-    //  * @returns the hashed password
-    //  */
-    // generatePassword(password: string) {
-    //     bcrypt.hash(password,10,function(hash){
-    //         return hash;
-    //     })
-    // }
-
-    // /**
-    //  * this is to verify unhashed password and hashed password
-    //  * @param password unhased password
-    //  * @param hashedPassword allready hashed and stored password
-    //  * @returns a boolean true or false;
-    //  */
-    // verifyPassword(password: string, hashedPassword: string) : any {
-    //     bcrypt.compare(password, hashedPassword, function(result) {
-    //         return result
-    //     });
-    // }
 }

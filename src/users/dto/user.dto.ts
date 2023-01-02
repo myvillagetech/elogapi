@@ -25,7 +25,7 @@ export class UserDto{
     @ApiProperty({
         type: String
     })
-    readonly password: string;
+    password: string;
 
     @IsNotEmpty()
     @ApiProperty({
@@ -91,7 +91,21 @@ export class UserUpdateDto{
     })
     readonly department ?: string;
 
+    @ApiProperty({
+        type : String
+    })
+    readonly email ? : string
+
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty({
+        type: String
+    })
+    password?: string;
+
+
 }
+
 
 export class removeUsersfromOrganizationDto{
     @ApiProperty({

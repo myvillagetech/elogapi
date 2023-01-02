@@ -110,7 +110,10 @@ export class OrganizationsController {
             return response.status(HttpStatus.OK).json({
                 message : 'Organizations Fetched Successfully',
                 success : true,
-                organizations
+                data : {
+                    metrics : organizations.metrics,
+                    organizations : organizations.results[0].organizations
+                }
             })
         }catch(error){
             return response.status(HttpStatus.BAD_REQUEST).json({

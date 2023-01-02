@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
@@ -63,7 +64,7 @@ export class OrganizationsService {
         return results;
     }
 
-    async organizationSearchCriteria(criteria: OrganizationSearchCriteriaDto): Promise<OrganizationDocument[]> {
+    async organizationSearchCriteria(criteria: OrganizationSearchCriteriaDto): Promise<any> {
         const search = { $and: [] }
 
         if (criteria.organization) {
@@ -128,7 +129,30 @@ export class OrganizationsService {
             paginationProps.push({ $sort: sortObject });
         }
 
-        const results = await this.organizationsModel.aggregate([
+        const metrics = await this.organizationsModel.aggregate([
+            {
+                $facet: {
+                    active: [
+                        {$match : {isActive : true}},
+                        { $count: "activeOrganizatiosns" },
+                    ],
+                    inActive: [
+                        {$match : {isActive : false}},
+                        { $count: "inActiveOrganizatiosns" },
+                    ],
+                    ministries: [
+                        {$match : {type : "63973bfb61ab6f49bfdd3c35",isActive : true}},
+                        { $count: "ministriesCount" },
+                    ],
+                    associations: [
+                        {$match : {type : "63973c8961ab6f49bfdd3c38",isActive : true}},
+                        { $count: "associationCount" },
+                    ]
+                }
+            }
+        ]);
+        const results:any = await this.organizationsModel.aggregate([
+            
             {
                 $lookup: {
                     from: MODEL_ENUMS.USERS,
@@ -144,7 +168,7 @@ export class OrganizationsService {
                     metrics: [
                         { $match: search.$and.length > 0 ? search : {} },
                         { $count: "totalCount" },
-                    ],
+                    ]
                 },
             },
         ])
@@ -155,9 +179,14 @@ export class OrganizationsService {
                 HttpStatus.NOT_FOUND
             )
         }
-        return results;
+
+        //return results;
+
+        // results.metricDetails = metrics;
+        return {results,metrics };
 
     }
+
 
     async updateOrganization(organizationId : string, updateOrganizationDetails:updateOrganizationDto) : Promise<OrganizationDocument>{
         const organization = await this.organizationsModel.findByIdAndUpdate(
