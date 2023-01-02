@@ -17,6 +17,8 @@ export const ActivityRelatedTypesSchema = SchemaFactory.createForClass(ActivityR
 export class ActivityTypesSchemaCreator {
     @Prop()
     name : string
+    @Prop()
+    shortName : string
 }
 
 export type ActivityTypesDocument = ActivityTypesSchemaCreator & Document

@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MODEL_ENUMS } from 'src/shared/enums/model.enums';
-import { ActivityTypesSchema } from '../activity/activity-type/schemas/activity-type.schema';
 import { ActivityMasterdataController } from './activity-masterdata.controller';
 import { ActivityMasterdataService } from './activity-masterdata.service';
-import { ActivityEntryTypesSchema, ActivityRelatedTypesSchema, ActivityScopesSchema, ActivitySectorsSchema } from './schemas/activity-masterdata.schema';
+import { ActivityEntryTypesSchema, ActivityRelatedTypesSchema, ActivityScopesSchema, ActivitySectorsSchema, ActivityTypesSchema } from './schemas/activity-masterdata.schema';
 
 @Module({
   imports:[MongooseModule.forFeature([{name:MODEL_ENUMS.ACTIVITY_TYPES, schema : ActivityTypesSchema}]),
