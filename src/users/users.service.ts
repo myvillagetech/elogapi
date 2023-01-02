@@ -278,7 +278,7 @@ export class UsersService {
     async removeOrganizationsFormUser(updateDetails : removeOrganizationsfromUserDto) : Promise<any>{
         const result = await this.usersModel.updateOne(
             {'_id': updateDetails.userId},
-            {$pull : {'organization' : updateDetails.organizationIds}}
+            {$pull : {'organization' : {$in:updateDetails.organizationIds}}}
         );
 
         if (!result) {
