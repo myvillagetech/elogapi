@@ -164,6 +164,9 @@ export class ActivitySchemaCreator {
     @Prop()
     statusLog : StatusLog[]
 
+    @Prop({})
+    isArchive : Boolean
+
 }
 
 export type ActivityDocument = ActivitySchemaCreator & Document
