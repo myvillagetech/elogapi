@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { MODEL_ENUMS } from 'src/shared/enums/model.enums';
 import { ActivityDto } from './dto/activity.dto';
+import { ArchiveActivityDto, UpdateActivityDto } from './dto/update-activity.dto';
 import { ActivityDocument } from './schemas/activity.schema';
 
 @Injectable()
@@ -24,5 +25,45 @@ export class ActivityService {
             throw new NotFoundException('Activity data not found');
         }
         return activityData;
+    }
+
+    async getActivityByActivityId(activityId : string):Promise<ActivityDocument>{
+        const activity = await this.activityModel.findById(activityId);
+
+        if(!activity){
+            throw new NotFoundException('Activity data not found');
+        }
+
+        return activity
+    }
+
+    async updateActivityByActivityId(activityId : string, activityData : UpdateActivityDto):Promise<ActivityDocument>{
+        const updatedActivity = await this.activityModel.findByIdAndUpdate(activityId,activityData);
+
+        if(!updatedActivity){
+            throw new NotFoundException('Activity data not found');
+        }
+
+        return updatedActivity
+    }
+
+    async deleteActivityByActivityId(activityId:string):Promise<any>{
+        const result = await this.activityModel.findByIdAndDelete(activityId);
+
+        if(!result){
+            throw new NotFoundException('Activity data not found');
+        }
+
+        return result
+    }
+
+    async archiveActivity(activityId:string,activityDetails : ArchiveActivityDto):Promise<any>{
+        const result = await this.activityModel.findByIdAndUpdate(activityId,activityDetails);
+
+        if(!result){
+            throw new NotFoundException('Activity data not found');
+        }
+
+        return result
     }
 }
