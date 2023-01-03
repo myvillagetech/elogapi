@@ -1,6 +1,8 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import mongoose, { Date } from "mongoose";
+import mongoose, { Date, modelNames } from "mongoose";
+import { ActivityEntryTypesSchemaCreator, ActivityRelatedTypesSchemaCreator, ActivityScopesSchemaCreator, ActivitySectorsSchemaCreator, ActivityTypesSchemaCreator } from "src/generic/activity-masterdata/schemas/activity-masterdata.schema";
 import { OrganizationSchemaCreator } from "src/organizations/schemas/organizations.schema";
+import { MODEL_ENUMS } from "src/shared/enums/model.enums";
 import { UserSchemaCreator } from "src/users/schemas/user.schemas";
 
 
@@ -91,14 +93,14 @@ export class StatusLog{
 export class ActivitySchemaCreator {
 
     @Prop({
-        required :true,
+        type : {type : mongoose.Schema.Types.ObjectId, ref : MODEL_ENUMS.ACTIVITY_TYPES},
     })
-    activityType : String
+    activityType : ActivityTypesSchemaCreator
 
     @Prop({
-        required :true,
+        type : {type : mongoose.Schema.Types.ObjectId, ref : MODEL_ENUMS.ACTIVITY_RELATED_TYPES},
     })
-    activityRelatedTo : String
+    activityRelatedTo : ActivityRelatedTypesSchemaCreator
 
     @Prop({
         type : [{type : mongoose.Schema.Types.ObjectId, ref : 'organization'}]
@@ -106,19 +108,19 @@ export class ActivitySchemaCreator {
     organization : OrganizationSchemaCreator[]
 
     @Prop({
-        required :true,
+        type : {type : mongoose.Schema.Types.ObjectId, ref : MODEL_ENUMS.ACTIVITY_ENTRY_TYPE},
     })
-    activitEntryType : String
+    activitEntryType : ActivityEntryTypesSchemaCreator
 
     @Prop({
-        required :true,
+        type : {type : mongoose.Schema.Types.ObjectId, ref : MODEL_ENUMS.ACTIVITY_SECTORS},
     })
-    activitySector : String
+    activitySector : ActivitySectorsSchemaCreator
 
     @Prop({
-        required :true,
+        type : {type : mongoose.Schema.Types.ObjectId, ref : MODEL_ENUMS.ACTIVITY_SCOPES},
     })
-    activityScope : String
+    activityScope : ActivityScopesSchemaCreator
 
     @Prop({
         required :true,

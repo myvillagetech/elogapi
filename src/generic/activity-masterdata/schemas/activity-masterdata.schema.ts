@@ -19,6 +19,10 @@ export class ActivityTypesSchemaCreator {
     name : string
     @Prop()
     shortName : string
+    @Prop()
+    isActive : boolean
+    @Prop()
+    isDefault : boolean
 }
 
 export type ActivityTypesDocument = ActivityTypesSchemaCreator & Document
