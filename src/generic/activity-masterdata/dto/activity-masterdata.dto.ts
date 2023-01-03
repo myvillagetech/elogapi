@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString } from "class-validator";
+import { IsBoolean, IsString } from "class-validator";
 
 
 export class ActivityMasterDataDto {
@@ -22,4 +22,16 @@ export class CreateActivityTypeDto {
         type : String
     })
     shortName : string
+
+    @IsBoolean()
+    @ApiProperty({
+        type : Boolean
+    })
+    isActive : boolean
+
+    @IsBoolean()
+    @ApiProperty({
+        type : Boolean
+    })
+    isDefault : boolean
 }

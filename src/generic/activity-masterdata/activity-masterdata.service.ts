@@ -24,16 +24,16 @@ export class ActivityMasterdataService {
         const activityScopesData = await this.activityScopesDocument.find();
         const activitySectorsData = await this.activitySectorsDocument.find();
 
-        const activityMasterData = {...activityTypesData,...activityRelatedTypesData,...activityEntryTypesData,...activityScopesData,...activitySectorsData};
+        const activityMasterData = {
+            activityTypesData : activityTypesData,
+            activityRelatedTypesData : activityRelatedTypesData,
+            activityEntryTypesData : activityEntryTypesData,
+            activityScopesData : activityScopesData,
+            activitySectorsData : activitySectorsData
+        }
         return activityMasterData;
     }
-
-    // async createActivityTypesData
-
-    // async createActivityMasterData(masterData : CrteateActivityMasterDataDto):Promise<any>{
-        // const activityMasterData = await new this.activityMasterdataModel(masterData);
-        // return activityMasterData.save()
-    // }
+    
 
     async getAllActivityTypes():Promise<ActivityTypesDocument[]>{
         const results = await this.activityTypesDocument.find();
