@@ -2,8 +2,11 @@ export const MODEL_ENUMS = {
     USERS : 'users',
     ORGANIZATIONS : 'organizations',
     ORGANIZATION_TYPES : 'organizationTypes',
-    ACTION_TYPES : 'actionTypes',
+    ACTIVITY_TYPES : 'activityTypes',
     PROFILES : 'profiles',
     ACTIVITY_RELATED_TYPES : 'activityRelatedTypes',
-    ACTIVITIES : 'activities'
+    ACTIVITIES : 'activities',
+    ACTIVITY_ENTRY_TYPE : 'activityEntryType',
+    ACTIVITY_SECTORS : 'activitySectors',
+    ACTIVITY_SCOPES : 'activityScopes'
 }

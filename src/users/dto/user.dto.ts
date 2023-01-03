@@ -96,8 +96,6 @@ export class UserUpdateDto{
     })
     readonly email ? : string
 
-    @IsString()
-    @IsNotEmpty()
     @ApiProperty({
         type: String
     })
