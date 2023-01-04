@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { MODEL_ENUMS } from 'src/shared/enums/model.enums';
 import { ActivityDto } from './dto/activity.dto';
 import { ArchiveActivityDto, UpdateActivityDto } from './dto/update-activity.dto';
@@ -27,8 +27,21 @@ export class ActivityService {
         return activityData;
     }
 
-    async getActivityByActivityId(activityId : string):Promise<ActivityDocument>{
-        const activity = await this.activityModel.findById(activityId);
+    async getActivityByActivityId(activityId : string):Promise<any>{
+        const activity = await this.activityModel.aggregate([
+            {
+                $lookup: {
+                    from: MODEL_ENUMS.ORGANIZATIONS,
+                    localField: 'organization',
+                    foreignField: '_id',
+                    as: 'organizationData',
+                    pipeline: [{ $project: { password: 0 } }],
+                },
+            },
+            {
+                $match : {_id : new Types.ObjectId(activityId)}
+            }
+        ])
 
         if(!activity){
             throw new NotFoundException('Activity data not found');

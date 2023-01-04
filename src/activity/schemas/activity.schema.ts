@@ -93,12 +93,12 @@ export class StatusLog{
 export class ActivitySchemaCreator {
 
     @Prop({
-        type : {type : mongoose.Schema.Types.ObjectId, ref : MODEL_ENUMS.ACTIVITY_TYPES},
+        type : mongoose.Schema.Types.ObjectId, ref : 'activityTypes',
     })
     activityType : ActivityTypesSchemaCreator
 
     @Prop({
-        type : {type : mongoose.Schema.Types.ObjectId, ref : MODEL_ENUMS.ACTIVITY_RELATED_TYPES},
+        type : mongoose.Schema.Types.ObjectId, ref : 'activityRelatedType',
     })
     activityRelatedTo : ActivityRelatedTypesSchemaCreator
 
@@ -108,17 +108,17 @@ export class ActivitySchemaCreator {
     organization : OrganizationSchemaCreator[]
 
     @Prop({
-        type : {type : mongoose.Schema.Types.ObjectId, ref : MODEL_ENUMS.ACTIVITY_ENTRY_TYPE},
+        type : mongoose.Schema.Types.ObjectId, ref : MODEL_ENUMS.ACTIVITY_ENTRY_TYPE,
     })
     activitEntryType : ActivityEntryTypesSchemaCreator
 
     @Prop({
-        type : {type : mongoose.Schema.Types.ObjectId, ref : MODEL_ENUMS.ACTIVITY_SECTORS},
+        type : mongoose.Schema.Types.ObjectId, ref : MODEL_ENUMS.ACTIVITY_SECTORS,
     })
     activitySector : ActivitySectorsSchemaCreator
 
     @Prop({
-        type : {type : mongoose.Schema.Types.ObjectId, ref : MODEL_ENUMS.ACTIVITY_SCOPES},
+        type : mongoose.Schema.Types.ObjectId, ref : MODEL_ENUMS.ACTIVITY_SCOPES,
     })
     activityScope : ActivityScopesSchemaCreator
 
@@ -149,7 +149,7 @@ export class ActivitySchemaCreator {
     activityLog : ActivityLog[]
 
     @Prop({
-        type : {type : mongoose.Schema.Types.ObjectId, ref : 'user'}
+        type : mongoose.Schema.Types.ObjectId, ref : 'user'
     })
     createdBy : UserSchemaCreator
 
