@@ -167,6 +167,11 @@ export class ActivitySchemaCreator {
     @Prop({})
     isArchive : Boolean
 
+    @Prop({
+        type : mongoose.Schema.Types.ObjectId , ref : 'organization'
+    })
+    createdByOrganization : OrganizationSchemaCreator
+
 }
 
 export type ActivityDocument = ActivitySchemaCreator & Document

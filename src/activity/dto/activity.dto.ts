@@ -1,8 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
     IsNotEmpty,
-    IsString,
-    MaxLength,
 } from 'class-validator';
 
 
@@ -101,6 +99,13 @@ export class ActivityDto{
         type:Boolean
     })
     readonly isArchive : boolean
+
+    @IsNotEmpty()
+    @ApiProperty({
+        type : String
+    })
+    readonly createdByOrganization : string
+
 
 }
 
