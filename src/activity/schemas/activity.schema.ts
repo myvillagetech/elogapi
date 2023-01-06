@@ -4,6 +4,7 @@ import { ActivityEntryTypesSchemaCreator, ActivityRelatedTypesSchemaCreator, Act
 import { OrganizationSchemaCreator } from "src/organizations/schemas/organizations.schema";
 import { MODEL_ENUMS } from "src/shared/enums/model.enums";
 import { UserSchemaCreator } from "src/users/schemas/user.schemas";
+import { Priority, Status } from "../dto/activity.enums";
 
 
 @Schema({
@@ -82,7 +83,7 @@ export class StatusLog{
     @Prop({
         type : String
     })
-    dueDate : string
+    status : Status
 }
 
 
@@ -136,14 +137,15 @@ export class ActivitySchemaCreator {
     attachments : Attachments[]
 
     @Prop({
-        required : true
+        required : true,
+        default : 'NONE'
     })
-    priority : string
+    priority : Priority
 
     @Prop({
         required : true,
     })
-    status : string
+    status : Status
 
     @Prop({})
     activityLog : ActivityLog[]

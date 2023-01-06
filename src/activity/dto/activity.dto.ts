@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
     IsNotEmpty,
 } from 'class-validator';
+import { Priority, Status } from './activity.enums';
 
 
 export class AttachmentsDto {
@@ -23,6 +24,7 @@ export class AttachmentsDto {
     })
     readonly path: string;
 }
+
 export class ActivityDto{
     @IsNotEmpty()
     @ApiProperty({
@@ -79,15 +81,17 @@ export class ActivityDto{
 
     @IsNotEmpty()
     @ApiProperty({
-        type: String
+        type: String,
+        enum : Priority
     })
-    readonly priority: string;
+    readonly priority: Priority;
 
     @IsNotEmpty()
     @ApiProperty({
-        type: String
+        type: String,
+        enum : Status
     })
-    readonly status: string;
+    readonly status: Status;
 
     @IsNotEmpty()
     @ApiProperty({
