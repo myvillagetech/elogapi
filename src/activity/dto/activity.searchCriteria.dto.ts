@@ -75,5 +75,10 @@ export class ActivitySearchCriteriaDto extends CriteriaWithPaginationAndSorting{
         type : Array<String>
     })
     readonly assignTo : string[];
+
+    @ApiProperty({
+        type : Boolean
+    })
+    readonly isArchive : Boolean
 }
 

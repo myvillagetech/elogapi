@@ -7,31 +7,28 @@ import { UserSchemaCreator } from "src/users/schemas/user.schemas";
 import { Priority, Status } from "../enums/activity.enums";
 
 @Schema({
-    timestamps : true
+    timestamps: true
 })
-export class Attachments { 
+export class Attachment {
     @Prop({
-        required: true,
     })
     name: string;
     @Prop({
-        required: true,
     })
     size: string;
     @Prop({
-        required: true,
     })
     path: string;
 }
 
-export const AttachmentsSchema = SchemaFactory.createForClass(
-    Attachments
+export const AttachmentSchema = SchemaFactory.createForClass(
+    Attachment
 )
 
 @Schema({
-    timestamps : true
+    timestamps: true
 })
-export class ActivityLog{
+export class ActivityLog {
     @Prop({
         required: true,
     })
@@ -43,8 +40,8 @@ export class ActivityLog{
     status: string;
 
     @Prop({
-        required : false,
-        type : {type : mongoose.Schema.Types.ObjectId, ref : 'organization'}
+        required: false,
+        type: { type: mongoose.Schema.Types.ObjectId, ref: 'organization' }
     })
     assignTo: OrganizationSchemaCreator;
 
@@ -58,8 +55,15 @@ export class ActivityLog{
     })
     visibility: string;
 
-    @Prop({})
-    attachments : Attachments[]
+    @Prop(
+        {type : [AttachmentSchema]}
+    )
+    attachments: Attachment[]
+
+    @Prop({
+        type :  mongoose.Schema.Types.ObjectId, ref: 'user'
+    })
+    userId : UserSchemaCreator
 }
 
 export const ActivityLogSchema = SchemaFactory.createForClass(
@@ -67,13 +71,13 @@ export const ActivityLogSchema = SchemaFactory.createForClass(
 )
 
 @Schema({
-    timestamps : true
+    timestamps: true
 })
-export class DueDateLog{
+export class DueDateLog {
     @Prop({
-        type : Date
+        type: Date
     })
-    dueDate : Date
+    dueDate: Date
 }
 
 export const DueDateLogSchema = SchemaFactory.createForClass(
@@ -81,13 +85,13 @@ export const DueDateLogSchema = SchemaFactory.createForClass(
 )
 
 @Schema({
-    timestamps : true
+    timestamps: true
 })
-export class StatusLog{
+export class StatusLog {
     @Prop({
-        type : String
+        type: String
     })
-    status : Status
+    status: Status
 }
 
 export const StatusLogSchema = SchemaFactory.createForClass(
@@ -97,103 +101,106 @@ export const StatusLogSchema = SchemaFactory.createForClass(
 
 
 @Schema({
-    timestamps : true
+    timestamps: true
 })
 export class ActivitySchemaCreator {
 
     @Prop({
-        type : mongoose.Schema.Types.ObjectId, ref : 'activityTypes',
+        type: mongoose.Schema.Types.ObjectId, ref: 'activityTypes',
     })
-    activityType : ActivityTypesSchemaCreator
+    activityType: ActivityTypesSchemaCreator
 
     @Prop({
-        type : mongoose.Schema.Types.ObjectId, ref : 'activityRelatedType',
+        type: mongoose.Schema.Types.ObjectId, ref: 'activityRelatedType',
     })
-    activityRelatedTo : ActivityRelatedTypesSchemaCreator
+    activityRelatedTo: ActivityRelatedTypesSchemaCreator
 
     @Prop({
-        type : [{type : mongoose.Schema.Types.ObjectId, ref : 'organization'}]
+        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'organization' }]
     })
-    organization : OrganizationSchemaCreator[]
+    organization: OrganizationSchemaCreator[]
 
     @Prop({
-        type : mongoose.Schema.Types.ObjectId, ref : MODEL_ENUMS.ACTIVITY_ENTRY_TYPE,
+        type: mongoose.Schema.Types.ObjectId, ref: MODEL_ENUMS.ACTIVITY_ENTRY_TYPE,
     })
-    activitEntryType : ActivityEntryTypesSchemaCreator
+    activitEntryType: ActivityEntryTypesSchemaCreator
 
     @Prop({
-        type : mongoose.Schema.Types.ObjectId, ref : MODEL_ENUMS.ACTIVITY_SECTORS,
+        type: mongoose.Schema.Types.ObjectId, ref: MODEL_ENUMS.ACTIVITY_SECTORS,
     })
-    activitySector : ActivitySectorsSchemaCreator
+    activitySector: ActivitySectorsSchemaCreator
 
     @Prop({
-        type : mongoose.Schema.Types.ObjectId, ref : MODEL_ENUMS.ACTIVITY_SCOPES,
+        type: mongoose.Schema.Types.ObjectId, ref: MODEL_ENUMS.ACTIVITY_SCOPES,
     })
-    activityScope : ActivityScopesSchemaCreator
+    activityScope: ActivityScopesSchemaCreator
 
     @Prop({
-        required :true,
+        required: true,
     })
-    title : string
+    title: string
 
     @Prop({
-        required :true,
+        required: true,
     })
-    description : string
+    description: string
+
+    @Prop(
+        {type : [AttachmentSchema]}
+    )
+    attachments: Attachment[]
 
     @Prop({
-        type : AttachmentsSchema
+        required: true,
+        default: 'NONE'
     })
-    attachments : Attachments[]
+    priority: Priority
 
     @Prop({
-        required : true,
-        default : 'NONE'
+        required: true,
     })
-    priority : Priority
+    status: Status
 
     @Prop({
-        required : true,
+        type: [ActivityLogSchema]
     })
-    status : Status
+    activityLog: ActivityLog[]
 
     @Prop({
-        type : [ActivityLogSchema]
+        type: mongoose.Schema.Types.ObjectId, ref: 'user'
     })
-    activityLog : ActivityLog[]
+    createdBy: UserSchemaCreator
 
     @Prop({
-        type : mongoose.Schema.Types.ObjectId, ref : 'user'
+        type: Date
     })
-    createdBy : UserSchemaCreator
+    dueDate: Date
 
     @Prop({
-        type : Date
+        type: [DueDateLogSchema]
     })
-    dueDate : Date
+    dueDateLog: DueDateLog[]
 
     @Prop({
-        type : [DueDateLogSchema]
+        type: [StatusLogSchema]
     })
-    dueDateLog : DueDateLog[]
+    statusLog: StatusLog[]
 
     @Prop({
-        type : [StatusLogSchema]
+        type: Boolean,
+        default: false
     })
-    statusLog : StatusLog[]
-
-    @Prop({})
-    isArchive : Boolean
+    isArchive: Boolean
 
     @Prop({
-        type : mongoose.Schema.Types.ObjectId , ref : 'organization'
+        type: mongoose.Schema.Types.ObjectId, ref: 'organization'
     })
-    createdByOrganization : OrganizationSchemaCreator
+    createdByOrganization: OrganizationSchemaCreator
 
     @Prop({
-        type : Number
+        type: Number
     })
-    activityNumber : number
+    activityNumber: number
 
 }
 

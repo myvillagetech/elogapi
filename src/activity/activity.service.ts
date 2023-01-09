@@ -16,7 +16,10 @@ export class ActivityService {
     }
 
     async createActivity(activityDto: ActivityDto): Promise<ActivityDocument> {
-        const newActivity = await new this.activityModel(activityDto);
+        let toDay = new Date()
+        const dueDate = new Date(toDay.setDate(toDay.getDate()+21));
+        const newActivity = await new this.activityModel({...activityDto,dueDate : dueDate,dueDateLog : {dueDate : dueDate} });
+        // newActivity.markModified('attachments');
         return newActivity.save()
     }
 
@@ -38,6 +41,24 @@ export class ActivityService {
                     as: 'organizationData',
                     pipeline: [{ $project: { password: 0 } }],
                 },
+            },
+            {
+                $lookup: {
+                    from: MODEL_ENUMS.ORGANIZATIONS,
+                    localField: 'createdByOrganization',
+                    foreignField: '_id',
+                    as: 'createdByOrganizationData',
+                    pipeline: [{ $project: { password: 0 } }],
+                },
+            },
+            {
+                $lookup: {
+                    from: MODEL_ENUMS.USERS,
+                    localField: 'activityLog.userId',
+                    foreignField: '_id',
+                    as: 'userData',
+                    pipeline: [{ $project: { password: 0 } }],
+                }
             },
             {
                 $match: { _id: new Types.ObjectId(activityId) }
@@ -83,7 +104,7 @@ export class ActivityService {
 
     async updateActivityLogByActivityId(activityId: string, activityLog: ActivityLogDto): Promise<any> {
 
-        const queryObject = { $push: { activityLog: activityLog } };
+        const queryObject = { $push: { "activityLog": {...activityLog, userId: new Types.ObjectId(activityLog.userId)} } };
 
         if(activityLog.attachments){
             queryObject.$push["attachments"] = {attachments : activityLog.attachments}
@@ -104,7 +125,7 @@ export class ActivityService {
         console.log(queryObject);
 
         const result = await this.activityModel.updateOne(
-            { "_id ": activityId },
+            { "_id": new Types.ObjectId(activityId) },
             queryObject
 
         );
@@ -114,5 +135,9 @@ export class ActivityService {
         }
 
         return result;
+    }
+
+    async activitySerachCriteria(){
+
     }
 }
