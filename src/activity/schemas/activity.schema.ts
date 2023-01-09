@@ -76,6 +76,10 @@ export class DueDateLog{
     dueDate : Date
 }
 
+export const DueDateLogSchema = SchemaFactory.createForClass(
+    DueDateLog
+)
+
 @Schema({
     timestamps : true
 })
@@ -85,6 +89,10 @@ export class StatusLog{
     })
     status : Status
 }
+
+export const StatusLogSchema = SchemaFactory.createForClass(
+    StatusLog
+)
 
 
 
@@ -133,7 +141,9 @@ export class ActivitySchemaCreator {
     })
     description : string
 
-    @Prop({})
+    @Prop({
+        type : AttachmentsSchema
+    })
     attachments : Attachments[]
 
     @Prop({
@@ -147,7 +157,9 @@ export class ActivitySchemaCreator {
     })
     status : Status
 
-    @Prop({})
+    @Prop({
+        type : [ActivityLogSchema]
+    })
     activityLog : ActivityLog[]
 
     @Prop({
@@ -160,10 +172,14 @@ export class ActivitySchemaCreator {
     })
     dueDate : Date
 
-    @Prop()
+    @Prop({
+        type : [DueDateLogSchema]
+    })
     dueDateLog : DueDateLog[]
 
-    @Prop()
+    @Prop({
+        type : [StatusLogSchema]
+    })
     statusLog : StatusLog[]
 
     @Prop({})
