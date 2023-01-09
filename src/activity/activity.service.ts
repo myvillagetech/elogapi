@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { MODEL_ENUMS } from 'src/shared/enums/model.enums';
+import { ActivityLogDto } from './dto/activity-log.dto';
 import { ActivityDto } from './dto/activity.dto';
 import { ArchiveActivityDto, UpdateActivityDto } from './dto/update-activity.dto';
 import { ActivityDocument } from './schemas/activity.schema';
@@ -10,24 +11,24 @@ import { ActivityDocument } from './schemas/activity.schema';
 export class ActivityService {
 
     @InjectModel(MODEL_ENUMS.ACTIVITIES) private activityModel: Model<ActivityDocument>
-    constructor(){
+    constructor() {
 
     }
 
-    async createActivity(activityDto : ActivityDto) : Promise<ActivityDocument>{
+    async createActivity(activityDto: ActivityDto): Promise<ActivityDocument> {
         const newActivity = await new this.activityModel(activityDto);
         return newActivity.save()
     }
 
-    async getAllActivities():Promise<ActivityDocument[]>{
+    async getAllActivities(): Promise<ActivityDocument[]> {
         const activityData = await this.activityModel.find();
-        if(!activityData || activityData.length ===0){
+        if (!activityData || activityData.length === 0) {
             throw new NotFoundException('Activity data not found');
         }
         return activityData;
     }
 
-    async getActivityByActivityId(activityId : string):Promise<any>{
+    async getActivityByActivityId(activityId: string): Promise<any> {
         const activity = await this.activityModel.aggregate([
             {
                 $lookup: {
@@ -39,44 +40,79 @@ export class ActivityService {
                 },
             },
             {
-                $match : {_id : new Types.ObjectId(activityId)}
+                $match: { _id: new Types.ObjectId(activityId) }
             }
         ])
 
-        if(!activity){
+        if (!activity) {
             throw new NotFoundException('Activity data not found');
         }
 
         return activity
     }
 
-    async updateActivityByActivityId(activityId : string, activityData : UpdateActivityDto):Promise<ActivityDocument>{
-        const updatedActivity = await this.activityModel.findByIdAndUpdate(activityId,activityData);
+    async updateActivityByActivityId(activityId: string, activityData: UpdateActivityDto): Promise<ActivityDocument> {
+        const updatedActivity = await this.activityModel.findByIdAndUpdate(activityId, activityData);
 
-        if(!updatedActivity){
+        if (!updatedActivity) {
             throw new NotFoundException('Activity data not found');
         }
 
         return updatedActivity
     }
 
-    async deleteActivityByActivityId(activityId:string):Promise<any>{
+    async deleteActivityByActivityId(activityId: string): Promise<any> {
         const result = await this.activityModel.findByIdAndDelete(activityId);
 
-        if(!result){
+        if (!result) {
             throw new NotFoundException('Activity data not found');
         }
 
         return result
     }
 
-    async archiveActivity(activityId:string,activityDetails : ArchiveActivityDto):Promise<any>{
-        const result = await this.activityModel.findByIdAndUpdate(activityId,activityDetails);
+    async archiveActivity(activityId: string, activityDetails: ArchiveActivityDto): Promise<any> {
+        const result = await this.activityModel.findByIdAndUpdate(activityId, activityDetails);
 
-        if(!result){
+        if (!result) {
             throw new NotFoundException('Activity data not found');
         }
 
         return result
+    }
+
+    async updateActivityLogByActivityId(activityId: string, activityLog: ActivityLogDto): Promise<any> {
+
+        const queryObject = { $push: { activityLog: activityLog } };
+
+        if(activityLog.attachments){
+            queryObject.$push["attachments"] = {attachments : activityLog.attachments}
+        }
+
+        if(activityLog.visibility){
+            queryObject["visibility"] = activityLog.visibility
+        }
+
+        if (activityLog.priority) {
+            queryObject["priority"] = activityLog.priority
+        }
+
+        if (activityLog.status) {
+            queryObject["status"] = activityLog.status;
+            queryObject.$push["statusLog"] = {status: activityLog.status}
+        }
+        console.log(queryObject);
+
+        const result = await this.activityModel.updateOne(
+            { "_id ": activityId },
+            queryObject
+
+        );
+
+        if (!result) {
+            throw new NotFoundException('Activity data not found');
+        }
+
+        return result;
     }
 }

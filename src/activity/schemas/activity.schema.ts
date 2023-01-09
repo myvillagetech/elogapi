@@ -4,7 +4,7 @@ import { ActivityEntryTypesSchemaCreator, ActivityRelatedTypesSchemaCreator, Act
 import { OrganizationSchemaCreator } from "src/organizations/schemas/organizations.schema";
 import { MODEL_ENUMS } from "src/shared/enums/model.enums";
 import { UserSchemaCreator } from "src/users/schemas/user.schemas";
-
+import { Priority, Status } from "../enums/activity.enums";
 
 @Schema({
     timestamps : true
@@ -38,22 +38,23 @@ export class ActivityLog{
     message: string;
 
     @Prop({
-        required: true,
+        required: false,
     })
     status: string;
 
     @Prop({
+        required : false,
         type : {type : mongoose.Schema.Types.ObjectId, ref : 'organization'}
     })
     assignTo: OrganizationSchemaCreator;
 
     @Prop({
-        required: true,
+        required: false,
     })
     priority: string;
 
     @Prop({
-        required: true,
+        required: false,
     })
     visibility: string;
 
@@ -75,6 +76,10 @@ export class DueDateLog{
     dueDate : Date
 }
 
+export const DueDateLogSchema = SchemaFactory.createForClass(
+    DueDateLog
+)
+
 @Schema({
     timestamps : true
 })
@@ -82,8 +87,12 @@ export class StatusLog{
     @Prop({
         type : String
     })
-    dueDate : string
+    status : Status
 }
+
+export const StatusLogSchema = SchemaFactory.createForClass(
+    StatusLog
+)
 
 
 
@@ -132,20 +141,25 @@ export class ActivitySchemaCreator {
     })
     description : string
 
-    @Prop({})
+    @Prop({
+        type : AttachmentsSchema
+    })
     attachments : Attachments[]
 
     @Prop({
-        required : true
+        required : true,
+        default : 'NONE'
     })
-    priority : string
+    priority : Priority
 
     @Prop({
         required : true,
     })
-    status : string
+    status : Status
 
-    @Prop({})
+    @Prop({
+        type : [ActivityLogSchema]
+    })
     activityLog : ActivityLog[]
 
     @Prop({
@@ -158,10 +172,14 @@ export class ActivitySchemaCreator {
     })
     dueDate : Date
 
-    @Prop()
+    @Prop({
+        type : [DueDateLogSchema]
+    })
     dueDateLog : DueDateLog[]
 
-    @Prop()
+    @Prop({
+        type : [StatusLogSchema]
+    })
     statusLog : StatusLog[]
 
     @Prop({})
@@ -171,6 +189,11 @@ export class ActivitySchemaCreator {
         type : mongoose.Schema.Types.ObjectId , ref : 'organization'
     })
     createdByOrganization : OrganizationSchemaCreator
+
+    @Prop({
+        type : Number
+    })
+    activityNumber : number
 
 }
 

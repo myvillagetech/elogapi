@@ -35,3 +35,17 @@ export class CreateActivityTypeDto {
     })
     isDefault : boolean
 }
+
+export class BulkUpdateActivityTypesDto{
+    @IsString()
+    @ApiProperty({
+        type : String
+    })
+    id: string
+    
+    @IsBoolean()
+    @ApiProperty({
+        type : Boolean
+    })
+    isActive : boolean
+}
