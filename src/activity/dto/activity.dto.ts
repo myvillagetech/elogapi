@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
     IsNotEmpty,
 } from 'class-validator';
-import { Priority, Status } from './activity.enums';
+import { Priority, Status } from '../enums/activity.enums';
 
 
 export class AttachmentsDto {

@@ -1,7 +1,7 @@
 import { Controller ,Post,Get,Res,Body, HttpStatus, Put, Param, Delete} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { ActivityMasterdataService } from './activity-masterdata.service';
-import { CreateActivityTypeDto } from './dto/activity-masterdata.dto';
+import { BulkUpdateActivityTypesDto, CreateActivityTypeDto } from './dto/activity-masterdata.dto';
 
 
 @Controller('activity-masterdata')
@@ -117,4 +117,22 @@ export class ActivityMasterdataController {
             })
         }
     }
+
+    // @Put("bulkupdate/activityType")
+    // async bulkUpdateActivityTypes(@Res() response, @Body() activityTypeDto : BulkUpdateActivityTypesDto[], @Param('id') activityTypeId : string){
+    //     try {
+    //         const activityData = await this.activitymasterDataService.bulkUpdateActivityType(activityTypeDto);
+    //         return response.status(HttpStatus.OK).json({
+    //             message : 'Activity Type updated Successfully',
+    //             data : activityData,
+    //             success : true
+    //         });
+    //     }catch(error){
+    //         return response.status(error.status).json({
+    //             message : 'Unable to update activity type',
+    //             error : error,
+    //             success : false
+    //         })
+    //     }
+    // }
 }

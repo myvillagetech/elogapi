@@ -1,6 +1,7 @@
 import { Controller,Post, Res, Body, HttpStatus, Get, Param , Put, Delete} from '@nestjs/common';
 import {  ApiTags } from '@nestjs/swagger';
 import { ActivityService } from './activity.service';
+import { ActivityLogDto } from './dto/activity-log.dto';
 import { ActivityDto } from './dto/activity.dto';
 import { ArchiveActivityDto, UpdateActivityDto } from './dto/update-activity.dto';
 
@@ -113,6 +114,24 @@ export class ActivityController {
         }catch(error){
             return response.status(error.status).json({
                 message : 'Unable to Archive Activity',
+                error : error,
+                success : false
+            })
+        }
+    }
+
+    @Put("activityLog/:activityId")
+    async updateActivityLog(@Res() response, @Body() activityLog : ActivityLogDto,  @Param('activityId') activityId : string){
+        try{
+            const result = await this.activityService.updateActivityLogByActivityId(activityId,activityLog);
+            return response.status(HttpStatus.OK).json({
+                message : 'Activity Log Updated Successfully',
+                data : result,
+                success : true
+            });
+        }catch(error){
+            return response.status(error.status).json({
+                message : 'Unable to update Activity Log',
                 error : error,
                 success : false
             })

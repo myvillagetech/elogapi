@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { MODEL_ENUMS } from 'src/shared/enums/model.enums';
+import { ActivityLogDto } from './dto/activity-log.dto';
 import { ActivityDto } from './dto/activity.dto';
 import { ArchiveActivityDto, UpdateActivityDto } from './dto/update-activity.dto';
 import { ActivityDocument } from './schemas/activity.schema';
@@ -78,5 +79,28 @@ export class ActivityService {
         }
 
         return result
+    }
+
+    async updateActivityLogByActivityId(activityId :string, activityLog : ActivityLogDto):Promise<any>{
+        // if(activityLog.status){
+        //     await this.activityModel.updateOne(
+        //         {"_id " : activityId},
+        //         {$push : {activityLog : activityLog.status}}
+        //     )
+        // }
+        // if(activityLog.priority){
+        //     await this.activityModel.findByIdAndUpdate(activityId,{"priority": activityLog.priority})
+        // }
+        
+        const result = await this.activityModel.updateOne(
+            {"_id " : activityId},
+            {$push : {activityLog : activityLog}}
+        );
+
+        if(!result){
+            throw new NotFoundException('Activity data not found');
+        }
+
+        return result;
     }
 }

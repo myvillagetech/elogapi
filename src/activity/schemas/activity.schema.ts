@@ -4,8 +4,7 @@ import { ActivityEntryTypesSchemaCreator, ActivityRelatedTypesSchemaCreator, Act
 import { OrganizationSchemaCreator } from "src/organizations/schemas/organizations.schema";
 import { MODEL_ENUMS } from "src/shared/enums/model.enums";
 import { UserSchemaCreator } from "src/users/schemas/user.schemas";
-import { Priority, Status } from "../dto/activity.enums";
-
+import { Priority, Status } from "../enums/activity.enums";
 
 @Schema({
     timestamps : true
@@ -39,22 +38,23 @@ export class ActivityLog{
     message: string;
 
     @Prop({
-        required: true,
+        required: false,
     })
     status: string;
 
     @Prop({
+        required : false,
         type : {type : mongoose.Schema.Types.ObjectId, ref : 'organization'}
     })
     assignTo: OrganizationSchemaCreator;
 
     @Prop({
-        required: true,
+        required: false,
     })
     priority: string;
 
     @Prop({
-        required: true,
+        required: false,
     })
     visibility: string;
 
@@ -173,6 +173,11 @@ export class ActivitySchemaCreator {
         type : mongoose.Schema.Types.ObjectId , ref : 'organization'
     })
     createdByOrganization : OrganizationSchemaCreator
+
+    @Prop({
+        type : Number
+    })
+    activityNumber : number
 
 }
 

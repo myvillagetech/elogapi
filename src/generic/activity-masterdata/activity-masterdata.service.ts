@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { MODEL_ENUMS } from 'src/shared/enums/model.enums';
-import { CreateActivityTypeDto } from './dto/activity-masterdata.dto';
+import {BulkUpdateActivityTypesDto, CreateActivityTypeDto } from './dto/activity-masterdata.dto';
 import { ActivityEntryTypesDocument, ActivityRelatedTypesDocument, ActivityScopesDocument, ActivitySectorsDocument, ActivityTypesDocument } from './schemas/activity-masterdata.schema';
 
 @Injectable()
@@ -67,4 +67,22 @@ export class ActivityMasterdataService {
 
         return result;
     }
+
+    // async bulkUpdateActivityType(activityTypes : BulkUpdateActivityTypesDto[]):Promise<any>{
+    //     let queries = activityTypes.map((activityType:BulkUpdateActivityTypesDto)=>{
+    //         return { updateOne: {
+    //             filter: { _id: activityType.id },
+    //             update: { isAcvitve: activityType.isActive }
+    //         }
+    //         };
+    //     })
+
+    //     const result  = await this.activityTypesDocument.bulkWrite(queries);
+
+    //     if(!result){
+    //         throw new NotFoundException("Unable to update activity types");
+    //     }
+
+    //     return result;
+    // }
 }
