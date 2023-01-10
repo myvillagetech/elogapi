@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-    IsNotEmpty,
+    IsNotEmpty, IsOptional,
 } from 'class-validator';
 import { Priority, Status } from '../enums/activity.enums';
 
@@ -74,6 +74,7 @@ export class ActivityDto{
     })
     readonly description: string;
 
+    @IsOptional()
     @ApiProperty({
         type: [AttachmentsDto]
     })
@@ -100,7 +101,8 @@ export class ActivityDto{
     readonly createdBy: string;
 
     @ApiProperty({
-        type:Boolean
+        type:Boolean,
+        default : false
     })
     readonly isArchive : boolean
 

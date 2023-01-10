@@ -36,4 +36,9 @@ export class ActivityLogDto{
         type : [AttachmentsDto]
     })
     attachments : AttachmentsDto[]
+
+    @ApiProperty({
+        type : String
+    })
+    userId : string
 }
