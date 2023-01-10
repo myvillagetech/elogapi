@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNotEmpty } from "class-validator";
+import { Status } from "../enums/activity.enums";
 import { AttachmentsDto } from "./activity.dto";
 
 export class UpdateActivityDto{
@@ -68,4 +69,13 @@ export class ArchiveActivityDto{
         type:Boolean
     })
     isArchive : boolean
+}
+
+export class UpdateActivityStatusDto{
+    @IsNotEmpty()
+    @ApiProperty({
+        type: String,
+        enum : Status
+    })
+    status : Status
 }

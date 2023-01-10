@@ -4,7 +4,7 @@ import { Model, Types } from 'mongoose';
 import { MODEL_ENUMS } from 'src/shared/enums/model.enums';
 import { ActivityLogDto } from './dto/activity-log.dto';
 import { ActivityDto } from './dto/activity.dto';
-import { ArchiveActivityDto, UpdateActivityDto } from './dto/update-activity.dto';
+import { ArchiveActivityDto, UpdateActivityDto, UpdateActivityStatusDto } from './dto/update-activity.dto';
 import { ActivityDocument } from './schemas/activity.schema';
 
 @Injectable()
@@ -136,6 +136,20 @@ export class ActivityService {
 
         return result;
     }
+
+    async updateActivityStatus(activityId : string , activityStatus : UpdateActivityStatusDto):Promise<any>{
+
+        const result = await this.activityModel.findByIdAndUpdate(activityId,activityStatus, { new: true });
+
+        if (!result) {
+            throw new NotFoundException('Activity data not found');
+        }
+
+        return result;
+
+    }
+
+
 
     async activitySerachCriteria(){
 

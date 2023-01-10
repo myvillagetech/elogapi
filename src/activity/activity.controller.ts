@@ -1,9 +1,10 @@
 import { Controller,Post, Res, Body, HttpStatus, Get, Param , Put, Delete} from '@nestjs/common';
 import {  ApiTags } from '@nestjs/swagger';
+import { response } from 'express';
 import { ActivityService } from './activity.service';
 import { ActivityLogDto } from './dto/activity-log.dto';
 import { ActivityDto } from './dto/activity.dto';
-import { ArchiveActivityDto, UpdateActivityDto } from './dto/update-activity.dto';
+import { ArchiveActivityDto, UpdateActivityDto, UpdateActivityStatusDto } from './dto/update-activity.dto';
 
 @Controller('activity')
 @ApiTags('activity')
@@ -132,6 +133,24 @@ export class ActivityController {
         }catch(error){
             return response.status(error.status).json({
                 message : 'Unable to update Activity Log',
+                error : error,
+                success : false
+            })
+        }
+    }
+
+    @Put("update/activityStatus/:activityId")
+    async updateActivityStatus(@Res() response, @Body() activityDetails : UpdateActivityStatusDto, @Param('activityId') activityId : string){
+        try{
+            const result = await this.activityService.updateActivityStatus(activityId,activityDetails);
+            return response.status(HttpStatus.OK).json({
+                message : 'Activity Status Updated Successfully',
+                data : result,
+                success : true
+            });
+        }catch(error){
+            return response.status(error.status).json({
+                message : 'Unable to update Activity Status',
                 error : error,
                 success : false
             })
