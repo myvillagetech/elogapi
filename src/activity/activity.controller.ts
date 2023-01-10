@@ -156,4 +156,22 @@ export class ActivityController {
             })
         }
     }
+
+    @Get("archive/activities")
+    async getAllArchivedActivities(@Res() response){
+        try{
+            const result = await this.activityService.getAllArchiveActivities();
+            return response.status(HttpStatus.OK).json({
+                message : 'Archived Activities fetchedSuccessfully',
+                data : result,
+                success : true
+            });
+        }catch(error){
+            return response.status(error.status).json({
+                message : 'Unable to fetch archived Activities',
+                error : error,
+                success : false
+            })
+        }
+    }
 }

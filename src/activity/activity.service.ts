@@ -149,6 +149,16 @@ export class ActivityService {
 
     }
 
+    async getAllArchiveActivities():Promise<ActivityDocument[]>{
+        const results = await this.activityModel.find({isArchive : true});
+
+        if (!results) {
+            throw new NotFoundException('Activity data not found');
+        }
+
+        return results;
+    }
+
 
 
     async activitySerachCriteria(){
