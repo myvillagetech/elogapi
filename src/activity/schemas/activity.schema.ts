@@ -1,32 +1,33 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import mongoose, { Date, modelNames } from "mongoose";
-import { ActivityEntryTypesSchemaCreator, ActivityRelatedTypesSchemaCreator, ActivityScopesSchemaCreator, ActivitySectorsSchemaCreator, ActivityTypesSchemaCreator } from "src/generic/activity-masterdata/schemas/activity-masterdata.schema";
-import { OrganizationSchemaCreator } from "src/organizations/schemas/organizations.schema";
-import { MODEL_ENUMS } from "src/shared/enums/model.enums";
-import { UserSchemaCreator } from "src/users/schemas/user.schemas";
-import { Priority, Status } from "../enums/activity.enums";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import mongoose, { Date, modelNames } from 'mongoose';
+import {
+    ActivityEntryTypesSchemaCreator,
+    ActivityRelatedTypesSchemaCreator,
+    ActivityScopesSchemaCreator,
+    ActivitySectorsSchemaCreator,
+    ActivityTypesSchemaCreator,
+} from 'src/generic/activity-masterdata/schemas/activity-masterdata.schema';
+import { OrganizationSchemaCreator } from 'src/organizations/schemas/organizations.schema';
+import { MODEL_ENUMS } from 'src/shared/enums/model.enums';
+import { UserSchemaCreator } from 'src/users/schemas/user.schemas';
+import { Priority, Status } from '../enums/activity.enums';
 
 @Schema({
-    timestamps: true
+    timestamps: true,
 })
 export class Attachment {
-    @Prop({
-    })
+    @Prop({})
     name: string;
-    @Prop({
-    })
+    @Prop({})
     size: string;
-    @Prop({
-    })
+    @Prop({})
     path: string;
 }
 
-export const AttachmentSchema = SchemaFactory.createForClass(
-    Attachment
-)
+export const AttachmentSchema = SchemaFactory.createForClass(Attachment);
 
 @Schema({
-    timestamps: true
+    timestamps: true,
 })
 export class ActivityLog {
     @Prop({
@@ -41,7 +42,7 @@ export class ActivityLog {
 
     @Prop({
         required: false,
-        type: { type: mongoose.Schema.Types.ObjectId, ref: 'organization' }
+        type: { type: mongoose.Schema.Types.ObjectId, ref: 'organization' },
     })
     assignTo: OrganizationSchemaCreator;
 
@@ -55,159 +56,156 @@ export class ActivityLog {
     })
     visibility: string;
 
-    @Prop(
-        {type : [AttachmentSchema]}
-    )
-    attachments: Attachment[]
+    @Prop({ type: [AttachmentSchema] })
+    attachments: Attachment[];
 
     @Prop({
-        type :  mongoose.Schema.Types.ObjectId, ref: 'user'
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user',
     })
-    userId : UserSchemaCreator
+    userId: UserSchemaCreator;
 }
 
-export const ActivityLogSchema = SchemaFactory.createForClass(
-    ActivityLog
-)
+export const ActivityLogSchema = SchemaFactory.createForClass(ActivityLog);
 
 @Schema({
-    timestamps: true
+    timestamps: true,
 })
 export class DueDateLog {
     @Prop({
-        type: Date
+        type: Date,
     })
-    dueDate: Date
+    dueDate: Date;
 }
 
-export const DueDateLogSchema = SchemaFactory.createForClass(
-    DueDateLog
-)
+export const DueDateLogSchema = SchemaFactory.createForClass(DueDateLog);
 
 @Schema({
-    timestamps: true
+    timestamps: true,
 })
 export class StatusLog {
     @Prop({
-        type: String
+        type: String,
     })
-    status: Status
+    status: Status;
 }
 
-export const StatusLogSchema = SchemaFactory.createForClass(
-    StatusLog
-)
-
-
+export const StatusLogSchema = SchemaFactory.createForClass(StatusLog);
 
 @Schema({
-    timestamps: true
+    timestamps: true,
 })
 export class ActivitySchemaCreator {
+    @Prop({
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'activityTypes',
+    })
+    activityType: ActivityTypesSchemaCreator;
 
     @Prop({
-        type: mongoose.Schema.Types.ObjectId, ref: 'activityTypes',
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'activityRelatedType',
     })
-    activityType: ActivityTypesSchemaCreator
+    activityRelatedTo: ActivityRelatedTypesSchemaCreator;
 
     @Prop({
-        type: mongoose.Schema.Types.ObjectId, ref: 'activityRelatedType',
+        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'organization' }],
     })
-    activityRelatedTo: ActivityRelatedTypesSchemaCreator
+    organization: OrganizationSchemaCreator[];
 
     @Prop({
-        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'organization' }]
+        type: mongoose.Schema.Types.ObjectId,
+        ref: MODEL_ENUMS.ACTIVITY_ENTRY_TYPE,
     })
-    organization: OrganizationSchemaCreator[]
+    activitEntryType: ActivityEntryTypesSchemaCreator;
 
     @Prop({
-        type: mongoose.Schema.Types.ObjectId, ref: MODEL_ENUMS.ACTIVITY_ENTRY_TYPE,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: MODEL_ENUMS.ACTIVITY_SECTORS,
     })
-    activitEntryType: ActivityEntryTypesSchemaCreator
+    activitySector: ActivitySectorsSchemaCreator;
 
     @Prop({
-        type: mongoose.Schema.Types.ObjectId, ref: MODEL_ENUMS.ACTIVITY_SECTORS,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: MODEL_ENUMS.ACTIVITY_SCOPES,
     })
-    activitySector: ActivitySectorsSchemaCreator
-
-    @Prop({
-        type: mongoose.Schema.Types.ObjectId, ref: MODEL_ENUMS.ACTIVITY_SCOPES,
-    })
-    activityScope: ActivityScopesSchemaCreator
-
-    @Prop({
-        required: true,
-    })
-    title: string
-
-    @Prop({
-        required: true,
-    })
-    description: string
-
-    @Prop(
-        {type : [AttachmentSchema]}
-    )
-    attachments: Attachment[]
-
-    @Prop({
-        required: true,
-        default: 'NONE'
-    })
-    priority: Priority
+    activityScope: ActivityScopesSchemaCreator;
 
     @Prop({
         required: true,
     })
-    status: Status
+    title: string;
 
     @Prop({
-        type: [ActivityLogSchema]
+        required: true,
     })
-    activityLog: ActivityLog[]
+    description: string;
+
+    @Prop({ type: [AttachmentSchema] })
+    attachments: Attachment[];
 
     @Prop({
-        type: mongoose.Schema.Types.ObjectId, ref: 'user'
+        required: true,
+        default: 'NONE',
     })
-    createdBy: UserSchemaCreator
+    priority: Priority;
 
     @Prop({
-        type: Date
+        required: true,
     })
-    dueDate: Date
+    status: Status;
 
     @Prop({
-        type: [DueDateLogSchema]
+        type: [ActivityLogSchema],
     })
-    dueDateLog: DueDateLog[]
+    activityLog: ActivityLog[];
 
     @Prop({
-        type: [StatusLogSchema]
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user',
     })
-    statusLog: StatusLog[]
+    createdBy: UserSchemaCreator;
+
+    @Prop({
+        type: Date,
+    })
+    dueDate: Date;
+
+    @Prop({
+        type: [DueDateLogSchema],
+    })
+    dueDateLog: DueDateLog[];
+
+    @Prop({
+        type: [StatusLogSchema],
+    })
+    statusLog: StatusLog[];
 
     @Prop({
         type: Boolean,
-        default: false
+        default: false,
     })
-    isArchive: Boolean
+    isArchive: boolean;
 
     @Prop({
-        type: mongoose.Schema.Types.ObjectId, ref: 'organization'
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'organization',
     })
-    createdByOrganization: OrganizationSchemaCreator
+    createdByOrganization: OrganizationSchemaCreator;
 
     @Prop({
-        type: Number
+        type: Number,
     })
-    activityNumber: number
+    activityNumber: number;
 
     @Prop({
-        type : mongoose.Schema.Types.ObjectId, ref: 'organization'
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'organization',
     })
-    assignTo : OrganizationSchemaCreator
-
+    assignTo: OrganizationSchemaCreator;
 }
 
-export type ActivityDocument = ActivitySchemaCreator & Document
-export const ActivitySchema = SchemaFactory.createForClass(ActivitySchemaCreator)
+export type ActivityDocument = ActivitySchemaCreator & Document;
+export const ActivitySchema = SchemaFactory.createForClass(
+    ActivitySchemaCreator,
+);

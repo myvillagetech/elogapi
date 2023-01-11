@@ -1,84 +1,81 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { CriteriaWithPaginationAndSorting } from "src/shared/DTOs/criteiaWithPaginationAndSorting";
+import { ApiProperty } from '@nestjs/swagger';
+import { CriteriaWithPaginationAndSorting } from 'src/shared/DTOs/criteiaWithPaginationAndSorting';
 
-
-export class DateFilter{
+export class DateFilter {
     @ApiProperty({
-        type : String
+        type: String,
     })
-    readonly fromDate : string;
+    readonly fromDate: string;
 
     @ApiProperty({
-        type : String
+        type: String,
     })
-    readonly toDate : string;
+    readonly toDate: string;
 }
 
-export class ActivitySearchCriteriaDto extends CriteriaWithPaginationAndSorting{
+export class ActivitySearchCriteriaDto extends CriteriaWithPaginationAndSorting {
+    @ApiProperty({
+        type: String,
+    })
+    readonly organization: string;
 
     @ApiProperty({
-        type : String
+        type: String,
     })
-    readonly organization : string;
+    readonly userId: string;
 
     @ApiProperty({
-        type : String
+        type: Array<string>,
     })
-    readonly userId : string;
+    readonly status: string[];
 
     @ApiProperty({
-        type : Array<String>
+        type: DateFilter,
     })
-    readonly status : string[];
+    readonly createdDate: DateFilter;
 
     @ApiProperty({
-        type : DateFilter
+        type: DateFilter,
     })
-    readonly createdDate : DateFilter;
+    readonly dueDate: DateFilter;
 
     @ApiProperty({
-        type : DateFilter
+        type: Array<string>,
     })
-    readonly dueDate : DateFilter;
+    readonly types: string[];
 
     @ApiProperty({
-        type : Array<String>
+        type: Array<string>,
     })
-    readonly types : string[];
-    
-    @ApiProperty({
-        type : Array<String>
-    })
-    readonly entryTypes : string[];
+    readonly entryTypes: string[];
 
     @ApiProperty({
-        type : Array<String>
+        type: Array<string>,
     })
-    readonly geography : string[];
+    readonly geography: string[];
 
     @ApiProperty({
-        type : Array<String>
+        type: Array<string>,
     })
-    readonly scope : string[];
+    readonly scope: string[];
 
     @ApiProperty({
-        type : Array<String>
+        type: Array<string>,
     })
-    readonly priority : string[];
+    readonly priority: string[];
 
     @ApiProperty({
-        type : Array<String>
+        type: Array<string>,
     })
-    readonly createdBy : string[];
+    readonly createdBy: string[];
 
     @ApiProperty({
-        type : Array<String>
+        type: Array<string>,
     })
-    readonly assignTo : string[];
+    readonly assignTo: string[];
 
     @ApiProperty({
-        type : Boolean
+        type: Boolean,
     })
-    readonly isArchive : Boolean
+    readonly isArchive: boolean;
 }
-

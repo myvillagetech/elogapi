@@ -1,24 +1,23 @@
-
-import { ApiProperty } from "@nestjs/swagger"
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CriteriaWithPaginationAndSorting {
     @ApiProperty({
-        type: Number
+        type: Number,
     })
     pageNumber: number;
 
     @ApiProperty({
-        type: Number
+        type: Number,
     })
     pageSize: number;
 
     @ApiProperty({
-        type: String
+        type: String,
     })
     sortField: string;
 
     @ApiProperty({
-        type: Number
+        type: Number,
     })
     sortOrder: number;
 }

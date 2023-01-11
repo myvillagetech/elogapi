@@ -4,10 +4,13 @@ import { Model, Types } from 'mongoose';
 import { MODEL_ENUMS } from 'src/shared/enums/model.enums';
 import { ActivityLogDto } from './dto/activity-log.dto';
 import { ActivityDto } from './dto/activity.dto';
+import { ActivitySearchCriteriaDto } from './dto/activity.searchCriteria.dto';
 import {
     ArchiveActivityDto,
+    UpdateActivityAssignedToDto,
     UpdateActivityDto,
     UpdateActivityDueDateDto,
+    UpdateActivityOrganizationDto,
     UpdateActivityStatusDto,
 } from './dto/update-activity.dto';
 import { ActivityDocument } from './schemas/activity.schema';
@@ -16,10 +19,9 @@ import { ActivityDocument } from './schemas/activity.schema';
 export class ActivityService {
     @InjectModel(MODEL_ENUMS.ACTIVITIES)
     private activityModel: Model<ActivityDocument>;
-    constructor() {}
 
     async createActivity(activityDto: ActivityDto): Promise<ActivityDocument> {
-        let toDay = new Date();
+        const toDay = new Date();
         const dueDate = new Date(toDay.setDate(toDay.getDate() + 21));
         const newActivity = await new this.activityModel({
             ...activityDto,
@@ -217,5 +219,41 @@ export class ActivityService {
         return result;
     }
 
-    async activitySerachCriteria() {}
+    async updateActivityAssignedTo(
+        dto: UpdateActivityAssignedToDto,
+    ): Promise<any> {
+        const result = await this.activityModel.updateOne(
+            { _id: new Types.ObjectId(dto.activityId) },
+            {
+                assignTo: new Types.ObjectId(dto.assignedTo),
+            },
+        );
+        if (!result) {
+            throw new NotFoundException('Activity data not found');
+        }
+
+        return result;
+    }
+
+    async updateActivityOrganization(
+        dto: UpdateActivityOrganizationDto,
+    ): Promise<any> {
+        const result = await this.activityModel.updateOne(
+            { _id: new Types.ObjectId(dto.activityId) },
+            {
+                organization: new Types.ObjectId(dto.organzation),
+            },
+        );
+        if (!result) {
+            throw new NotFoundException('Activity data not found');
+        }
+
+        return result;
+    }
+
+    async activitySerachCriteria(criteria: ActivitySearchCriteriaDto) {
+        const result = [];
+
+        return result;
+    }
 }
