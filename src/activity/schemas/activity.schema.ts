@@ -202,6 +202,11 @@ export class ActivitySchemaCreator {
     })
     activityNumber: number
 
+    @Prop({
+        type : mongoose.Schema.Types.ObjectId, ref: 'organization'
+    })
+    assignTo : OrganizationSchemaCreator
+
 }
 
 export type ActivityDocument = ActivitySchemaCreator & Document

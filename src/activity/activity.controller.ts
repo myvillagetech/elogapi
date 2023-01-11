@@ -1,10 +1,10 @@
 import { Controller,Post, Res, Body, HttpStatus, Get, Param , Put, Delete} from '@nestjs/common';
-import {  ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { response } from 'express';
 import { ActivityService } from './activity.service';
 import { ActivityLogDto } from './dto/activity-log.dto';
 import { ActivityDto } from './dto/activity.dto';
-import { ArchiveActivityDto, UpdateActivityDto, UpdateActivityStatusDto } from './dto/update-activity.dto';
+import { ArchiveActivityDto, UpdateActivityDto, UpdateActivityDueDateDto, UpdateActivityStatusDto } from './dto/update-activity.dto';
 
 @Controller('activity')
 @ApiTags('activity')
@@ -169,6 +169,24 @@ export class ActivityController {
         }catch(error){
             return response.status(error.status).json({
                 message : 'Unable to fetch archived Activities',
+                error : error,
+                success : false
+            })
+        }
+    }
+
+    @Put("update/dueDate/:activityId")
+    async updateActivityDueDate(@Res() response,@Body() dueDateDetails : UpdateActivityDueDateDto, @Param('activityId') activityId : string){
+        try{
+            const result = await this.activityService.updateActivityDuedate(activityId,dueDateDetails)
+            return response.status(HttpStatus.OK).json({
+                message : 'Activity duedate Updated Successfully',
+                data : result,
+                success : true
+            });
+        }catch(error){
+            return response.status(error.status).json({
+                message : 'Unable to update activity duedate',
                 error : error,
                 success : false
             })

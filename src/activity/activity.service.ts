@@ -4,7 +4,7 @@ import { Model, Types } from 'mongoose';
 import { MODEL_ENUMS } from 'src/shared/enums/model.enums';
 import { ActivityLogDto } from './dto/activity-log.dto';
 import { ActivityDto } from './dto/activity.dto';
-import { ArchiveActivityDto, UpdateActivityDto, UpdateActivityStatusDto } from './dto/update-activity.dto';
+import { ArchiveActivityDto, UpdateActivityDto, UpdateActivityDueDateDto, UpdateActivityStatusDto } from './dto/update-activity.dto';
 import { ActivityDocument } from './schemas/activity.schema';
 
 @Injectable()
@@ -18,7 +18,7 @@ export class ActivityService {
     async createActivity(activityDto: ActivityDto): Promise<ActivityDocument> {
         let toDay = new Date()
         const dueDate = new Date(toDay.setDate(toDay.getDate()+21));
-        const newActivity = await new this.activityModel({...activityDto,dueDate : dueDate,dueDateLog : {dueDate : dueDate} });
+        const newActivity = await new this.activityModel({...activityDto,dueDate : dueDate,dueDateLog : {dueDate : dueDate}, assignTo : activityDto.organization[0] });
         // newActivity.markModified('attachments');
         return newActivity.save()
     }
@@ -106,10 +106,6 @@ export class ActivityService {
 
         const queryObject = { $push: { "activityLog": {...activityLog, userId: new Types.ObjectId(activityLog.userId)} } };
 
-        if(activityLog.attachments){
-            queryObject.$push["attachments"] = {attachments : activityLog.attachments}
-        }
-
         if(activityLog.visibility){
             queryObject["visibility"] = activityLog.visibility
         }
@@ -122,7 +118,6 @@ export class ActivityService {
             queryObject["status"] = activityLog.status;
             queryObject.$push["statusLog"] = {status: activityLog.status}
         }
-        console.log(queryObject);
 
         const result = await this.activityModel.updateOne(
             { "_id": new Types.ObjectId(activityId) },
@@ -150,13 +145,43 @@ export class ActivityService {
     }
 
     async getAllArchiveActivities():Promise<ActivityDocument[]>{
-        const results = await this.activityModel.find({isArchive : true});
+
+        const results = await this.activityModel.aggregate([
+            {
+                $lookup: {
+                    from: MODEL_ENUMS.ORGANIZATIONS,
+                    localField: 'createdByOrganization',
+                    foreignField: '_id',
+                    as: 'createdByOrganizationData',
+                },
+            },
+            {
+                $match: { isArchive : true}
+            }
+        ])
 
         if (!results) {
             throw new NotFoundException('Activity data not found');
         }
 
         return results;
+    }
+
+    async updateActivityDuedate(activityId : string, dueDateDetails : UpdateActivityDueDateDto):Promise<any>{
+
+        const result = await this.activityModel.updateOne(
+            { "_id": new Types.ObjectId(activityId) },
+            {
+                dueDate : dueDateDetails.dueDate,
+                $push : {dueDateLog : dueDateDetails}
+            }
+        );
+        if (!result) {
+            throw new NotFoundException('Activity data not found');
+        }
+
+        return result;
+
     }
 
 
