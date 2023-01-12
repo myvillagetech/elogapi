@@ -83,6 +83,13 @@ export class DueDateLog {
         type: Date,
     })
     dueDate: Date;
+
+    @Prop({type: mongoose.Schema.Types.ObjectId,
+        ref: 'user',})
+    createdBy: UserSchemaCreator;
+
+    @Prop()
+    createdByUserName: string
 }
 
 export const DueDateLogSchema = SchemaFactory.createForClass(DueDateLog);

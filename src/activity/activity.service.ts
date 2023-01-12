@@ -31,7 +31,7 @@ export class ActivityService {
         const newActivity = await new this.activityModel({
             ...activityDto,
             dueDate: dueDate,
-            dueDateLog: { dueDate: dueDate },
+            dueDateLog: { dueDate: dueDate, createdBy : decodedToken['_doc']._id, createdByUserName : decodedToken['_doc'].Name },
             assignTo: activityDto.organization[0],
             createdBy : decodedToken['_doc']._id
         });
@@ -214,12 +214,14 @@ export class ActivityService {
     async updateActivityDuedate(
         activityId: string,
         dueDateDetails: UpdateActivityDueDateDto,
+        tokenHeader: string
     ): Promise<any> {
+        const decodedToken = this.authService.getDecodedToken(tokenHeader);
         const result = await this.activityModel.updateOne(
             { _id: new Types.ObjectId(activityId) },
             {
                 dueDate: dueDateDetails.dueDate,
-                $push: { dueDateLog: dueDateDetails },
+                $push: { dueDateLog: dueDateDetails, createdBy : decodedToken['_doc']._id, createdByUserName : decodedToken['_doc'].Name  },
             },
         );
         if (!result) {

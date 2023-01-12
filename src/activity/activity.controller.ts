@@ -180,13 +180,13 @@ export class ActivityController {
     }
 
 
+    @Put('activityLog/:activityId')
     @ApiParam({
         name: 'Authorization',
         required: false,
         description:
             '(Leave empty. Use lock icon on the top-right to authorize)',
     })
-    @Put('activityLog/:activityId')
     async updateActivityLog(
         @Res() response,
         @Body() activityLog: ActivityLogDto,
@@ -258,15 +258,23 @@ export class ActivityController {
     }
 
     @Put('update/dueDate/:activityId')
+    @ApiParam({
+        name: 'Authorization',
+        required: false,
+        description:
+            '(Leave empty. Use lock icon on the top-right to authorize)',
+    })
     async updateActivityDueDate(
         @Res() response,
         @Body() dueDateDetails: UpdateActivityDueDateDto,
         @Param('activityId') activityId: string,
+        @Headers('Authorization') authHeader: string,
     ) {
         try {
             const result = await this.activityService.updateActivityDuedate(
                 activityId,
                 dueDateDetails,
+                authHeader
             );
             return response.status(HttpStatus.OK).json({
                 message: 'Activity duedate Updated Successfully',
