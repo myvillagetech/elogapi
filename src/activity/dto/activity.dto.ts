@@ -94,12 +94,6 @@ export class ActivityDto{
     })
     readonly status: Status;
 
-    @IsNotEmpty()
-    @ApiProperty({
-        type: String
-    })
-    readonly createdBy: string;
-
     @ApiProperty({
         type:Boolean,
         default : false

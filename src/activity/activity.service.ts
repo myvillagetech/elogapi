@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { ApiParam } from '@nestjs/swagger';
 import { Model, Types } from 'mongoose';
 import { AuthService } from 'src/auth/auth.service';
 import { MODEL_ENUMS } from 'src/shared/enums/model.enums';
@@ -23,15 +24,16 @@ export class ActivityService {
 
     constructor(private readonly authService: AuthService) {}
 
-
-    async createActivity(activityDto: ActivityDto): Promise<ActivityDocument> {
+    async createActivity(activityDto: ActivityDto,tokenHeader: string,): Promise<ActivityDocument> {
         const toDay = new Date();
         const dueDate = new Date(toDay.setDate(toDay.getDate() + 21));
+        const decodedToken = this.authService.getDecodedToken(tokenHeader);
         const newActivity = await new this.activityModel({
             ...activityDto,
             dueDate: dueDate,
             dueDateLog: { dueDate: dueDate },
             assignTo: activityDto.organization[0],
+            createdBy : decodedToken['_doc']._id
         });
         // newActivity.markModified('attachments');
         return newActivity.save();
@@ -134,7 +136,6 @@ export class ActivityService {
         tokenHeader: string,
     ): Promise<any> {
         const decodedToken = this.authService.getDecodedToken(tokenHeader);
-        console.log(decodedToken);
         const queryObject = {
             $push: {
                 activityLog: {

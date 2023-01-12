@@ -10,7 +10,7 @@ import {
     Delete,
     Headers,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
 import { response } from 'express';
 import { ActivityService } from './activity.service';
 import { ActivityLogDto } from './dto/activity-log.dto';
@@ -32,13 +32,21 @@ export class ActivityController {
     constructor(private activityService: ActivityService) {}
 
     @Post()
+    @ApiParam({
+        name: 'Authorization',
+        required: false,
+        description:
+            '(Leave empty. Use lock icon on the top-right to authorize)',
+    })
     async createActivity(
         @Res() response: any,
         @Body() activityDetails: ActivityDto,
+        @Headers('Authorization') authHeader: string,
     ) {
         try {
             const newActivity = await this.activityService.createActivity(
                 activityDetails,
+                authHeader
             );
             return response.status(HttpStatus.CREATED).json({
                 message: 'Activity created Successfully',
@@ -171,6 +179,13 @@ export class ActivityController {
         }
     }
 
+
+    @ApiParam({
+        name: 'Authorization',
+        required: false,
+        description:
+            '(Leave empty. Use lock icon on the top-right to authorize)',
+    })
     @Put('activityLog/:activityId')
     async updateActivityLog(
         @Res() response,
