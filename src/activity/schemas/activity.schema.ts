@@ -64,6 +64,13 @@ export class ActivityLog {
         ref: 'user',
     })
     userId: UserSchemaCreator;
+
+    @Prop({type: mongoose.Schema.Types.ObjectId,
+        ref: 'user',})
+    createdBy: UserSchemaCreator;
+
+    @Prop()
+    createdByUserName: string
 }
 
 export const ActivityLogSchema = SchemaFactory.createForClass(ActivityLog);

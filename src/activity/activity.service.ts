@@ -131,12 +131,17 @@ export class ActivityService {
     async updateActivityLogByActivityId(
         activityId: string,
         activityLog: ActivityLogDto,
+        tokenHeader: string,
     ): Promise<any> {
+        const decodedToken = this.authService.getDecodedToken(tokenHeader);
+        console.log(decodedToken);
         const queryObject = {
             $push: {
                 activityLog: {
                     ...activityLog,
                     userId: new Types.ObjectId(activityLog.userId),
+                    createdBy : decodedToken['_doc']._id,
+                    createdByUserName : decodedToken['_doc'].Name
                 },
             },
         };

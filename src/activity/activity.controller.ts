@@ -176,12 +176,14 @@ export class ActivityController {
         @Res() response,
         @Body() activityLog: ActivityLogDto,
         @Param('activityId') activityId: string,
+        @Headers('Authorization') authHeader: string,
     ) {
         try {
             const result =
                 await this.activityService.updateActivityLogByActivityId(
                     activityId,
                     activityLog,
+                    authHeader
                 );
             return response.status(HttpStatus.OK).json({
                 message: 'Activity Log Updated Successfully',
