@@ -15,13 +15,7 @@ async function bootstrap() {
         .setVersion('1.0')
         .addTag('auth')
         .addBearerAuth(
-            {
-                name: 'Authorization',
-                bearerFormat: 'Bearer',
-                scheme: 'Bearer',
-                type: 'http',
-                in: 'Header',
-            },
+            { type: 'http', scheme: 'bearer', bearerFormat: 'jwt' },
             'access-token',
         )
         .build();

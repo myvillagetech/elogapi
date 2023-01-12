@@ -12,6 +12,7 @@ import { ActivityModule } from './activity/activity.module';
 import { ActivityMasterdataModule } from './generic/activity-masterdata/activity-masterdata.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { ConfigModule } from '@nestjs/config';
 
 
 
@@ -23,6 +24,7 @@ import { join } from 'path';
     OrganizationTypeModule,
     ProfileModule,
     ActivityModule,
+    ConfigModule.forRoot(),
     ActivityMasterdataModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'static'),

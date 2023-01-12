@@ -6,7 +6,7 @@ import jwt, { sign, verify } from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
 import { Error } from 'mongoose';
 
-const secret = 'A4169476C5A5889A';
+const secret = process.env.ACCESS_SECRET;
 @Injectable()
 export class AuthService {
     constructor(private readonly userService: UsersService) {}

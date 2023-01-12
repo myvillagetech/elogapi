@@ -9,9 +9,11 @@ import {
     Put,
     Delete,
     Headers,
+    UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
 import { response } from 'express';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { ActivityService } from './activity.service';
 import { ActivityLogDto } from './dto/activity-log.dto';
 import { ActivityDto } from './dto/activity.dto';
@@ -28,6 +30,7 @@ import {
 @Controller('activity')
 @ApiTags('activity')
 @ApiBearerAuth('access-token')
+@UseGuards(JwtAuthGuard)
 export class ActivityController {
     constructor(private activityService: ActivityService) {}
 
