@@ -2,31 +2,42 @@ import { Injectable } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { LoginDto } from './dto/login.dto';
 import { ResetPasswordDto } from '../users/dto/resetPassword.dto';
-import jwt,{sign} from 'jsonwebtoken';
+import jwt, { sign, verify } from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
 import { Error } from 'mongoose';
 
+const secret = 'A4169476C5A5889A';
 @Injectable()
 export class AuthService {
-    constructor(private readonly userService: UsersService) { }
+    constructor(private readonly userService: UsersService) {}
+
+    getDecodedToken(token: string) {
+        const tokenPart = token ? token.split(' ')[1] : '';
+        return verify(tokenPart, secret);
+    }
 
     async login(loginDetails: LoginDto): Promise<any> {
-        const user :any = await this.userService.getUserByEmail(loginDetails.email);
+        const user: any = await this.userService.getUserByEmail(
+            loginDetails.email,
+        );
         if (!user) {
-            throw new Error("Invaild user details");
+            throw new Error('Invaild user details');
         }
-        const verifyUser : any = await this.verifyPassword(loginDetails.password, user.password);
-        console.log(verifyUser,loginDetails.password, user.password);
+        const verifyUser: any = await this.verifyPassword(
+            loginDetails.password,
+            user.password,
+        );
         if (verifyUser) {
-            const accessToken = sign(
-                { ...user },
-                'A4169476C5A5889A',
-                { expiresIn: '4hr' }
-            );
-            return {accessToken : accessToken, role : user.roles, userId : user._id}
-
+            const accessToken = sign({ ...user }, secret, {
+                expiresIn: '4hr',
+            });
+            return {
+                accessToken: accessToken,
+                role: user.roles,
+                userId: user._id,
+            };
         } else {
-            throw new Error("Invaild Password");
+            throw new Error('Invaild Password');
         }
     }
 
@@ -36,9 +47,11 @@ export class AuthService {
      * @param hashedPassword allready hashed and stored password
      * @returns a boolean true or false;
      */
-    async verifyPassword(password: string, hashedPassword: string) : Promise<any> {
-
+    async verifyPassword(
+        password: string,
+        hashedPassword: string,
+    ): Promise<any> {
         const result = await bcrypt.compareSync(password, hashedPassword);
-        return result
+        return result;
     }
 }

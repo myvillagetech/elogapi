@@ -8,12 +8,14 @@ import {
     Param,
     Put,
     Delete,
+    Headers,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { response } from 'express';
 import { ActivityService } from './activity.service';
 import { ActivityLogDto } from './dto/activity-log.dto';
 import { ActivityDto } from './dto/activity.dto';
+import { ActivitySearchCriteriaDto } from './dto/activity.searchCriteria.dto';
 import {
     ArchiveActivityDto,
     UpdateActivityAssignedToDto,
@@ -25,6 +27,7 @@ import {
 
 @Controller('activity')
 @ApiTags('activity')
+@ApiBearerAuth('access-token')
 export class ActivityController {
     constructor(private activityService: ActivityService) {}
 
@@ -289,10 +292,14 @@ export class ActivityController {
     async updateActivityOrganizationDto(
         @Res() response,
         @Body() dto: UpdateActivityOrganizationDto,
+        @Headers('Authorization') authHeader: string,
     ) {
         try {
             const result =
-                await this.activityService.updateActivityOrganization(dto);
+                await this.activityService.updateActivityOrganization(
+                    dto,
+                    authHeader,
+                );
             return response.status(HttpStatus.OK).json({
                 message: 'Activity assignement Updated Successfully',
                 data: result,
@@ -301,6 +308,28 @@ export class ActivityController {
         } catch (error) {
             return response.status(error.status).json({
                 message: 'Unable to update activity assignement',
+                error: error,
+                success: false,
+            });
+        }
+    }
+
+    @Post('activitysearch')
+    async getActivitiesBySearchCriteria(
+        @Body() criteria: ActivitySearchCriteriaDto,
+    ) {
+        try {
+            const result = await this.activityService.activitySerachCriteria(
+                criteria,
+            );
+            return response.status(HttpStatus.OK).json({
+                message: 'fetched activities Successfully',
+                data: result,
+                success: true,
+            });
+        } catch (error) {
+            return response.status(error.status).json({
+                message: 'Unable to fetch activities',
                 error: error,
                 success: false,
             });

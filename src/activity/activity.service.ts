@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
+import { AuthService } from 'src/auth/auth.service';
 import { MODEL_ENUMS } from 'src/shared/enums/model.enums';
 import { ActivityLogDto } from './dto/activity-log.dto';
 import { ActivityDto } from './dto/activity.dto';
@@ -19,6 +20,9 @@ import { ActivityDocument } from './schemas/activity.schema';
 export class ActivityService {
     @InjectModel(MODEL_ENUMS.ACTIVITIES)
     private activityModel: Model<ActivityDocument>;
+
+    constructor(private readonly authService: AuthService) {}
+
 
     async createActivity(activityDto: ActivityDto): Promise<ActivityDocument> {
         const toDay = new Date();
@@ -237,7 +241,9 @@ export class ActivityService {
 
     async updateActivityOrganization(
         dto: UpdateActivityOrganizationDto,
+        tokenHeader: string,
     ): Promise<any> {
+        const decodedToken = this.authService.getDecodedToken(tokenHeader);
         const result = await this.activityModel.updateOne(
             { _id: new Types.ObjectId(dto.activityId) },
             {
@@ -252,8 +258,9 @@ export class ActivityService {
     }
 
     async activitySerachCriteria(criteria: ActivitySearchCriteriaDto) {
-        const result = [];
+        let result = [];
 
+        result = await this.activityModel.aggregate([]);
         return result;
     }
 }
