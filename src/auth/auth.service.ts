@@ -6,14 +6,13 @@ import jwt, { sign, verify } from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
 import { Error } from 'mongoose';
 
-const secret = process.env.ACCESS_SECRET;
 @Injectable()
 export class AuthService {
     constructor(private readonly userService: UsersService) {}
 
     getDecodedToken(token: string) {
         const tokenPart = token ? token.split(' ')[1] : '';
-        return verify(tokenPart, secret);
+        return verify(tokenPart, process.env.ACCESS_SECRET);
     }
 
     async login(loginDetails: LoginDto): Promise<any> {
@@ -28,7 +27,7 @@ export class AuthService {
             user.password,
         );
         if (verifyUser) {
-            const accessToken = sign({ ...user }, secret, {
+            const accessToken = sign({ ...user }, process.env.ACCESS_SECRET, {
                 expiresIn: '4hr',
             });
             return {
