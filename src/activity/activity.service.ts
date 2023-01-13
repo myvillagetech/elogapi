@@ -221,7 +221,7 @@ export class ActivityService {
             { _id: new Types.ObjectId(activityId) },
             {
                 dueDate: dueDateDetails.dueDate,
-                $push: { dueDateLog: dueDateDetails, createdBy : decodedToken['_doc']._id, createdByUserName : decodedToken['_doc'].Name  },
+                $push: { dueDateLog: {...dueDateDetails, createdBy : decodedToken['_doc']._id, createdByUserName : decodedToken['_doc'].Name  }},
             },
         );
         if (!result) {

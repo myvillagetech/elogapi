@@ -78,11 +78,10 @@ export class UpdateActivityStatusDto {
 }
 
 export class UpdateActivityDueDateDto {
-    @IsNotEmpty()
     @ApiProperty({
         type: Date,
     })
-    dueDate: Date;
+    dueDate: Date | null;
 }
 
 export class UpdateActivityAssignedToDto {
