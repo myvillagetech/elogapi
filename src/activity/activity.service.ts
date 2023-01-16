@@ -17,6 +17,7 @@ import {
 } from './dto/update-activity.dto';
 import { ActivityDocument } from './schemas/activity.schema';
 import * as dayjs from 'dayjs';
+import { getMilliSecondsbyParam } from 'src/shared/services/date-time-helpers';
 
 @Injectable()
 export class ActivityService {
@@ -378,9 +379,38 @@ export class ActivityService {
             }
         }
 
-        // if(criteria.createdDate) {
+        if (criteria.createdDate) {
+            if (criteria.createdDate.quantity && criteria.createdDate.unit) {
+                const pastTime = dayjs().subtract(
+                    getMilliSecondsbyParam({
+                        unit: criteria.createdDate.unit,
+                        quantity: criteria.createdDate.quantity,
+                    }),
+                    'ms',
+                );
+                search.$and.push({
+                    createdAt: {
+                        $gte: pastTime,
+                    },
+                });
+            }
 
-        // }
+            if (criteria.createdDate.fromDate) {
+                search.$and.push({
+                    createdAt: {
+                        $gte: dayjs(criteria.createdDate.fromDate).startOf('day'),
+                    },
+                });
+            }
+
+            if (criteria.createdDate.toDate) {
+                search.$and.push({
+                    createdAt: {
+                        $lte: dayjs(criteria.createdDate.toDate).endOf('day'),
+                    },
+                });
+            }
+        }
 
         const paginationProps: any = [
             { $match: search.$and.length > 0 ? search : {} },
