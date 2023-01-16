@@ -13,6 +13,23 @@ export class DateFilter {
     readonly toDate: string;
 }
 
+export class DateWithCustomName extends DateFilter {
+    @ApiProperty({
+        type: String,
+    })
+    readonly customString: string;
+
+    @ApiProperty({
+        type: String,
+    })
+    readonly unit: string;
+
+    @ApiProperty({
+        type: Number,
+    })
+    readonly quantity: number;
+}
+
 export class ActivitySearchCriteriaDto extends CriteriaWithPaginationAndSorting {
     @ApiProperty({
         type: String,
@@ -30,14 +47,14 @@ export class ActivitySearchCriteriaDto extends CriteriaWithPaginationAndSorting 
     readonly status: string[];
 
     @ApiProperty({
-        type: DateFilter,
+        type: DateWithCustomName,
     })
-    readonly createdDate: DateFilter;
+    readonly createdDate: DateWithCustomName;
 
     @ApiProperty({
-        type: DateFilter,
+        type: DateWithCustomName,
     })
-    readonly dueDate: DateFilter;
+    readonly dueDate: DateWithCustomName;
 
     @ApiProperty({
         type: Array<string>,

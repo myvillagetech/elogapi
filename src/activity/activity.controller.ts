@@ -350,6 +350,7 @@ export class ActivityController {
             const result = await this.activityService.activitySerachCriteria(
                 criteria,
             );
+            return result;
             return response.status(HttpStatus.OK).json({
                 message: 'fetched activities Successfully',
                 data: result,

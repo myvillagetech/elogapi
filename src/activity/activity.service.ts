@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ApiParam } from '@nestjs/swagger';
-import { Model, Types } from 'mongoose';
+import mongoose, { Model, Types } from 'mongoose';
 import { AuthService } from 'src/auth/auth.service';
 import { MODEL_ENUMS } from 'src/shared/enums/model.enums';
 import { ActivityLogDto } from './dto/activity-log.dto';
@@ -16,6 +16,7 @@ import {
     UpdateActivityStatusDto,
 } from './dto/update-activity.dto';
 import { ActivityDocument } from './schemas/activity.schema';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class ActivityService {
@@ -24,16 +25,23 @@ export class ActivityService {
 
     constructor(private readonly authService: AuthService) {}
 
-    async createActivity(activityDto: ActivityDto,tokenHeader: string,): Promise<ActivityDocument> {
+    async createActivity(
+        activityDto: ActivityDto,
+        tokenHeader: string,
+    ): Promise<ActivityDocument> {
         const toDay = new Date();
         const dueDate = new Date(toDay.setDate(toDay.getDate() + 21));
         const decodedToken = this.authService.getDecodedToken(tokenHeader);
         const newActivity = await new this.activityModel({
             ...activityDto,
             dueDate: dueDate,
-            dueDateLog: { dueDate: dueDate, createdBy : decodedToken['_doc']._id, createdByUserName : decodedToken['_doc'].Name },
+            dueDateLog: {
+                dueDate: dueDate,
+                createdBy: decodedToken['_doc']._id,
+                createdByUserName: decodedToken['_doc'].Name,
+            },
             assignTo: activityDto.organization[0],
-            createdBy : decodedToken['_doc']._id
+            createdBy: decodedToken['_doc']._id,
         });
         // newActivity.markModified('attachments');
         return newActivity.save();
@@ -141,8 +149,8 @@ export class ActivityService {
                 activityLog: {
                     ...activityLog,
                     userId: new Types.ObjectId(activityLog.userId),
-                    createdBy : decodedToken['_doc']._id,
-                    createdByUserName : decodedToken['_doc'].Name
+                    createdBy: decodedToken['_doc']._id,
+                    createdByUserName: decodedToken['_doc'].Name,
                 },
             },
         };
@@ -214,14 +222,20 @@ export class ActivityService {
     async updateActivityDuedate(
         activityId: string,
         dueDateDetails: UpdateActivityDueDateDto,
-        tokenHeader: string
+        tokenHeader: string,
     ): Promise<any> {
         const decodedToken = this.authService.getDecodedToken(tokenHeader);
         const result = await this.activityModel.updateOne(
             { _id: new Types.ObjectId(activityId) },
             {
                 dueDate: dueDateDetails.dueDate,
-                $push: { dueDateLog: {...dueDateDetails, createdBy : decodedToken['_doc']._id, createdByUserName : decodedToken['_doc'].Name  }},
+                $push: {
+                    dueDateLog: {
+                        ...dueDateDetails,
+                        createdBy: decodedToken['_doc']._id,
+                        createdByUserName: decodedToken['_doc'].Name,
+                    },
+                },
             },
         );
         if (!result) {
@@ -268,7 +282,117 @@ export class ActivityService {
     async activitySerachCriteria(criteria: ActivitySearchCriteriaDto) {
         let result = [];
 
-        result = await this.activityModel.aggregate([]);
+        const search = { $and: [] };
+
+        if (criteria.status && criteria.status.length > 0) {
+            search.$and.push({
+                status: {
+                    $in: criteria.status,
+                },
+            });
+        }
+
+        if (criteria.priority && criteria.priority.length > 0) {
+            search.$and.push({
+                priority: {
+                    $in: criteria.priority,
+                },
+            });
+        }
+
+        if (criteria.types && criteria.types.length > 0) {
+            search.$and.push({
+                activityType: {
+                    $in: criteria.types.map(
+                        (type) => new mongoose.Types.ObjectId(type),
+                    ),
+                },
+            });
+        }
+
+        if (criteria.scope && criteria.scope.length > 0) {
+            search.$and.push({
+                activityScope: {
+                    $in: criteria.scope.map(
+                        (type) => new mongoose.Types.ObjectId(type),
+                    ),
+                },
+            });
+        }
+
+        if (criteria.geography && criteria.geography.length > 0) {
+            search.$and.push({
+                activitySector: {
+                    $in: criteria.geography.map(
+                        (type) => new mongoose.Types.ObjectId(type),
+                    ),
+                },
+            });
+        }
+
+        if (criteria.entryTypes && criteria.entryTypes.length > 0) {
+            search.$and.push({
+                activitEntryType: {
+                    $in: criteria.entryTypes.map(
+                        (type) => new mongoose.Types.ObjectId(type),
+                    ),
+                },
+            });
+        }
+
+        if (criteria.dueDate) {
+            if (criteria.dueDate.customString) {
+                if (criteria.dueDate.customString === 'TODAY') {
+                    search.$and.push({
+                        dueDate: {
+                            $gte: dayjs().startOf('day'),
+                            $lte: dayjs().endOf('day'),
+                        },
+                    });
+                }
+
+                if (criteria.dueDate.customString === 'OVERDUE') {
+                    search.$and.push({
+                        dueDate: {
+                            $lte: dayjs().startOf('day'),
+                        },
+                    });
+                }
+            } else {
+                if (criteria.dueDate.fromDate) {
+                    search.$and.push({
+                        dueDate: {
+                            $gte: dayjs(criteria.dueDate.fromDate).startOf(
+                                'day',
+                            ),
+                        },
+                    });
+                }
+                if (criteria.dueDate.toDate) {
+                    search.$and.push({
+                        dueDate: {
+                            $lte: dayjs(criteria.dueDate.toDate).endOf('day'),
+                        },
+                    });
+                }
+            }
+        }
+
+        // if(criteria.createdDate) {
+
+        // }
+
+        const paginationProps: any = [
+            { $match: search.$and.length > 0 ? search : {} },
+        ];
+
+        result = await this.activityModel.aggregate([
+            {
+                $facet: {
+                    schedules: paginationProps,
+                },
+            },
+        ]);
         return result;
     }
 }
