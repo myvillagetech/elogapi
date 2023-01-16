@@ -18,6 +18,7 @@ import {
 import { ActivityDocument } from './schemas/activity.schema';
 import * as dayjs from 'dayjs';
 import { getMilliSecondsbyParam } from 'src/shared/services/date-time-helpers';
+import { ActivityMetricsRequest } from './dto/dashboard.dto';
 
 @Injectable()
 export class ActivityService {
@@ -398,7 +399,9 @@ export class ActivityService {
             if (criteria.createdDate.fromDate) {
                 search.$and.push({
                     createdAt: {
-                        $gte: dayjs(criteria.createdDate.fromDate).startOf('day'),
+                        $gte: dayjs(criteria.createdDate.fromDate).startOf(
+                            'day',
+                        ),
                     },
                 });
             }
@@ -420,6 +423,57 @@ export class ActivityService {
             {
                 $facet: {
                     schedules: paginationProps,
+                },
+            },
+        ]);
+        return result;
+    }
+
+    async getDashBoardActivityMetrics(request: ActivityMetricsRequest) {
+        const search = { $and: [] };
+
+        if (request.type) {
+            search.$and.push({
+                activityType: new mongoose.Types.ObjectId(request.type),
+            });
+        }
+
+        if (request.dateRnge.fromDate) {
+            search.$and.push({
+                createdAt: {
+                    $gte: dayjs(request.dateRnge.fromDate).startOf('day'),
+                },
+            });
+        }
+
+        if (request.dateRnge.toDate) {
+            search.$and.push({
+                createdAt: {
+                    $lte: dayjs(request.dateRnge.toDate).endOf('day'),
+                },
+            });
+        }
+
+        const result = await this.activityModel.aggregate([
+            { $match: search },
+            {
+                $facet: {
+                    new: [
+                        { $match: { status: 'NEW' } },
+                        { $count: 'newCount' },
+                    ],
+                    inProgress: [
+                        { $match: { status: 'INPROGRESS' } },
+                        { $count: 'inProgressCount' },
+                    ],
+                    resolved: [
+                        { $match: { status: 'RESOLVED' } },
+                        { $count: 'resolvedCount' },
+                    ],
+                    notAdmissible: [
+                        { $match: { status: 'NOTADMISSIBLE' } },
+                        { $count: 'resolvedCount' },
+                    ],
                 },
             },
         ]);
