@@ -18,6 +18,7 @@ import { ActivityService } from './activity.service';
 import { ActivityLogDto } from './dto/activity-log.dto';
 import { ActivityDto } from './dto/activity.dto';
 import { ActivitySearchCriteriaDto } from './dto/activity.searchCriteria.dto';
+import { ActivityMetricsRequest } from './dto/dashboard.dto';
 import {
     ArchiveActivityDto,
     UpdateActivityAssignedToDto,
@@ -49,7 +50,7 @@ export class ActivityController {
         try {
             const newActivity = await this.activityService.createActivity(
                 activityDetails,
-                authHeader
+                authHeader,
             );
             return response.status(HttpStatus.CREATED).json({
                 message: 'Activity created Successfully',
@@ -182,7 +183,6 @@ export class ActivityController {
         }
     }
 
-
     @Put('activityLog/:activityId')
     @ApiParam({
         name: 'Authorization',
@@ -201,7 +201,7 @@ export class ActivityController {
                 await this.activityService.updateActivityLogByActivityId(
                     activityId,
                     activityLog,
-                    authHeader
+                    authHeader,
                 );
             return response.status(HttpStatus.OK).json({
                 message: 'Activity Log Updated Successfully',
@@ -277,7 +277,7 @@ export class ActivityController {
             const result = await this.activityService.updateActivityDuedate(
                 activityId,
                 dueDateDetails,
-                authHeader
+                authHeader,
             );
             return response.status(HttpStatus.OK).json({
                 message: 'Activity duedate Updated Successfully',
@@ -350,6 +350,46 @@ export class ActivityController {
             const result = await this.activityService.activitySerachCriteria(
                 criteria,
             );
+            return result;
+            return response.status(HttpStatus.OK).json({
+                message: 'fetched activities Successfully',
+                data: result,
+                success: true,
+            });
+        } catch (error) {
+            return response.status(error.status).json({
+                message: 'Unable to fetch activities',
+                error: error,
+                success: false,
+            });
+        }
+    }
+
+    @Post('getDashBoardActivityMetrics')
+    async getDashBoardActivityMetrics(@Body() request: ActivityMetricsRequest) {
+        try {
+            const result =
+                await this.activityService.getDashBoardActivityMetrics(request);
+            return result;
+            return response.status(HttpStatus.OK).json({
+                message: 'fetched activities Successfully',
+                data: result,
+                success: true,
+            });
+        } catch (error) {
+            return response.status(error.status).json({
+                message: 'Unable to fetch activities',
+                error: error,
+                success: false,
+            });
+        }
+    }
+
+    @Get('getDashBoardDueDateMetrics')
+    async getDashBoardDueDateMetrics() {
+        try {
+            const result =
+                await this.activityService.getDashBoardDueDateMetrics();
             return result;
             return response.status(HttpStatus.OK).json({
                 message: 'fetched activities Successfully',

@@ -479,4 +479,138 @@ export class ActivityService {
         ]);
         return result;
     }
+
+    async getDashBoardDueDateMetrics() {
+        const search = { $and: [] };
+
+        const result = await this.activityModel.aggregate([
+            { $match: search },
+            {
+                $facet: {
+                    oneWeek: [
+                        {
+                            $match: {
+                                dueDate: {
+                                    $and: [
+                                        {
+                                            $lte: dayjs().startOf('day'),
+                                        },
+                                        {
+                                            $gte: dayjs()
+                                                .subtract(
+                                                    getMilliSecondsbyParam({
+                                                        unit: 'W',
+                                                        quantity: 1,
+                                                    }),
+                                                    'ms',
+                                                )
+                                                .startOf('day'),
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                        { $count: 'oneWeek' },
+                    ],
+                    oneToTwoWeek: [
+                        {
+                            $match: {
+                                dueDate: {
+                                    $and: [
+                                        {
+                                            $lte: dayjs()
+                                                .subtract(
+                                                    getMilliSecondsbyParam({
+                                                        unit: 'W',
+                                                        quantity: 1,
+                                                    }),
+                                                    'ms',
+                                                )
+                                                .startOf('day'),
+                                        },
+                                        {
+                                            $gte: dayjs()
+                                                .subtract(
+                                                    getMilliSecondsbyParam({
+                                                        unit: 'W',
+                                                        quantity: 2,
+                                                    }),
+                                                    'ms',
+                                                )
+                                                .startOf('day'),
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                        { $count: 'oneToTwoWeeks' },
+                    ],
+                    twoWeeksToOneMonth: [
+                        {
+                            $match: {
+                                dueDate: {
+                                    $and: [
+                                        {
+                                            $lte: dayjs()
+                                                .subtract(
+                                                    getMilliSecondsbyParam({
+                                                        unit: 'W',
+                                                        quantity: 2,
+                                                    }),
+                                                    'ms',
+                                                )
+                                                .startOf('day'),
+                                        },
+                                        {
+                                            $gte: dayjs()
+                                                .subtract(
+                                                    getMilliSecondsbyParam({
+                                                        unit: 'M',
+                                                        quantity: 1,
+                                                    }),
+                                                    'ms',
+                                                )
+                                                .startOf('day'),
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                        { $count: 'twoWeeksToOneMonth' },
+                    ],
+                    moreThanAMonth: [
+                        {
+                            $match: {
+                                dueDate: {
+                                    $and: [
+                                        {
+                                            $lte: dayjs()
+                                                .subtract(1, 'M')
+                                                .startOf('day'),
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                        { $count: 'moreThanAMonth' },
+                    ],
+                    OnTime: [
+                        {
+                            $match: {
+                                dueDate: {
+                                    $and: [
+                                        {
+                                            $gte: dayjs().startOf('day'),
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                        { $count: 'OnTime' },
+                    ],
+                },
+            },
+        ]);
+        return result;
+    }
 }
