@@ -27,9 +27,13 @@ export class AuthService {
             user.password,
         );
         if (verifyUser) {
-            const accessToken = sign({ ...user }, process.env.ACCESS_SECRET, {
-                expiresIn: '4hr',
-            });
+            const accessToken = sign(
+                { ...user._doc, password: undefined },
+                process.env.ACCESS_SECRET,
+                {
+                    expiresIn: '4hr',
+                },
+            );
             return {
                 accessToken: accessToken,
                 role: user.roles,

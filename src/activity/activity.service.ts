@@ -37,17 +37,17 @@ export class ActivityService {
     ): Promise<ActivityDocument> {
         const toDay = new Date();
         const dueDate = new Date(toDay.setDate(toDay.getDate() + 21));
-        const decodedToken = this.authService.getDecodedToken(tokenHeader);
+        const decodedToken: any = this.authService.getDecodedToken(tokenHeader);
         const newActivity = await new this.activityModel({
             ...activityDto,
             dueDate: dueDate,
             dueDateLog: {
                 dueDate: dueDate,
-                createdBy: decodedToken['_doc']._id,
-                createdByUserName: decodedToken['_doc'].Name,
+                createdBy: decodedToken._id,
+                createdByUserName: decodedToken.Name,
             },
             assignTo: activityDto.organization[0],
-            createdBy: decodedToken['_doc']._id,
+            createdBy: decodedToken._id,
         });
         // newActivity.markModified('attachments');
         return newActivity.save();
@@ -149,14 +149,14 @@ export class ActivityService {
         activityLog: ActivityLogDto,
         tokenHeader: string,
     ): Promise<any> {
-        const decodedToken = this.authService.getDecodedToken(tokenHeader);
+        const decodedToken: any = this.authService.getDecodedToken(tokenHeader);
         const queryObject = {
             $push: {
                 activityLog: {
                     ...activityLog,
                     userId: new Types.ObjectId(activityLog.userId),
-                    createdBy: decodedToken['_doc']._id,
-                    createdByUserName: decodedToken['_doc'].Name,
+                    createdBy: decodedToken._id,
+                    createdByUserName: decodedToken.Name,
                 },
             },
         };
@@ -230,7 +230,7 @@ export class ActivityService {
         dueDateDetails: UpdateActivityDueDateDto,
         tokenHeader: string,
     ): Promise<any> {
-        const decodedToken = this.authService.getDecodedToken(tokenHeader);
+        const decodedToken: any = this.authService.getDecodedToken(tokenHeader);
         const result = await this.activityModel.updateOne(
             { _id: new Types.ObjectId(activityId) },
             {
@@ -238,8 +238,8 @@ export class ActivityService {
                 $push: {
                     dueDateLog: {
                         ...dueDateDetails,
-                        createdBy: decodedToken['_doc']._id,
-                        createdByUserName: decodedToken['_doc'].Name,
+                        createdBy: decodedToken._id,
+                        createdByUserName: decodedToken.Name,
                     },
                 },
             },

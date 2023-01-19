@@ -1,42 +1,60 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import {
+    BadRequestException,
+    HttpException,
+    HttpStatus,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { MODEL_ENUMS } from 'src/shared/enums/model.enums';
-import { addOrganizationsToUserDto, addUsersToOrganizationDto, removeOrganizationsfromUserDto, removeUsersfromOrganizationDto, UserDto, UserUpdateDto } from './dto/user.dto';
+import {
+    addOrganizationsToUserDto,
+    addUsersToOrganizationDto,
+    removeOrganizationsfromUserDto,
+    removeUsersfromOrganizationDto,
+    UserDto,
+    UserUpdateDto,
+} from './dto/user.dto';
 import { UserSearchCriteriaDto } from './dto/user.searchCriteria.dto';
 import { UserDocument } from './schemas/user.schemas';
 import * as bcrypt from 'bcrypt';
 import { ResetPasswordDto } from './dto/resetPassword.dto';
 
-
 @Injectable()
 export class UsersService {
-    @InjectModel(MODEL_ENUMS.USERS) private usersModel: Model<UserDocument>
+    @InjectModel(MODEL_ENUMS.USERS) private usersModel: Model<UserDocument>;
     constructor() {
     }
 
     /**
-     * To create new user 
+     * To create new user
      * @param createUserDto new user data to create a new user
-     * @returns the new user 
+     * @returns the new user
      */
     async createUser(createUserDto: UserDto): Promise<UserDocument> {
-        const hasedPassword  = await this.generatePassword(createUserDto.password)
+        const hasedPassword = await this.generatePassword(
+            createUserDto.password,
+        );
         createUserDto.password = hasedPassword;
         const newUser = await new this.usersModel(createUserDto);
         return newUser.save();
-        
     }
 
     /**
      * to update the existing User
-     * @param id userId 
+     * @param id userId
      * @param updateUserDTO new data to update the user
      * @returns the update user details
      */
-    async updateUser(id: string, updateUserDTO: UserUpdateDto): Promise<UserDocument> {
-        if(updateUserDTO.password){
-            const hasedPassword = await this.generatePassword(updateUserDTO.password);
+    async updateUser(
+        id: string,
+        updateUserDTO: UserUpdateDto,
+    ): Promise<UserDocument> {
+        if (updateUserDTO.password) {
+            const hasedPassword = await this.generatePassword(
+                updateUserDTO.password,
+            );
             updateUserDTO.password = hasedPassword;
         }
         const existingUser = await this.usersModel.findByIdAndUpdate(
@@ -58,7 +76,7 @@ export class UsersService {
     async getUserById(id: string): Promise<UserDocument> {
         const existingUser = await this.usersModel.findById(id);
         if (!existingUser) {
-            throw new NotFoundException(`user with ${id} is not found`)
+            throw new NotFoundException(`user with ${id} is not found`);
         }
         return existingUser;
     }
@@ -108,10 +126,7 @@ export class UsersService {
      * @param object is details that to update
      * @returns the updated user details
      */
-    async updateUserByEmail(
-        email: string,
-        object: any,
-    ): Promise<UserDocument> {
+    async updateUserByEmail(email: string, object: any): Promise<UserDocument> {
         const existingUser = await this.usersModel.findOneAndUpdate(
             { email: email },
             object,
@@ -123,8 +138,12 @@ export class UsersService {
         return existingUser;
     }
 
-    async getUsersByorganizationId(organizationId: string): Promise<UserDocument[]> {
-        const users = await this.usersModel.find({ organization: organizationId });
+    async getUsersByorganizationId(
+        organizationId: string,
+    ): Promise<UserDocument[]> {
+        const users = await this.usersModel.find({
+            organization: organizationId,
+        });
         if (!users || users.length == 0) {
             throw new NotFoundException('users data not found!');
         }
@@ -142,52 +161,53 @@ export class UsersService {
     // }
 
     async usersSearchCriteria(criteria: UserSearchCriteriaDto): Promise<any> {
-        const search = { $and: [] }
+        const search = { $and: [] };
 
         if (criteria.user) {
             search.$and.push({
-                Name: new RegExp(criteria.user.toString(), 'i')
-            })
+                Name: new RegExp(criteria.user.toString(), 'i'),
+            });
         }
 
         if (criteria.role) {
             search.$and.push({
-                roles: criteria.role
-            })
+                roles: criteria.role,
+            });
         }
 
         if (criteria.isActive !== null && criteria.isActive !== undefined) {
-            search.$and.push(
-                { isActive: criteria.isActive },
-            )
+            search.$and.push({ isActive: criteria.isActive });
         }
 
         if (criteria.userId) {
-            search.$and.push(
-                {
-                    "_id": new Types.ObjectId(criteria.userId)
-                }
-            )
+            search.$and.push({
+                _id: new Types.ObjectId(criteria.userId),
+            });
         }
 
-        if(criteria.type) {
+        if (criteria.type) {
             search.$and.push({
-                "organizationsdata.type" : criteria.type
-            })
+                'organizationsdata.type': criteria.type,
+            });
         }
 
-        if(criteria.organizationSerach) {
+        if (criteria.organizationSerach) {
             search.$and.push({
-                "organizationsdata.organization" : new RegExp(criteria.organizationSerach.toString(), 'i')
-            })
+                'organizationsdata.organization': new RegExp(
+                    criteria.organizationSerach.toString(),
+                    'i',
+                ),
+            });
         }
 
         let paginationProps: any = [
-            { $match: search.$and.length > 0 ? search : {} }
+            { $match: search.$and.length > 0 ? search : {} },
         ];
 
-        if ((criteria.pageSize || criteria.pageSize > 0) &&
-            (criteria.pageNumber || criteria.pageNumber === 0)) {
+        if (
+            (criteria.pageSize || criteria.pageSize > 0) &&
+            (criteria.pageNumber || criteria.pageNumber === 0)
+        ) {
             paginationProps.push({
                 $skip: criteria.pageNumber * criteria.pageSize,
             });
@@ -211,26 +231,38 @@ export class UsersService {
                 },
             },
             {
-                $facet : {
-                    active : [
-                        {$match : {isActive : true}},
-                        { $count: "activeUsers" },
+                $facet: {
+                    active: [
+                        { $match: { isActive: true } },
+                        { $count: 'activeUsers' },
                     ],
                     inActive: [
-                        {$match : {isActive : false}},
-                        { $count: "inActiveUsers" },
+                        { $match: { isActive: false } },
+                        { $count: 'inActiveUsers' },
                     ],
                     ministries: [
-                        {$match : {"organizationsdata.type" : "63973bfb61ab6f49bfdd3c35",isActive : true}},
-                        { $count: "ministriesCount" },
+                        {
+                            $match: {
+                                'organizationsdata.type':
+                                    '63973bfb61ab6f49bfdd3c35',
+                                isActive: true,
+                            },
+                        },
+                        { $count: 'ministriesCount' },
                     ],
                     associations: [
-                        {$match : {"organizationsdata.type" : "63973c8961ab6f49bfdd3c38",isActive : true}},
-                        { $count: "associationCount" },
-                    ]
-                }
-            }
-        ])
+                        {
+                            $match: {
+                                'organizationsdata.type':
+                                    '63973c8961ab6f49bfdd3c38',
+                                isActive: true,
+                            },
+                        },
+                        { $count: 'associationCount' },
+                    ],
+                },
+            },
+        ]);
 
         const results = await this.usersModel.aggregate([
             {
@@ -246,96 +278,115 @@ export class UsersService {
                     users: paginationProps,
                     metrics: [
                         { $match: search.$and.length > 0 ? search : {} },
-                        { $count: "totalCount" },
+                        { $count: 'totalCount' },
                     ],
                 },
             },
-        ])
+        ]);
 
         if (!results || results.length == 0) {
-            throw new HttpException(
-                `Users not found`,
-                HttpStatus.NOT_FOUND
-            )
+            throw new HttpException(`Users not found`, HttpStatus.NOT_FOUND);
         }
-        return {results,metrics};
-
+        return { results, metrics };
     }
 
-    async removeUsersFormOrganization(updateDetails : removeUsersfromOrganizationDto) : Promise<any>{
+    async removeUsersFormOrganization(
+        updateDetails: removeUsersfromOrganizationDto,
+    ): Promise<any> {
         const result = await this.usersModel.updateMany(
-            {'_id': updateDetails.userIds},
-            {$pull : {'organization' : updateDetails.organizationId}}
+            { _id: updateDetails.userIds },
+            { $pull: { organization: updateDetails.organizationId } },
         );
 
         if (!result) {
-            throw new NotFoundException(`users not found`)
+            throw new NotFoundException(`users not found`);
         }
 
         return result;
     }
 
-    async removeOrganizationsFormUser(updateDetails : removeOrganizationsfromUserDto) : Promise<any>{
+    async removeOrganizationsFormUser(
+        updateDetails: removeOrganizationsfromUserDto,
+    ): Promise<any> {
         const result = await this.usersModel.updateOne(
-            {'_id': updateDetails.userId},
-            {$pull : {'organization' : {$in:updateDetails.organizationIds}}}
+            { _id: updateDetails.userId },
+            { $pull: { organization: { $in: updateDetails.organizationIds } } },
         );
 
         if (!result) {
-            throw new NotFoundException(`Organizations not found`)
+            throw new NotFoundException(`Organizations not found`);
         }
 
         return result;
     }
 
-    async addUsersToOrganization(updateDetails : addUsersToOrganizationDto) : Promise<any>{
+    async addUsersToOrganization(
+        updateDetails: addUsersToOrganizationDto,
+    ): Promise<any> {
         const result = await this.usersModel.updateMany(
-            {'_id': updateDetails.userIds},
-            {$push : {'organization' : updateDetails.organizationId}}
+            { _id: updateDetails.userIds },
+            { $push: { organization: updateDetails.organizationId } },
         );
 
         if (!result) {
-            throw new NotFoundException(`users not found`)
+            throw new NotFoundException(`users not found`);
         }
 
         return result;
     }
 
-    async addOrganizationsToUsers(updateDetails:addOrganizationsToUserDto) : Promise<any>{
+    async addOrganizationsToUsers(
+        updateDetails: addOrganizationsToUserDto,
+    ): Promise<any> {
         const result = await this.usersModel.updateOne(
-            {'_id': updateDetails.userId},
-            {$push : {'organization' : updateDetails.organizationIds}}
+            { _id: updateDetails.userId },
+            { $push: { organization: updateDetails.organizationIds } },
         );
 
         if (!result) {
-            throw new NotFoundException(`users not found`)
+            throw new NotFoundException(`users not found`);
         }
 
         return result;
     }
 
-    async userResetPassword(resetPasswordDetails : ResetPasswordDto): Promise<any>{
-        const user = await this.usersModel.findById(resetPasswordDetails.userId);
-        if(!user){
-            throw new NotFoundException(`User with ${resetPasswordDetails.userId} is Not found`);
+    async userResetPassword(
+        resetPasswordDetails: ResetPasswordDto,
+    ): Promise<any> {
+        const user = await this.usersModel.findById(
+            resetPasswordDetails.userId,
+        );
+        if (!user) {
+            throw new NotFoundException(
+                `User with ${resetPasswordDetails.userId} is Not found`,
+            );
         }
-        const verifyUser : any = await this.verifyPassword(resetPasswordDetails.oldPassword, user.password);
-        if(!verifyUser){
-            throw new BadRequestException('Invaild Password ! Please tryn again with correct password');
+        const verifyUser: any = await this.verifyPassword(
+            resetPasswordDetails.oldPassword,
+            user.password,
+        );
+        if (!verifyUser) {
+            throw new BadRequestException(
+                'Invaild Password ! Please tryn again with correct password',
+            );
         }
-        const hashedPassword = await this.generatePassword(resetPasswordDetails.newPassword);
-        const result = await this.usersModel.findByIdAndUpdate(resetPasswordDetails.userId, { password: hashedPassword })
+        const hashedPassword = await this.generatePassword(
+            resetPasswordDetails.newPassword,
+        );
+        const result = await this.usersModel.findByIdAndUpdate(
+            resetPasswordDetails.userId,
+            { password: hashedPassword },
+        );
         return result;
-        
     }
 
     /**
-     * it will genrate the hashed password 
+     * it will genrate the hashed password
      * @param password user Password
      * @returns the hashed password
      */
-    async generatePassword(password: string):Promise<any> {
-        const hash = await bcrypt.hashSync(password,10);
+    async generatePassword(password: string): Promise<any> {
+        const hash = await bcrypt.hashSync(password, 10);
         return hash;
     }
 
@@ -345,9 +396,15 @@ export class UsersService {
      * @param hashedPassword allready hashed and stored password
      * @returns a boolean true or false;
      */
-    async verifyPassword(password: string, hashedPassword: string) : Promise<any> {
-
+    async verifyPassword(
+        password: string,
+        hashedPassword: string,
+    ): Promise<any> {
         const result = await bcrypt.compareSync(password, hashedPassword);
-        return result
+        return result;
+    }
+
+    async logUserActvity(user) {
+        console.log(user);
     }
 }
