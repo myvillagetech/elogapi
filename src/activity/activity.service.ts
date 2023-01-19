@@ -25,7 +25,7 @@ export class ActivityService {
     @InjectModel(MODEL_ENUMS.ACTIVITIES)
     private activityModel: Model<ActivityDocument>;
 
-    constructor(private readonly authService: AuthService) {}
+    constructor(private readonly authService: AuthService) { }
 
     async createActivity(
         activityDto: ActivityDto,
@@ -487,7 +487,7 @@ export class ActivityService {
 
         const lessThantoday = {
             dueDate: {
-                $lte: dayjs().startOf('day').toDate(),
+                $gte: dayjs().startOf('day').toDate(),
             },
         };
 
@@ -501,7 +501,7 @@ export class ActivityService {
                                 $and: [
                                     {
                                         dueDate: {
-                                            $lte: dayjs()
+                                            $lt: dayjs()
                                                 .startOf('day')
                                                 .toDate(),
                                         },
@@ -509,14 +509,8 @@ export class ActivityService {
                                     {
                                         dueDate: {
                                             $gte: dayjs()
-                                                .subtract(
-                                                    getMilliSecondsbyParam({
-                                                        unit: 'W',
-                                                        quantity: 1,
-                                                    }),
-                                                    'ms',
-                                                )
                                                 .startOf('day')
+                                                .subtract(1, 'week')
                                                 .toDate(),
                                         },
                                     },
@@ -531,29 +525,17 @@ export class ActivityService {
                                 $and: [
                                     {
                                         dueDate: {
-                                            $lte: dayjs()
-                                                .subtract(
-                                                    getMilliSecondsbyParam({
-                                                        unit: 'W',
-                                                        quantity: 1,
-                                                    }),
-                                                    'ms',
-                                                )
+                                            $lt: dayjs()
                                                 .startOf('day')
+                                                .subtract(1, 'week')
                                                 .toDate(),
                                         },
                                     },
                                     {
                                         dueDate: {
                                             $gte: dayjs()
-                                                .subtract(
-                                                    getMilliSecondsbyParam({
-                                                        unit: 'W',
-                                                        quantity: 2,
-                                                    }),
-                                                    'ms',
-                                                )
                                                 .startOf('day')
+                                                .subtract(2, 'week')
                                                 .toDate(),
                                         },
                                     },
@@ -568,29 +550,17 @@ export class ActivityService {
                                 $and: [
                                     {
                                         dueDate: {
-                                            $lte: dayjs()
-                                                .subtract(
-                                                    getMilliSecondsbyParam({
-                                                        unit: 'W',
-                                                        quantity: 2,
-                                                    }),
-                                                    'ms',
-                                                )
+                                            $lt: dayjs()
                                                 .startOf('day')
+                                                .subtract(2, 'week')
                                                 .toDate(),
                                         },
                                     },
                                     {
                                         dueDate: {
                                             $gte: dayjs()
-                                                .subtract(
-                                                    getMilliSecondsbyParam({
-                                                        unit: 'M',
-                                                        quantity: 1,
-                                                    }),
-                                                    'ms',
-                                                )
                                                 .startOf('day')
+                                                .subtract(1, 'month')
                                                 .toDate(),
                                         },
                                     },
@@ -605,9 +575,9 @@ export class ActivityService {
                                 $and: [
                                     {
                                         dueDate: {
-                                            $lte: dayjs()
-                                                .subtract(1, 'M')
+                                            $lt: dayjs()
                                                 .startOf('day')
+                                                .subtract(1, 'month')
                                                 .toDate(),
                                         },
                                     },
@@ -620,7 +590,7 @@ export class ActivityService {
                         {
                             $match: {
                                 dueDate: {
-                                    $gte: dayjs().startOf('day'),
+                                    $gte: dayjs().startOf('day').toDate(),
                                 },
                             },
                         },
