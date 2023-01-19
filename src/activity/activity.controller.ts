@@ -365,7 +365,7 @@ export class ActivityController {
         }
     }
 
-    @Post('getDashBoardActivityMetrics')
+    @Post('dashboard/getDashBoardActivityMetrics')
     async getDashBoardActivityMetrics(@Body() request: ActivityMetricsRequest) {
         try {
             const result =
@@ -385,17 +385,17 @@ export class ActivityController {
         }
     }
 
-    @Get('getDashBoardDueDateMetrics')
+    @Get('dashboard/getDashBoardDueDateMetrics')
     async getDashBoardDueDateMetrics() {
         try {
             const result =
                 await this.activityService.getDashBoardDueDateMetrics();
             return result;
-            return response.status(HttpStatus.OK).json({
-                message: 'fetched activities Successfully',
-                data: result,
-                success: true,
-            });
+            // return response.status(HttpStatus.OK).json({
+            //     message: 'fetched activities Successfully',
+            //     data: result,
+            //     success: true,
+            // });
         } catch (error) {
             return response.status(error.status).json({
                 message: 'Unable to fetch activities',

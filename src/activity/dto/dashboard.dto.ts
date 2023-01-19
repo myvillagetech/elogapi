@@ -5,7 +5,7 @@ export class ActivityMetricsRequest {
     @ApiProperty({
         type: DateFilter,
     })
-    readonly dateRnge: DateFilter;
+    readonly dateRange: DateFilter;
 
     @ApiProperty({
         type: String,

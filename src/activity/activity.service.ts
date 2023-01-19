@@ -438,24 +438,26 @@ export class ActivityService {
             });
         }
 
-        if (request.dateRnge.fromDate) {
+        if (request.dateRange?.fromDate) {
             search.$and.push({
                 createdAt: {
-                    $gte: dayjs(request.dateRnge.fromDate).startOf('day'),
+                    $gte: dayjs(request.dateRange.fromDate)
+                        .startOf('day')
+                        .toDate(),
                 },
             });
         }
 
-        if (request.dateRnge.toDate) {
+        if (request.dateRange?.toDate) {
             search.$and.push({
                 createdAt: {
-                    $lte: dayjs(request.dateRnge.toDate).endOf('day'),
+                    $lte: dayjs(request.dateRange.toDate).endOf('day').toDate(),
                 },
             });
         }
 
         const result = await this.activityModel.aggregate([
-            { $match: search },
+            { $match: search.$and.length > 0 ? search : {} },
             {
                 $facet: {
                     new: [
@@ -483,19 +485,29 @@ export class ActivityService {
     async getDashBoardDueDateMetrics() {
         const search = { $and: [] };
 
+        const lessThantoday = {
+            dueDate: {
+                $lte: dayjs().startOf('day').toDate(),
+            },
+        };
+
         const result = await this.activityModel.aggregate([
-            { $match: search },
+            // { $match: search },
             {
                 $facet: {
                     oneWeek: [
                         {
                             $match: {
-                                dueDate: {
-                                    $and: [
-                                        {
-                                            $lte: dayjs().startOf('day'),
+                                $and: [
+                                    {
+                                        dueDate: {
+                                            $lte: dayjs()
+                                                .startOf('day')
+                                                .toDate(),
                                         },
-                                        {
+                                    },
+                                    {
+                                        dueDate: {
                                             $gte: dayjs()
                                                 .subtract(
                                                     getMilliSecondsbyParam({
@@ -504,10 +516,11 @@ export class ActivityService {
                                                     }),
                                                     'ms',
                                                 )
-                                                .startOf('day'),
+                                                .startOf('day')
+                                                .toDate(),
                                         },
-                                    ],
-                                },
+                                    },
+                                ],
                             },
                         },
                         { $count: 'oneWeek' },
@@ -515,9 +528,9 @@ export class ActivityService {
                     oneToTwoWeek: [
                         {
                             $match: {
-                                dueDate: {
-                                    $and: [
-                                        {
+                                $and: [
+                                    {
+                                        dueDate: {
                                             $lte: dayjs()
                                                 .subtract(
                                                     getMilliSecondsbyParam({
@@ -526,9 +539,12 @@ export class ActivityService {
                                                     }),
                                                     'ms',
                                                 )
-                                                .startOf('day'),
+                                                .startOf('day')
+                                                .toDate(),
                                         },
-                                        {
+                                    },
+                                    {
+                                        dueDate: {
                                             $gte: dayjs()
                                                 .subtract(
                                                     getMilliSecondsbyParam({
@@ -537,10 +553,11 @@ export class ActivityService {
                                                     }),
                                                     'ms',
                                                 )
-                                                .startOf('day'),
+                                                .startOf('day')
+                                                .toDate(),
                                         },
-                                    ],
-                                },
+                                    },
+                                ],
                             },
                         },
                         { $count: 'oneToTwoWeeks' },
@@ -548,9 +565,9 @@ export class ActivityService {
                     twoWeeksToOneMonth: [
                         {
                             $match: {
-                                dueDate: {
-                                    $and: [
-                                        {
+                                $and: [
+                                    {
+                                        dueDate: {
                                             $lte: dayjs()
                                                 .subtract(
                                                     getMilliSecondsbyParam({
@@ -559,9 +576,12 @@ export class ActivityService {
                                                     }),
                                                     'ms',
                                                 )
-                                                .startOf('day'),
+                                                .startOf('day')
+                                                .toDate(),
                                         },
-                                        {
+                                    },
+                                    {
+                                        dueDate: {
                                             $gte: dayjs()
                                                 .subtract(
                                                     getMilliSecondsbyParam({
@@ -570,10 +590,11 @@ export class ActivityService {
                                                     }),
                                                     'ms',
                                                 )
-                                                .startOf('day'),
+                                                .startOf('day')
+                                                .toDate(),
                                         },
-                                    ],
-                                },
+                                    },
+                                ],
                             },
                         },
                         { $count: 'twoWeeksToOneMonth' },
@@ -581,15 +602,16 @@ export class ActivityService {
                     moreThanAMonth: [
                         {
                             $match: {
-                                dueDate: {
-                                    $and: [
-                                        {
+                                $and: [
+                                    {
+                                        dueDate: {
                                             $lte: dayjs()
                                                 .subtract(1, 'M')
-                                                .startOf('day'),
+                                                .startOf('day')
+                                                .toDate(),
                                         },
-                                    ],
-                                },
+                                    },
+                                ],
                             },
                         },
                         { $count: 'moreThanAMonth' },
@@ -598,11 +620,7 @@ export class ActivityService {
                         {
                             $match: {
                                 dueDate: {
-                                    $and: [
-                                        {
-                                            $gte: dayjs().startOf('day'),
-                                        },
-                                    ],
+                                    $gte: dayjs().startOf('day'),
                                 },
                             },
                         },
