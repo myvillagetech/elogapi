@@ -19,13 +19,17 @@ import { ActivityDocument } from './schemas/activity.schema';
 import * as dayjs from 'dayjs';
 import { getMilliSecondsbyParam } from 'src/shared/services/date-time-helpers';
 import { ActivityMetricsRequest } from './dto/dashboard.dto';
+import { ActivityMasterdataService } from 'src/generic/activity-masterdata/activity-masterdata.service';
 
 @Injectable()
 export class ActivityService {
     @InjectModel(MODEL_ENUMS.ACTIVITIES)
     private activityModel: Model<ActivityDocument>;
 
-    constructor(private readonly authService: AuthService) { }
+    constructor(
+        private readonly authService: AuthService,
+        private readonly masterDataService: ActivityMasterdataService,
+    ) {}
 
     async createActivity(
         activityDto: ActivityDto,
@@ -595,6 +599,80 @@ export class ActivityService {
                             },
                         },
                         { $count: 'OnTime' },
+                    ],
+                },
+            },
+        ]);
+        return result;
+    }
+
+    async getDashBoardRelatedToMetricsMetrics() {
+        const search = { $and: [] };
+
+        let relatedtoTypes =
+            await this.masterDataService.getAllActivityRelatedToTypes();
+
+        relatedtoTypes = relatedtoTypes.map((t: any) => t._doc);
+
+        const result = await this.activityModel.aggregate([
+            { $match: search.$and.length > 0 ? search : {} },
+            {
+                $facet: {
+                    singleMinistry: [
+                        {
+                            $match: {
+                                activityRelatedTo: new mongoose.Types.ObjectId(
+                                    relatedtoTypes
+                                        .find(
+                                            (type) =>
+                                                type.name ===
+                                                'Single Ministry/Department',
+                                        )
+                                        ._id.toString(),
+                                ),
+                            },
+                        },
+                        { $count: 'singleMinistry' },
+                    ],
+                    multiMinistry: [
+                        {
+                            $match: {
+                                activityRelatedTo: new mongoose.Types.ObjectId(
+                                    relatedtoTypes
+                                        .find(
+                                            (type) =>
+                                                type.name ===
+                                                'Multiple Ministries/Departments',
+                                        )
+                                        ._id.toString(),
+                                ),
+                            },
+                        },
+                        { $count: 'multiMinistry' },
+                    ],
+                    others: [
+                        {
+                            $match: {
+                                activityRelatedTo: new mongoose.Types.ObjectId(
+                                    relatedtoTypes
+                                        .find((type) => type.name === 'Others')
+                                        ._id.toString(),
+                                ),
+                            },
+                        },
+                        { $count: 'others' },
+                    ],
+                    none: [
+                        {
+                            $match: {
+                                $or: [
+                                    { activityRelatedTo: null },
+                                    { activityRelatedTo: '' },
+                                    { activityRelatedTo: { $exists: false } },
+                                ],
+                            },
+                        },
+                        { $count: 'none' },
                     ],
                 },
             },

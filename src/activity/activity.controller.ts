@@ -404,4 +404,24 @@ export class ActivityController {
             });
         }
     }
+
+    @Get('dashboard/getDashBoardRelatedToMetricsMetrics')
+    async getDashBoardRelatedToMetricsMetrics() {
+        try {
+            const result =
+                await this.activityService.getDashBoardRelatedToMetricsMetrics();
+            return result;
+            // return response.status(HttpStatus.OK).json({
+            //     message: 'fetched activities Successfully',
+            //     data: result,
+            //     success: true,
+            // });
+        } catch (error) {
+            return response.status(error.status).json({
+                message: 'Unable to fetch activities',
+                error: error,
+                success: false,
+            });
+        }
+    }
 }
