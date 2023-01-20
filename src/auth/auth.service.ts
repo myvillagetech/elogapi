@@ -12,7 +12,13 @@ export class AuthService {
 
     getDecodedToken(token: string) {
         const tokenPart = token ? token.split(' ')[1] : '';
-        return verify(tokenPart, process.env.ACCESS_SECRET);
+
+        try {
+            return verify(tokenPart, process.env.ACCESS_SECRET);
+        } catch (e) {
+            console.error(e.message);
+            return null;
+        }
     }
 
     async login(loginDetails: LoginDto): Promise<any> {

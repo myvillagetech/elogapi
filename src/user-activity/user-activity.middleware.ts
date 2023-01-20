@@ -13,7 +13,7 @@ export class UserActivityMiddleware implements NestMiddleware {
             const user = this.authService.getDecodedToken(
                 req.headers.authorization,
             );
-            this.usersService.logUserActvity(user);
+            user && this.usersService.logUserActvity(user);
         }
 
         next();
