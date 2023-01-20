@@ -21,6 +21,7 @@ import { UserDocument } from './schemas/user.schemas';
 import * as bcrypt from 'bcrypt';
 import { ResetPasswordDto } from './dto/resetPassword.dto';
 import { UserActivityLogDocument } from './schemas/user.activitylog';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class UsersService {
@@ -333,6 +334,78 @@ export class UsersService {
         if (!result) {
             throw new NotFoundException(`users not found`);
         }
+
+        return result;
+    }
+
+    async getUserMetrics(): Promise<any> {
+        const result = await this.usersModel.aggregate([
+            {
+                $lookup: {
+                    from: MODEL_ENUMS.USERS_ACTIVITY_LOG,
+                    localField: '_id',
+                    foreignField: 'user',
+                    as: 'useractivitylogs',
+                },
+            },
+            // { $unwind: { path: '$useractivitylogs' } },
+            {
+                $facet: {
+                    // activeUsers: [{ $match: { isActive: true } }],
+                    active: [
+                        { $match: { isActive: true } },
+                        { $count: 'active' },
+                    ],
+                    inActive: [
+                        { $match: { isActive: false } },
+                        { $count: 'inActive' },
+                    ],
+                    moreThanOneOrg: [
+                        {
+                            $match: {
+                                $and: [
+                                    { organization: { $exists: true } },
+                                    { 'organization.1': { $exists: true } },
+                                ],
+                            },
+                        },
+                        { $count: 'moreThanOneOrg' },
+                    ],
+                    activeLast24Hours: [
+                        {
+                            $match: {
+                                'useractivitylogs.updatedAt': {
+                                    $gt: dayjs().subtract(24, 'h').toDate(),
+                                },
+                            },
+                        },
+                        { $count: 'activeLast24Hours' },
+                    ],
+                },
+            },
+            {
+                $addFields: {
+                    active: {
+                        $arrayElemAt: ['$active', 0],
+                    },
+                    inActive: {
+                        $arrayElemAt: ['$inActive', 0],
+                    },
+                    moreThanOneOrg: { $arrayElemAt: ['$moreThanOneOrg', 0] },
+                    activeLast24Hours: {
+                        $arrayElemAt: ['$activeLast24Hours', 0],
+                    },
+                },
+            },
+            {
+                $addFields: {
+                    active: '$active.active',
+                    inActive: '$inActive.inActive',
+                    moreThanOneOrg: '$moreThanOneOrg.moreThanOneOrg',
+                    activeLast24Hours: '$activeLast24Hours.activeLast24Hours',
+                },
+            },
+        ]);
 
         return result;
     }
