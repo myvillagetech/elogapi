@@ -1,32 +1,45 @@
 /* eslint-disable prettier/prettier */
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import {
+    HttpException,
+    HttpStatus,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { MODEL_ENUMS } from 'src/shared/enums/model.enums';
+import { UserActivityLogDocument } from 'src/users/schemas/user.activitylog';
 import { UserDocument } from 'src/users/schemas/user.schemas';
 import { UsersService } from 'src/users/users.service';
 import { OrganizationSearchCriteriaDto } from './dto/organization.searchCriteria.dto';
-import { OrganizationDto, updateOrganizationDto } from './dto/organizations.dto';
+import {
+    OrganizationDto,
+    updateOrganizationDto,
+} from './dto/organizations.dto';
 import { OrganizationDocument } from './schemas/organizations.schema';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class OrganizationsService {
-    @InjectModel(MODEL_ENUMS.ORGANIZATIONS) private organizationsModel : Model<OrganizationDocument>
-    constructor(
-        private userService : UsersService
-    ){
+    @InjectModel(MODEL_ENUMS.ORGANIZATIONS)
+    private organizationsModel: Model<OrganizationDocument>;
+    @InjectModel(MODEL_ENUMS.USERS_ACTIVITY_LOG)
+    private userActivityLogsModel: Model<UserActivityLogDocument>;
+    constructor(private userService: UsersService) {}
 
-    }
-
-    async createOrganization(createOrganizationDto : OrganizationDto) : Promise <OrganizationDocument>{
-        const newOrganization = await new this.organizationsModel(createOrganizationDto);
+    async createOrganization(
+        createOrganizationDto: OrganizationDto,
+    ): Promise<OrganizationDocument> {
+        const newOrganization = await new this.organizationsModel(
+            createOrganizationDto,
+        );
         return newOrganization.save();
     }
 
     async getOrganizationById(id: string): Promise<OrganizationDocument> {
         const existingUser = await this.organizationsModel.findById(id);
         if (!existingUser) {
-            throw new NotFoundException(`organization with ${id} is not found`)
+            throw new NotFoundException(`organization with ${id} is not found`);
         }
         return existingUser;
     }
@@ -39,83 +52,101 @@ export class OrganizationsService {
         return organizations;
     }
 
-    async getAllOrganizationsbyUserId(userId:string): Promise<OrganizationDocument[]>{
-        const user : UserDocument = await this.userService.getUserById(userId);
+    async getAllOrganizationsbyUserId(
+        userId: string,
+    ): Promise<OrganizationDocument[]> {
+        const user: UserDocument = await this.userService.getUserById(userId);
 
-        const organizations = this.organizationsModel.find({_id : {$in :user.organization}})
+        const organizations = this.organizationsModel.find({
+            _id: { $in: user.organization },
+        });
 
-        if(organizations){
+        if (organizations) {
             return organizations;
-        }else{
+        } else {
             throw new NotFoundException('organizations data not found!');
         }
-        
     }
 
-    async organizationTextSerach(searchString: string): Promise<OrganizationDocument[]> {
-        const search = searchString ? {
-            $or: [
-                { organization: new RegExp(searchString.toString(), 'i') },
-                { shortName: new RegExp(searchString.toString(), 'i') }
-            ]
-        } : {};
+    async organizationTextSerach(
+        searchString: string,
+    ): Promise<OrganizationDocument[]> {
+        const search = searchString
+            ? {
+                  $or: [
+                      {
+                          organization: new RegExp(
+                              searchString.toString(),
+                              'i',
+                          ),
+                      },
+                      { shortName: new RegExp(searchString.toString(), 'i') },
+                  ],
+              }
+            : {};
 
         const results = await this.organizationsModel.find(search);
         return results;
     }
 
-    async organizationSearchCriteria(criteria: OrganizationSearchCriteriaDto): Promise<any> {
-        const search = { $and: [] }
+    async organizationSearchCriteria(
+        criteria: OrganizationSearchCriteriaDto,
+    ): Promise<any> {
+        const search = { $and: [] };
 
         if (criteria.organization) {
             search.$and.push({
                 $or: [
-                    { organization: new RegExp(criteria.organization.toString(), 'i') },
-                    { shortName: new RegExp(criteria.organization.toString(), 'i') }
-                ]
-            })
+                    {
+                        organization: new RegExp(
+                            criteria.organization.toString(),
+                            'i',
+                        ),
+                    },
+                    {
+                        shortName: new RegExp(
+                            criteria.organization.toString(),
+                            'i',
+                        ),
+                    },
+                ],
+            });
         }
 
-        if(criteria.organizationId) {
-            search.$and.push(
-                {
-                    "_id" : new Types.ObjectId(criteria.organizationId)
-                }
-            )
+        if (criteria.organizationId) {
+            search.$and.push({
+                _id: new Types.ObjectId(criteria.organizationId),
+            });
         }
 
         if (criteria.isActive !== null && criteria.isActive !== undefined) {
-            search.$and.push(
-                { isActive: criteria.isActive },
-            )
+            search.$and.push({ isActive: criteria.isActive });
         }
 
         if (criteria.type) {
-            search.$and.push(
-                { type: criteria.type},
-            )
+            search.$and.push({ type: criteria.type });
         }
 
-        if(criteria.userId){
-            search.$and.push(
-                {
-                    "users._id" : new Types.ObjectId(criteria.userId)
-                }
-            )
-        }
-
-        if(criteria.userSearch){
+        if (criteria.userId) {
             search.$and.push({
-                "users.Name" : new RegExp(criteria.userSearch.toString(), 'i')
-            })
+                'users._id': new Types.ObjectId(criteria.userId),
+            });
+        }
+
+        if (criteria.userSearch) {
+            search.$and.push({
+                'users.Name': new RegExp(criteria.userSearch.toString(), 'i'),
+            });
         }
 
         let paginationProps: any = [
-            { $match: search.$and.length > 0 ? search : {} }
+            { $match: search.$and.length > 0 ? search : {} },
         ];
 
-        if ((criteria.pageSize || criteria.pageSize > 0) &&
-            (criteria.pageNumber || criteria.pageNumber === 0)) {
+        if (
+            (criteria.pageSize || criteria.pageSize > 0) &&
+            (criteria.pageNumber || criteria.pageNumber === 0)
+        ) {
             paginationProps.push({
                 $skip: criteria.pageNumber * criteria.pageSize,
             });
@@ -133,26 +164,35 @@ export class OrganizationsService {
             {
                 $facet: {
                     active: [
-                        {$match : {isActive : true}},
-                        { $count: "activeOrganizatiosns" },
+                        { $match: { isActive: true } },
+                        { $count: 'activeOrganizatiosns' },
                     ],
                     inActive: [
-                        {$match : {isActive : false}},
-                        { $count: "inActiveOrganizatiosns" },
+                        { $match: { isActive: false } },
+                        { $count: 'inActiveOrganizatiosns' },
                     ],
                     ministries: [
-                        {$match : {type : "63973bfb61ab6f49bfdd3c35",isActive : true}},
-                        { $count: "ministriesCount" },
+                        {
+                            $match: {
+                                type: '63973bfb61ab6f49bfdd3c35',
+                                isActive: true,
+                            },
+                        },
+                        { $count: 'ministriesCount' },
                     ],
                     associations: [
-                        {$match : {type : "63973c8961ab6f49bfdd3c38",isActive : true}},
-                        { $count: "associationCount" },
-                    ]
-                }
-            }
+                        {
+                            $match: {
+                                type: '63973c8961ab6f49bfdd3c38',
+                                isActive: true,
+                            },
+                        },
+                        { $count: 'associationCount' },
+                    ],
+                },
+            },
         ]);
-        const results:any = await this.organizationsModel.aggregate([
-            
+        const results: any = await this.organizationsModel.aggregate([
             {
                 $lookup: {
                     from: MODEL_ENUMS.USERS,
@@ -167,47 +207,110 @@ export class OrganizationsService {
                     organizations: paginationProps,
                     metrics: [
                         { $match: search.$and.length > 0 ? search : {} },
-                        { $count: "totalCount" },
-                    ]
+                        { $count: 'totalCount' },
+                    ],
                 },
             },
-        ])
+        ]);
 
         if (!results || results.length == 0) {
             throw new HttpException(
                 `Organizations not found`,
-                HttpStatus.NOT_FOUND
-            )
+                HttpStatus.NOT_FOUND,
+            );
         }
 
         //return results;
 
         // results.metricDetails = metrics;
-        return {results,metrics };
-
+        return { results, metrics };
     }
 
-
-    async updateOrganization(organizationId : string, updateOrganizationDetails:updateOrganizationDto) : Promise<OrganizationDocument>{
+    async updateOrganization(
+        organizationId: string,
+        updateOrganizationDetails: updateOrganizationDto,
+    ): Promise<OrganizationDocument> {
         const organization = await this.organizationsModel.findByIdAndUpdate(
             organizationId,
             updateOrganizationDetails,
-            { new: true},
+            { new: true },
         );
 
-        if(!organization) {
-            throw new NotFoundException(`Organization with #${organizationId} not Found`);
+        if (!organization) {
+            throw new NotFoundException(
+                `Organization with #${organizationId} not Found`,
+            );
         }
         return organization;
     }
 
-    async deleteOrganization(organizationId : string) : Promise<String>{
-        const organization = await this.organizationsModel.findByIdAndDelete(organizationId);
+    async deleteOrganization(organizationId: string): Promise<String> {
+        const organization = await this.organizationsModel.findByIdAndDelete(
+            organizationId,
+        );
 
-        if(!organization){
-            throw new NotFoundException(`Organization with #${organizationId} not Found`);
+        if (!organization) {
+            throw new NotFoundException(
+                `Organization with #${organizationId} not Found`,
+            );
         }
-        return `Organization with #${organizationId} is deleted`
+        return `Organization with #${organizationId} is deleted`;
     }
 
+    async organizationMetrics() {
+        const metrics = await this.organizationsModel.aggregate([
+            {
+                $lookup: {
+                    from: MODEL_ENUMS.USERS_ACTIVITY_LOG,
+                    localField: '_id',
+                    foreignField: 'organization',
+                    as: 'activitylogs',
+                },
+            },
+            {
+                $facet: {
+                    active: [
+                        { $match: { isActive: true } },
+                        { $count: 'active' },
+                    ],
+                    inActive: [
+                        { $match: { isActive: false } },
+                        { $count: 'inActive' },
+                    ],
+                    activeInLast24Hours: [
+                        {
+                            $match: {
+                                'activitylogs.updatedAt': {
+                                    $gt: dayjs().subtract(24, 'h').toDate(),
+                                },
+                            },
+                        },
+                        { $count: 'activeInLast24Hours' },
+                    ],
+                },
+            },
+            {
+                $addFields: {
+                    active: {
+                        $arrayElemAt: ['$active', 0],
+                    },
+                    inActive: {
+                        $arrayElemAt: ['$inActive', 0],
+                    },
+                    activeInLast24Hours: {
+                        $arrayElemAt: ['$activeInLast24Hours', 0],
+                    },
+                },
+            },
+            {
+                $addFields: {
+                    active: '$active.active',
+                    inActive: '$inActive.inActive',
+                    activeInLast24Hours: '$activeInLast24Hours.activeInLast24Hours',
+                },
+            },
+        ]);
+
+        return metrics;
+    }
 }
