@@ -1,44 +1,41 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import mongoose, { Types } from "mongoose";
-import { OrganizationSchema, OrganizationSchemaCreator } from "src/organizations/schemas/organizations.schema";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import mongoose from 'mongoose';
+import { OrganizationSchemaCreator } from 'src/organizations/schemas/organizations.schema';
 
-
-@Schema(  {
-    timestamps : true
+@Schema({
+    timestamps: true,
 })
-export class UserSchemaCreator  {
+export class UserSchemaCreator {
     @Prop()
-    email: string
+    email: string;
 
     @Prop()
-    Name: string
+    Name: string;
 
     @Prop()
-    password: string
+    password: string;
 
     @Prop({
-        type : [{type : mongoose.Schema.Types.ObjectId, ref : 'organization'}]
+        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'organization' }],
     })
-    organization : OrganizationSchemaCreator[]
+    organization: OrganizationSchemaCreator[];
 
     @Prop()
-    department : string
-
-    @Prop(
-        {
-            default  : true
-        }
-    )
-    isActive : boolean
+    department: string;
 
     @Prop({
-        type: mongoose.Types.Map
+        default: true,
     })
-    userAttributes : Object;
+    isActive: boolean;
+
+    @Prop({
+        type: mongoose.Types.Map,
+    })
+    userAttributes: Object;
 
     @Prop()
-    roles : string[]
+    roles: string[];
 }
 
 export type UserDocument = UserSchemaCreator & Document;
-export const UserSchema = SchemaFactory.createForClass(UserSchemaCreator); 
+export const UserSchema = SchemaFactory.createForClass(UserSchemaCreator);

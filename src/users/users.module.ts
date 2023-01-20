@@ -4,11 +4,20 @@ import { UsersService } from './users.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserSchema } from './schemas/user.schemas';
 import { MODEL_ENUMS } from 'src/shared/enums/model.enums';
+import { UserActivityLogSchema } from './schemas/user.activitylog';
 
 @Module({
-  imports:[MongooseModule.forFeature([{name:MODEL_ENUMS.USERS, schema : UserSchema}])],
-  controllers: [UsersController],
-  providers: [UsersService],
-  exports:[UsersService]
+    imports: [
+        MongooseModule.forFeature([
+            { name: MODEL_ENUMS.USERS, schema: UserSchema },
+            {
+                name: MODEL_ENUMS.USERS_ACTIVITY_LOG,
+                schema: UserActivityLogSchema,
+            },
+        ]),
+    ],
+    controllers: [UsersController],
+    providers: [UsersService],
+    exports: [UsersService],
 })
 export class UsersModule {}

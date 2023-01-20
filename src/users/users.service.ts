@@ -20,12 +20,14 @@ import { UserSearchCriteriaDto } from './dto/user.searchCriteria.dto';
 import { UserDocument } from './schemas/user.schemas';
 import * as bcrypt from 'bcrypt';
 import { ResetPasswordDto } from './dto/resetPassword.dto';
+import { UserActivityLogDocument } from './schemas/user.activitylog';
 
 @Injectable()
 export class UsersService {
     @InjectModel(MODEL_ENUMS.USERS) private usersModel: Model<UserDocument>;
-    constructor() {
-    }
+    @InjectModel(MODEL_ENUMS.USERS_ACTIVITY_LOG)
+    private userActivityLogsModel: Model<UserActivityLogDocument>;
+    constructor() {}
 
     /**
      * To create new user
@@ -200,7 +202,7 @@ export class UsersService {
             });
         }
 
-        let paginationProps: any = [
+        const paginationProps: any = [
             { $match: search.$and.length > 0 ? search : {} },
         ];
 
@@ -406,5 +408,11 @@ export class UsersService {
 
     async logUserActvity(user) {
         console.log(user);
+
+        await this.userActivityLogsModel.findOneAndUpdate(
+            { user: user._id },
+            { user: user._id, organization: user.organization },
+            { upsert: true },
+        );
     }
 }
