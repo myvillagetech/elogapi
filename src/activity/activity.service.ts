@@ -544,7 +544,7 @@ export class ActivityService {
         }
 
         const result = await this.activityModel.aggregate([
-            // { $match: search },
+            { $match: search },
             {
                 $facet: {
                     oneWeek: [
