@@ -15,6 +15,7 @@ import { join } from 'path';
 import { ConfigModule } from '@nestjs/config';
 import { UserActivityModule } from './user-activity/user-activity.module';
 import { UserActivityMiddleware } from './user-activity/user-activity.middleware';
+import { CompanySettingsModule } from './company-settings/company-settings.module';
 
 @Module({
     imports: [
@@ -31,6 +32,7 @@ import { UserActivityMiddleware } from './user-activity/user-activity.middleware
             rootPath: join(__dirname, '..', 'static'),
         }),
         UserActivityModule,
+        CompanySettingsModule,
     ],
     controllers: [AppController],
     providers: [AppService],
