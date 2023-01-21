@@ -430,6 +430,23 @@ export class ActivityService {
         ];
 
         result = await this.activityModel.aggregate([
+            // { $match: search.$and.length > 0 ? search : {} },
+            {
+                $lookup: {
+                    from: 'organizations',
+                    localField: 'assignTo',
+                    foreignField: '_id',
+                    as: 'assignTo',
+                },
+            },
+            {
+                $lookup: {
+                    from: 'organizations',
+                    localField: 'createdByOrganization',
+                    foreignField: '_id',
+                    as: 'createdByOrganization',
+                },
+            },
             {
                 $facet: {
                     activities: paginationProps,
