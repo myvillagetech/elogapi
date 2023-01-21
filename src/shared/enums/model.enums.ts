@@ -10,4 +10,5 @@ export const MODEL_ENUMS = {
     ACTIVITY_ENTRY_TYPE: 'activityEntryType',
     ACTIVITY_SECTORS: 'activitySectors',
     ACTIVITY_SCOPES: 'activityScopes',
+    COMPANY_SETTINGS: 'companySettings',
 };
