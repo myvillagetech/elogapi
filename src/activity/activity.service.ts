@@ -471,7 +471,11 @@ export class ActivityService {
 
         if (request.organizations && request.organizations.length > 0) {
             search.$and.push({
-                assignTo: { $in: request.organizations },
+                assignTo: {
+                    $in: request.organizations.map(
+                        (s) => new Types.ObjectId(s),
+                    ),
+                },
             });
         }
 
@@ -531,7 +535,11 @@ export class ActivityService {
 
         if (request.organizations && request.organizations.length > 0) {
             search.$and.push({
-                assignTo: { $in: request.organizations },
+                assignTo: {
+                    $in: request.organizations.map(
+                        (s) => new Types.ObjectId(s),
+                    ),
+                },
             });
         }
 
@@ -651,7 +659,11 @@ export class ActivityService {
 
         if (request.organizations && request.organizations.length > 0) {
             search.$and.push({
-                assignTo: { $in: request.organizations },
+                assignTo: {
+                    $in: request.organizations.map(
+                        (s) => new Types.ObjectId(s),
+                    ),
+                },
             });
         }
         let relatedtoTypes =
