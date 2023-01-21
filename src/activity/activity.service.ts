@@ -351,8 +351,8 @@ export class ActivityService {
                 if (criteria.dueDate.customString === 'TODAY') {
                     search.$and.push({
                         dueDate: {
-                            $gte: dayjs().startOf('day'),
-                            $lte: dayjs().endOf('day'),
+                            $gte: dayjs().startOf('day').toDate(),
+                            $lte: dayjs().endOf('day').toDate(),
                         },
                     });
                 }
@@ -360,7 +360,7 @@ export class ActivityService {
                 if (criteria.dueDate.customString === 'OVERDUE') {
                     search.$and.push({
                         dueDate: {
-                            $lte: dayjs().startOf('day'),
+                            $lte: dayjs().startOf('day').toDate(),
                         },
                     });
                 }
@@ -368,16 +368,18 @@ export class ActivityService {
                 if (criteria.dueDate.fromDate) {
                     search.$and.push({
                         dueDate: {
-                            $gte: dayjs(criteria.dueDate.fromDate).startOf(
-                                'day',
-                            ),
+                            $gte: dayjs(criteria.dueDate.fromDate)
+                                .startOf('day')
+                                .toDate(),
                         },
                     });
                 }
                 if (criteria.dueDate.toDate) {
                     search.$and.push({
                         dueDate: {
-                            $lte: dayjs(criteria.dueDate.toDate).endOf('day'),
+                            $lte: dayjs(criteria.dueDate.toDate)
+                                .endOf('day')
+                                .toDate(),
                         },
                     });
                 }
@@ -386,13 +388,12 @@ export class ActivityService {
 
         if (criteria.createdDate) {
             if (criteria.createdDate.quantity && criteria.createdDate.unit) {
-                const pastTime = dayjs().subtract(
-                    getMilliSecondsbyParam({
-                        unit: criteria.createdDate.unit,
-                        quantity: criteria.createdDate.quantity,
-                    }),
-                    'ms',
-                );
+                const pastTime = dayjs()
+                    .subtract(
+                        criteria.createdDate.quantity,
+                        criteria.createdDate.unit as any,
+                    )
+                    .toDate();
                 search.$and.push({
                     createdAt: {
                         $gte: pastTime,
@@ -403,9 +404,9 @@ export class ActivityService {
             if (criteria.createdDate.fromDate) {
                 search.$and.push({
                     createdAt: {
-                        $gte: dayjs(criteria.createdDate.fromDate).startOf(
-                            'day',
-                        ),
+                        $gte: dayjs(criteria.createdDate.fromDate)
+                            .startOf('day')
+                            .toDate(),
                     },
                 });
             }
@@ -413,7 +414,9 @@ export class ActivityService {
             if (criteria.createdDate.toDate) {
                 search.$and.push({
                     createdAt: {
-                        $lte: dayjs(criteria.createdDate.toDate).endOf('day'),
+                        $lte: dayjs(criteria.createdDate.toDate)
+                            .endOf('day')
+                            .toDate(),
                     },
                 });
             }
@@ -426,7 +429,7 @@ export class ActivityService {
         result = await this.activityModel.aggregate([
             {
                 $facet: {
-                    schedules: paginationProps,
+                    activities: paginationProps,
                 },
             },
         ]);

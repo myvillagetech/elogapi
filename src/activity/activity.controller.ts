@@ -345,12 +345,13 @@ export class ActivityController {
     @Post('activitysearch')
     async getActivitiesBySearchCriteria(
         @Body() criteria: ActivitySearchCriteriaDto,
+        @Res() response,
     ) {
         try {
             const result = await this.activityService.activitySerachCriteria(
                 criteria,
             );
-            return result;
+            // return result;
             return response.status(HttpStatus.OK).json({
                 message: 'fetched activities Successfully',
                 data: result,
@@ -366,11 +367,14 @@ export class ActivityController {
     }
 
     @Post('dashboard/getDashBoardActivityMetrics')
-    async getDashBoardActivityMetrics(@Body() request: ActivityMetricsRequest) {
+    async getDashBoardActivityMetrics(
+        @Body() request: ActivityMetricsRequest,
+        @Res() response,
+    ) {
         try {
             const result =
                 await this.activityService.getDashBoardActivityMetrics(request);
-            return result;
+            // return result;
             return response.status(HttpStatus.OK).json({
                 message: 'fetched activities Successfully',
                 data: result,
@@ -406,16 +410,16 @@ export class ActivityController {
     }
 
     @Get('dashboard/getDashBoardRelatedToMetricsMetrics')
-    async getDashBoardRelatedToMetricsMetrics() {
+    async getDashBoardRelatedToMetricsMetrics(@Res() response) {
         try {
             const result =
                 await this.activityService.getDashBoardRelatedToMetricsMetrics();
-            return result;
-            // return response.status(HttpStatus.OK).json({
-            //     message: 'fetched activities Successfully',
-            //     data: result,
-            //     success: true,
-            // });
+            // return result;
+            return response.status(HttpStatus.OK).json({
+                message: 'fetched activities Successfully',
+                data: result,
+                success: true,
+            });
         } catch (error) {
             return response.status(error.status).json({
                 message: 'Unable to fetch activities',
