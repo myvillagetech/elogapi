@@ -448,6 +448,14 @@ export class ActivityService {
                 },
             },
             {
+                $lookup: {
+                    from: 'users',
+                    localField: 'createdBy',
+                    foreignField: '_id',
+                    as: 'createdByUser',
+                },
+            },
+            {
                 $facet: {
                     activities: paginationProps,
                 },
