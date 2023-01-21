@@ -18,7 +18,10 @@ import { ActivityService } from './activity.service';
 import { ActivityLogDto } from './dto/activity-log.dto';
 import { ActivityDto } from './dto/activity.dto';
 import { ActivitySearchCriteriaDto } from './dto/activity.searchCriteria.dto';
-import { ActivityMetricsRequest } from './dto/dashboard.dto';
+import {
+    ActivityMetricsRequest,
+    DashboardBaseModel,
+} from './dto/dashboard.dto';
 import {
     ArchiveActivityDto,
     UpdateActivityAssignedToDto,
@@ -389,17 +392,20 @@ export class ActivityController {
         }
     }
 
-    @Get('dashboard/getDashBoardDueDateMetrics')
-    async getDashBoardDueDateMetrics() {
+    @Post('dashboard/getDashBoardDueDateMetrics')
+    async getDashBoardDueDateMetrics(
+        @Res() response,
+        @Body() request: DashboardBaseModel,
+    ) {
         try {
             const result =
-                await this.activityService.getDashBoardDueDateMetrics();
-            return result;
-            // return response.status(HttpStatus.OK).json({
-            //     message: 'fetched activities Successfully',
-            //     data: result,
-            //     success: true,
-            // });
+                await this.activityService.getDashBoardDueDateMetrics(request);
+            // return result;
+            return response.status(HttpStatus.OK).json({
+                message: 'fetched activities Successfully',
+                data: result,
+                success: true,
+            });
         } catch (error) {
             return response.status(error.status).json({
                 message: 'Unable to fetch activities',
@@ -409,11 +415,16 @@ export class ActivityController {
         }
     }
 
-    @Get('dashboard/getDashBoardRelatedToMetricsMetrics')
-    async getDashBoardRelatedToMetricsMetrics(@Res() response) {
+    @Post('dashboard/getDashBoardRelatedToMetricsMetrics')
+    async getDashBoardRelatedToMetricsMetrics(
+        @Res() response,
+        @Body() request: DashboardBaseModel,
+    ) {
         try {
             const result =
-                await this.activityService.getDashBoardRelatedToMetricsMetrics();
+                await this.activityService.getDashBoardRelatedToMetricsMetrics(
+                    request,
+                );
             // return result;
             return response.status(HttpStatus.OK).json({
                 message: 'fetched activities Successfully',

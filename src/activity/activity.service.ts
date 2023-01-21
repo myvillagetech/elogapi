@@ -18,7 +18,10 @@ import {
 import { ActivityDocument } from './schemas/activity.schema';
 import * as dayjs from 'dayjs';
 import { getMilliSecondsbyParam } from 'src/shared/services/date-time-helpers';
-import { ActivityMetricsRequest } from './dto/dashboard.dto';
+import {
+    ActivityMetricsRequest,
+    DashboardBaseModel,
+} from './dto/dashboard.dto';
 import { ActivityMasterdataService } from 'src/generic/activity-masterdata/activity-masterdata.service';
 
 @Injectable()
@@ -437,7 +440,15 @@ export class ActivityService {
     }
 
     async getDashBoardActivityMetrics(request: ActivityMetricsRequest) {
+        // assignto must be part of  user organizarion
+        // if organization
         const search = { $and: [] };
+
+        if (request.organizations && request.organizations.length > 0) {
+            search.$and.push({
+                assignTo: { $in: request.organizations },
+            });
+        }
 
         if (request.type) {
             search.$and.push({
@@ -490,14 +501,14 @@ export class ActivityService {
         return result;
     }
 
-    async getDashBoardDueDateMetrics() {
+    async getDashBoardDueDateMetrics(request: DashboardBaseModel) {
         const search = { $and: [] };
 
-        const lessThantoday = {
-            dueDate: {
-                $gte: dayjs().startOf('day').toDate(),
-            },
-        };
+        if (request.organizations && request.organizations.length > 0) {
+            search.$and.push({
+                assignTo: { $in: request.organizations },
+            });
+        }
 
         const result = await this.activityModel.aggregate([
             // { $match: search },
@@ -610,9 +621,14 @@ export class ActivityService {
         return result;
     }
 
-    async getDashBoardRelatedToMetricsMetrics() {
+    async getDashBoardRelatedToMetricsMetrics(request: DashboardBaseModel) {
         const search = { $and: [] };
 
+        if (request.organizations && request.organizations.length > 0) {
+            search.$and.push({
+                assignTo: { $in: request.organizations },
+            });
+        }
         let relatedtoTypes =
             await this.masterDataService.getAllActivityRelatedToTypes();
 
