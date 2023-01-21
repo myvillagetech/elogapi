@@ -675,6 +675,7 @@ export class ActivityService {
             { $match: search.$and.length > 0 ? search : {} },
             {
                 $facet: {
+                    total: [{ $match: {} }, { $count: 'total' }],
                     singleMinistry: [
                         {
                             $match: {
