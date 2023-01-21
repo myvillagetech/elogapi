@@ -483,6 +483,7 @@ export class ActivityService {
                         { $match: { status: 'NOTADMISSIBLE' } },
                         { $count: 'resolvedCount' },
                     ],
+                    total: [{ $count: 'total' }],
                 },
             },
         ]);
