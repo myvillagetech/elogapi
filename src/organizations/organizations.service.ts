@@ -18,6 +18,7 @@ import {
 } from './dto/organizations.dto';
 import { OrganizationDocument } from './schemas/organizations.schema';
 import * as dayjs from 'dayjs';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class OrganizationsService {
@@ -25,14 +26,18 @@ export class OrganizationsService {
     private organizationsModel: Model<OrganizationDocument>;
     @InjectModel(MODEL_ENUMS.USERS_ACTIVITY_LOG)
     private userActivityLogsModel: Model<UserActivityLogDocument>;
-    constructor(private userService: UsersService) {}
+    constructor(private userService: UsersService,
+        private readonly authService: AuthService,) { }
 
     async createOrganization(
         createOrganizationDto: OrganizationDto,
+        tokenHeader: string,
     ): Promise<OrganizationDocument> {
+        const decodedToken: any = this.authService.getDecodedToken(tokenHeader);
         const newOrganization = await new this.organizationsModel(
             createOrganizationDto,
         );
+        await this.userService.updateUser(decodedToken._id,{organization : [newOrganization._id.toString()]})
         return newOrganization.save();
     }
 
@@ -73,16 +78,16 @@ export class OrganizationsService {
     ): Promise<OrganizationDocument[]> {
         const search = searchString
             ? {
-                  $or: [
-                      {
-                          organization: new RegExp(
-                              searchString.toString(),
-                              'i',
-                          ),
-                      },
-                      { shortName: new RegExp(searchString.toString(), 'i') },
-                  ],
-              }
+                $or: [
+                    {
+                        organization: new RegExp(
+                            searchString.toString(),
+                            'i',
+                        ),
+                    },
+                    { shortName: new RegExp(searchString.toString(), 'i') },
+                ],
+            }
             : {};
 
         const results = await this.organizationsModel.find(search);
@@ -160,7 +165,7 @@ export class OrganizationsService {
             paginationProps.push({ $sort: sortObject });
         }
 
-        const matchQuery = criteria.userId ? { 'users._id': criteria.userId ? new Types.ObjectId(criteria.userId) : ""} : {}
+        const matchQuery = criteria.userId ? { 'users._id': criteria.userId ? new Types.ObjectId(criteria.userId) : "" } : {}
         const metrics = await this.organizationsModel.aggregate([
             {
                 $lookup: {
@@ -224,8 +229,8 @@ export class OrganizationsService {
                 },
             },
             {
-                $addFields : {
-                    activities : {$size : '$activities'}
+                $addFields: {
+                    activities: { $size: '$activities' }
                 }
             },
             {

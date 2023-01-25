@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { AuthModule } from 'src/auth/auth.module';
 import { MODEL_ENUMS } from 'src/shared/enums/model.enums';
 import { UserActivityLogSchema } from 'src/users/schemas/user.activitylog';
 import { UsersModule } from 'src/users/users.module';
@@ -18,6 +19,7 @@ import { OrganizationSchema } from './schemas/organizations.schema';
             },
         ]),
         UsersModule,
+        AuthModule
     ],
     controllers: [OrganizationsController],
     providers: [OrganizationsService],
