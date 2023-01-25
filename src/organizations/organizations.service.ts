@@ -160,7 +160,20 @@ export class OrganizationsService {
             paginationProps.push({ $sort: sortObject });
         }
 
+        const matchQuery = criteria.userId ? { 'users._id': criteria.userId ? new Types.ObjectId(criteria.userId) : ""} : {}
         const metrics = await this.organizationsModel.aggregate([
+            {
+                $lookup: {
+                    from: MODEL_ENUMS.USERS,
+                    localField: '_id',
+                    foreignField: 'organization',
+                    as: 'users',
+                    pipeline: [{ $project: { password: 0 } }],
+                },
+            },
+            {
+                $match: matchQuery,
+            },
             {
                 $facet: {
                     active: [
@@ -201,6 +214,19 @@ export class OrganizationsService {
                     as: 'users',
                     pipeline: [{ $project: { password: 0 } }],
                 },
+            },
+            {
+                $lookup: {
+                    from: MODEL_ENUMS.ACTIVITIES,
+                    localField: '_id',
+                    foreignField: 'createdByOrganization',
+                    as: 'activities',
+                },
+            },
+            {
+                $addFields : {
+                    activities : {$size : '$activities'}
+                }
             },
             {
                 $facet: {
