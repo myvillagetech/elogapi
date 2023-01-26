@@ -20,4 +20,9 @@ export class CriteriaWithPaginationAndSorting {
         type: Number,
     })
     sortOrder: number;
+
+    @ApiProperty({
+        type: Number,
+    })
+    groupBy: number;
 }

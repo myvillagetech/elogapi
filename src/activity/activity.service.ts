@@ -475,6 +475,10 @@ export class ActivityService {
             {
                 $facet: {
                     activities: paginationProps,
+                    count: [
+                        { $match: search.$and.length > 0 ? search : {} },
+                        { $count: 'count' },
+                    ],
                 },
             },
         ]);
