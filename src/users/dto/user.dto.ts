@@ -4,6 +4,7 @@ import {
     IsString,
     MaxLength,
 } from 'class-validator';
+import { ObjectId } from 'mongoose';
 
 export class UserDto{
     @IsString()

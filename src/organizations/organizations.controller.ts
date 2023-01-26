@@ -9,8 +9,11 @@ import {
     Delete,
     Param,
     Query,
+    UseGuards,
+    Headers,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { OrganizationSearchCriteriaDto } from './dto/organization.searchCriteria.dto';
 import {
     OrganizationDto,
@@ -20,17 +23,27 @@ import { OrganizationsService } from './organizations.service';
 
 @Controller('/organizations')
 @ApiTags('organizations')
+@ApiBearerAuth('access-token')
+@UseGuards(JwtAuthGuard)
 export class OrganizationsController {
     constructor(private organizationsService: OrganizationsService) {}
 
     @Post()
+    @ApiParam({
+        name: 'Authorization',
+        required: false,
+        description:
+            '(Leave empty. Use lock icon on the top-right to authorize)',
+    })
     async createOrganization(
         @Res() response,
         @Body() organizationModel: OrganizationDto,
+        @Headers('Authorization') authHeader: string,
     ) {
         try {
             const newOrg = await this.organizationsService.createOrganization(
                 organizationModel,
+                authHeader,
             );
             return response.status(HttpStatus.OK).json({
                 message: 'Organization created Successfully',
