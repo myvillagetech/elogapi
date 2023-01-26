@@ -95,4 +95,14 @@ export class ActivitySearchCriteriaDto extends CriteriaWithPaginationAndSorting 
         type: Boolean,
     })
     readonly isArchive: boolean;
+
+    @ApiProperty({
+        type: Boolean,
+    })
+    readonly onlyMyTasks: boolean;
+
+    @ApiProperty({
+        type: Array<string>,
+    })
+    readonly organizations: string[];
 }

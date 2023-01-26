@@ -293,6 +293,33 @@ export class ActivityService {
 
         const search = { $and: [] };
 
+        if (criteria.organizations) {
+            const filters: any = [
+                {
+                    assignTo: {
+                        $in: criteria.organizations.map(
+                            (s) => new Types.ObjectId(s),
+                        ),
+                    },
+                },
+            ];
+
+            if (criteria.onlyMyTasks) {
+                filters.push({
+                    visibility: 'EVERYONE',
+                });
+
+                filters.push({
+                    createdBy: {
+                        $in: criteria.organizations.map(
+                            (s) => new Types.ObjectId(s),
+                        ),
+                    },
+                });
+            }
+            search.$and.push({ $or: filters });
+        }
+
         if (criteria.status && criteria.status.length > 0) {
             search.$and.push({
                 status: {
