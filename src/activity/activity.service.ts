@@ -429,6 +429,23 @@ export class ActivityService {
             { $match: search.$and.length > 0 ? search : {} },
         ];
 
+        if (
+            (criteria.pageSize || criteria.pageSize > 0) &&
+            (criteria.pageNumber || criteria.pageNumber === 0)
+        ) {
+            paginationProps.push({
+                $skip: criteria.pageNumber * criteria.pageSize,
+            });
+            paginationProps.push({ $limit: criteria.pageSize });
+        }
+
+        let sortObject;
+        if (criteria.sortField) {
+            sortObject = {};
+            sortObject[criteria.sortField] = criteria.sortOrder;
+            paginationProps.push({ $sort: sortObject });
+        }
+
         result = await this.activityModel.aggregate([
             // { $match: search.$and.length > 0 ? search : {} },
             {
