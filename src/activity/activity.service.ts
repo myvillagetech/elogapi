@@ -592,7 +592,7 @@ export class ActivityService {
         }
 
         const result = await this.activityModel.aggregate([
-            { $match: search },
+            { $match: search.$and.length > 0 ? search : {} },
             {
                 $facet: {
                     oneWeek: [

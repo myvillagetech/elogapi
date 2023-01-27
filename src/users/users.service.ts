@@ -480,8 +480,6 @@ export class UsersService {
     }
 
     async logUserActvity(user) {
-        console.log(user);
-
         await this.userActivityLogsModel.findOneAndUpdate(
             { user: user._id },
             { user: user._id, organization: user.organization },
