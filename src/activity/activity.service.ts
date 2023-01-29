@@ -278,7 +278,10 @@ export class ActivityService {
         const result = await this.activityModel.updateOne(
             { _id: new Types.ObjectId(dto.activityId) },
             {
-                organization: new Types.ObjectId(dto.organzation),
+                createdByOrganization: new Types.ObjectId(dto.organzation),
+                $addToSet: {
+                    organization: new Types.ObjectId(dto.organzation),
+                },
             },
         );
         if (!result) {
