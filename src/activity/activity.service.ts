@@ -468,6 +468,13 @@ export class ActivityService {
             paginationProps.push({ $limit: criteria.pageSize });
         }
 
+        paginationProps.push({
+            $addFields: {
+                assignTo: '$assignToObj',
+                createdByOrganization: '$createdByOrganizationObj',
+            },
+        });
+
         let sortObject;
         if (criteria.sortField) {
             sortObject = {};
@@ -476,13 +483,13 @@ export class ActivityService {
         }
 
         result = await this.activityModel.aggregate([
-            // { $match: search.$and.length > 0 ? search : {} },
+            { $match: search.$and.length > 0 ? search : {} },
             {
                 $lookup: {
                     from: 'organizations',
                     localField: 'assignTo',
                     foreignField: '_id',
-                    as: 'assignTo',
+                    as: 'assignToObj',
                 },
             },
             {
@@ -490,7 +497,7 @@ export class ActivityService {
                     from: 'organizations',
                     localField: 'createdByOrganization',
                     foreignField: '_id',
-                    as: 'createdByOrganization',
+                    as: 'createdByOrganizationObj',
                 },
             },
             {
