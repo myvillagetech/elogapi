@@ -305,19 +305,18 @@ export class ActivityService {
                         ),
                     },
                 },
-            ];
-
-            if (criteria.onlyMyTasks) {
-                filters.push({
-                    visibility: 'EVERYONE',
-                });
-
-                filters.push({
-                    createdBy: {
+                {
+                    createdByOrganization: {
                         $in: criteria.organizations.map(
                             (s) => new Types.ObjectId(s),
                         ),
                     },
+                },
+            ];
+
+            if (!criteria.onlyMyTasks) {
+                filters.push({
+                    visibility: 'EVERYONE',
                 });
             }
             search.$and.push({ $or: filters });
