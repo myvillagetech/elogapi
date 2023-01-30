@@ -454,6 +454,12 @@ export class ActivityService {
             }
         }
 
+        if (criteria.searchTerm && criteria.searchTerm.trim() !== '') {
+            search.$and.push({
+                $or: [{ title: RegExp(criteria.searchTerm, 'i') }],
+            });
+        }
+
         const paginationProps: any = [
             { $match: search.$and.length > 0 ? search : {} },
         ];
@@ -576,9 +582,9 @@ export class ActivityService {
                         { $match: { status: 'RESOLVED' } },
                         { $count: 'resolvedCount' },
                     ],
-                    notAdmissible: [
-                        { $match: { status: 'NOTADMISSIBLE' } },
-                        { $count: 'resolvedCount' },
+                    rejectedCount: [
+                        { $match: { status: 'REJECTED' } },
+                        { $count: 'rejectedCount' },
                     ],
                     total: [{ $count: 'total' }],
                 },

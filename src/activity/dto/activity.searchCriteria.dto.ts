@@ -105,4 +105,9 @@ export class ActivitySearchCriteriaDto extends CriteriaWithPaginationAndSorting 
         type: Array<string>,
     })
     readonly organizations: string[];
+
+    @ApiProperty({
+        type: String,
+    })
+    readonly searchTerm: string;
 }
