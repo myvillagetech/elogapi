@@ -18,7 +18,7 @@ export class OrganizationSchemaCreator {
     isActive: boolean;
 
     @Prop()
-    orgActivityAutoIncrementId: string;
+    orgActivityAutoIncrementId: number;
 }
 
 export type OrganizationDocument = OrganizationSchemaCreator & Document;

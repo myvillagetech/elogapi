@@ -44,21 +44,23 @@ export class ActivityService {
         const dueDate = new Date(toDay.setDate(toDay.getDate() + 21));
         const decodedToken: any = this.authService.getDecodedToken(tokenHeader);
 
-        const organizarion = await this.organizationsModel.findById(
+        const organizarionDoc = await this.organizationsModel.findById(
             activityDto.createdByOrganization,
         );
 
+        const organizarion = organizarionDoc['_doc'];
         const identifier = `${
             organizarion.shortName ? organizarion.shortName : ''
-        } ${organizarion.orgActivityAutoIncrementId + 1}`;
+        } ${organizarion.orgActivityAutoIncrementId ? organizarion.orgActivityAutoIncrementId + 1 : 1}`;
 
+        const indentierUpdate = organizarion.orgActivityAutoIncrementId ? {
+            $inc: { orgActivityAutoIncrementId: 1 },
+        } : { orgActivityAutoIncrementId: 1 };
         await this.organizationsModel.updateOne(
             {
                 _id: new Types.ObjectId(activityDto.createdByOrganization),
             },
-            {
-                $inc: { orgActivityAutoIncrementId: 1 },
-            },
+            indentierUpdate,
         );
 
         const newActivity = await new this.activityModel({
