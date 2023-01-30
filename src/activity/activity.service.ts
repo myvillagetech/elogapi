@@ -23,12 +23,14 @@ import {
     DashboardBaseModel,
 } from './dto/dashboard.dto';
 import { ActivityMasterdataService } from 'src/generic/activity-masterdata/activity-masterdata.service';
+import { OrganizationDocument } from 'src/organizations/schemas/organizations.schema';
 
 @Injectable()
 export class ActivityService {
     @InjectModel(MODEL_ENUMS.ACTIVITIES)
     private activityModel: Model<ActivityDocument>;
-
+    @InjectModel(MODEL_ENUMS.ORGANIZATIONS)
+    private organizationsModel: Model<OrganizationDocument>;
     constructor(
         private readonly authService: AuthService,
         private readonly masterDataService: ActivityMasterdataService,
@@ -41,6 +43,24 @@ export class ActivityService {
         const toDay = new Date();
         const dueDate = new Date(toDay.setDate(toDay.getDate() + 21));
         const decodedToken: any = this.authService.getDecodedToken(tokenHeader);
+
+        const organizarion = await this.organizationsModel.findById(
+            activityDto.createdByOrganization,
+        );
+
+        const identifier = `${
+            organizarion.shortName ? organizarion.shortName : ''
+        } ${organizarion.orgActivityAutoIncrementId + 1}`;
+
+        await this.organizationsModel.updateOne(
+            {
+                _id: new Types.ObjectId(activityDto.createdByOrganization),
+            },
+            {
+                $inc: { orgActivityAutoIncrementId: 1 },
+            },
+        );
+
         const newActivity = await new this.activityModel({
             ...activityDto,
             dueDate: dueDate,
@@ -51,6 +71,7 @@ export class ActivityService {
             },
             assignTo: activityDto.organization[0],
             createdBy: decodedToken._id,
+            uniqIdentity: identifier,
         });
         // newActivity.markModified('attachments');
         return newActivity.save();
@@ -275,6 +296,24 @@ export class ActivityService {
         tokenHeader: string,
     ): Promise<any> {
         const decodedToken = this.authService.getDecodedToken(tokenHeader);
+
+        const organizarion = await this.organizationsModel.findById(
+            dto.organzation,
+        );
+
+        const identifier = `${
+            organizarion.shortName ? organizarion.shortName : ''
+        } ${organizarion.orgActivityAutoIncrementId + 1}`;
+
+        await this.organizationsModel.updateOne(
+            {
+                _id: new Types.ObjectId(dto.organzation),
+            },
+            {
+                $inc: { orgActivityAutoIncrementId: 1 },
+            },
+        );
+
         const result = await this.activityModel.updateOne(
             { _id: new Types.ObjectId(dto.activityId) },
             {
@@ -282,6 +321,7 @@ export class ActivityService {
                 $addToSet: {
                     organization: new Types.ObjectId(dto.organzation),
                 },
+                uniqIdentity: identifier,
             },
         );
         if (!result) {

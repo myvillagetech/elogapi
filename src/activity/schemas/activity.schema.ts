@@ -152,6 +152,12 @@ export class ActivitySchemaCreator {
 
     @Prop({
         required: true,
+        unique: true,
+    })
+    uniqIdentity: string;
+
+    @Prop({
+        required: true,
     })
     description: string;
 

@@ -35,7 +35,7 @@ export class OrganizationsService {
     ): Promise<OrganizationDocument> {
         const decodedToken: any = this.authService.getDecodedToken(tokenHeader);
         const newOrganization = await new this.organizationsModel(
-            createOrganizationDto,
+            {...createOrganizationDto, orgActivityAutoIncrementId: 0},
         );
         await this.userService.updateUser(decodedToken._id,{organization : [newOrganization._id.toString()]})
         return newOrganization.save();
