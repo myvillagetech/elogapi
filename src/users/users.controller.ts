@@ -175,6 +175,7 @@ export class UsersController {
                 data: {
                     metrics: users.metrics,
                     users: users.results[0].users,
+                    totalCount : users.results[0].metrics[0].totalCount
                 },
             });
         } catch (error) {
