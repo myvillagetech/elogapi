@@ -296,7 +296,7 @@ export class ActivityService {
 
         const search = { $and: [] };
 
-        if (criteria.organizations) {
+        if (criteria.organizations && criteria.organizations.length > 0) {
             const filters: any = [
                 {
                     assignTo: {
