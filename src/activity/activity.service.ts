@@ -567,6 +567,174 @@ export class ActivityService {
         return result;
     }
 
+    async activitySerachPageHeaderCounts(criteria: ActivitySearchCriteriaDto) {
+        let result = [];
+
+        const search = { $and: [] };
+
+        if (criteria.organizations && criteria.organizations.length > 0) {
+            const filters: any = [
+                {
+                    assignTo: {
+                        $in: criteria.organizations.map(
+                            (s) => new Types.ObjectId(s),
+                        ),
+                    },
+                },
+                {
+                    createdByOrganization: {
+                        $in: criteria.organizations.map(
+                            (s) => new Types.ObjectId(s),
+                        ),
+                    },
+                },
+            ];
+
+            if (!criteria.onlyMyTasks) {
+                filters.push({
+                    visibility: 'EVERYONE',
+                });
+            }
+            search.$and.push({ $or: filters });
+        }
+
+        result = await this.activityModel.aggregate([
+            { $match: search.$and.length > 0 ? search : {} },
+            {
+                $facet: {
+                    all: [
+                        {
+                            $match: {
+                                $or: [
+                                    {
+                                        assignTo: {
+                                            $in: criteria.organizations.map(
+                                                (s) => new Types.ObjectId(s),
+                                            ),
+                                        },
+                                    },
+                                    {
+                                        createdByOrganization: {
+                                            $in: criteria.organizations.map(
+                                                (s) => new Types.ObjectId(s),
+                                            ),
+                                        },
+                                    },
+                                    {
+                                        visibility: 'EVERYONE',
+                                    },
+                                ],
+                            },
+                        },
+                        { $count: 'all' },
+                    ],
+
+                    myTasks: [
+                        {
+                            $match: {
+                                $or: [
+                                    {
+                                        assignTo: {
+                                            $in: criteria.organizations.map(
+                                                (s) => new Types.ObjectId(s),
+                                            ),
+                                        },
+                                    },
+                                    {
+                                        createdByOrganization: {
+                                            $in: criteria.organizations.map(
+                                                (s) => new Types.ObjectId(s),
+                                            ),
+                                        },
+                                    },
+                                ],
+                            },
+                        },
+                        { $count: 'myTasks' },
+                    ],
+
+                    overDue: [
+                        {
+                            $match: {
+                                $and: [
+                                    {
+                                        dueDate: {
+                                            $lt: dayjs()
+                                                .startOf('day')
+                                                .toDate(),
+                                        },
+                                    },
+                                    {
+                                        $or: [
+                                            {
+                                                assignTo: {
+                                                    $in: criteria.organizations.map(
+                                                        (s) =>
+                                                            new Types.ObjectId(
+                                                                s,
+                                                            ),
+                                                    ),
+                                                },
+                                            },
+                                            {
+                                                createdByOrganization: {
+                                                    $in: criteria.organizations.map(
+                                                        (s) =>
+                                                            new Types.ObjectId(
+                                                                s,
+                                                            ),
+                                                    ),
+                                                },
+                                            },
+                                        ],
+                                    },
+                                ],
+                            },
+                        },
+                        { $count: 'overDue' },
+                    ],
+                    highPriority: [
+                        {
+                            $match: {
+                                $and: [
+                                    {
+                                        priority: 'HIGH',
+                                    },
+                                    {
+                                        $or: [
+                                            {
+                                                assignTo: {
+                                                    $in: criteria.organizations.map(
+                                                        (s) =>
+                                                            new Types.ObjectId(
+                                                                s,
+                                                            ),
+                                                    ),
+                                                },
+                                            },
+                                            {
+                                                createdByOrganization: {
+                                                    $in: criteria.organizations.map(
+                                                        (s) =>
+                                                            new Types.ObjectId(
+                                                                s,
+                                                            ),
+                                                    ),
+                                                },
+                                            },
+                                        ],
+                                    },
+                                ],
+                            },
+                        },
+                        { $count: 'highPriority' },
+                    ],
+                },
+            },
+        ]);
+        return result;
+    }
+
     async getDashBoardActivityMetrics(request: ActivityMetricsRequest) {
         // assignto must be part of  user organizarion
         // if organization

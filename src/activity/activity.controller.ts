@@ -369,6 +369,31 @@ export class ActivityController {
         }
     }
 
+    @Post('activitysearchPageHeaderCounts')
+    async activitysearchPageHeaderCounts(
+        @Body() criteria: ActivitySearchCriteriaDto,
+        @Res() response,
+    ) {
+        try {
+            const result =
+                await this.activityService.activitySerachPageHeaderCounts(
+                    criteria,
+                );
+            // return result;
+            return response.status(HttpStatus.OK).json({
+                message: 'fetched activities counts Successfully',
+                data: result,
+                success: true,
+            });
+        } catch (error) {
+            return response.status(error.status).json({
+                message: 'Unable to fetch counts activities',
+                error: error,
+                success: false,
+            });
+        }
+    }
+
     @Post('dashboard/getDashBoardActivityMetrics')
     async getDashBoardActivityMetrics(
         @Body() request: ActivityMetricsRequest,
