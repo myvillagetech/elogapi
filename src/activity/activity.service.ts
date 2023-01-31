@@ -44,21 +44,23 @@ export class ActivityService {
         const dueDate = new Date(toDay.setDate(toDay.getDate() + 21));
         const decodedToken: any = this.authService.getDecodedToken(tokenHeader);
 
-        const organizarion = await this.organizationsModel.findById(
+        const organizarionDoc = await this.organizationsModel.findById(
             activityDto.createdByOrganization,
         );
 
+        const organizarion = organizarionDoc['_doc'];
         const identifier = `${
             organizarion.shortName ? organizarion.shortName : ''
-        } ${organizarion.orgActivityAutoIncrementId + 1}`;
+        }${organizarion.orgActivityAutoIncrementId ? organizarion.orgActivityAutoIncrementId + 1 : 1}`;
 
+        const indentierUpdate = organizarion.orgActivityAutoIncrementId ? {
+            $inc: { orgActivityAutoIncrementId: 1 },
+        } : { orgActivityAutoIncrementId: 1 };
         await this.organizationsModel.updateOne(
             {
                 _id: new Types.ObjectId(activityDto.createdByOrganization),
             },
-            {
-                $inc: { orgActivityAutoIncrementId: 1 },
-            },
+            indentierUpdate,
         );
 
         const newActivity = await new this.activityModel({
@@ -133,6 +135,7 @@ export class ActivityService {
         const updatedActivity = await this.activityModel.findByIdAndUpdate(
             activityId,
             activityData,
+            { new: true }
         );
 
         if (!updatedActivity) {
@@ -159,6 +162,7 @@ export class ActivityService {
         const result = await this.activityModel.findByIdAndUpdate(
             activityId,
             activityDetails,
+            { new: true }
         );
 
         if (!result) {
@@ -303,7 +307,7 @@ export class ActivityService {
 
         const identifier = `${
             organizarion.shortName ? organizarion.shortName : ''
-        } ${organizarion.orgActivityAutoIncrementId + 1}`;
+        }${organizarion.orgActivityAutoIncrementId + 1}`;
 
         await this.organizationsModel.updateOne(
             {
@@ -334,7 +338,7 @@ export class ActivityService {
     async activitySerachCriteria(criteria: ActivitySearchCriteriaDto) {
         let result = [];
 
-        const search = { $and: [] };
+        const search: any = { $and: [{isArchive : false}] };
 
         if (criteria.organizations && criteria.organizations.length > 0) {
             const filters: any = [

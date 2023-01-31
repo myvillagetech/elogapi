@@ -128,6 +128,11 @@ export class ActivitySchemaCreator {
     organization: OrganizationSchemaCreator[];
 
     @Prop({
+        required: false,
+    })
+    visibility: string;
+
+    @Prop({
         type: mongoose.Schema.Types.ObjectId,
         ref: MODEL_ENUMS.ACTIVITY_ENTRY_TYPE,
     })
