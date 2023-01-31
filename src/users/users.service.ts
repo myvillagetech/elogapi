@@ -36,7 +36,7 @@ export class UsersService {
                 _id: new mongoose.Types.ObjectId(userId),
             },
             {
-                organization: { $push: orgId },
+                $push: { organization:  new mongoose.Types.ObjectId(orgId) }
             },
         );
     }
