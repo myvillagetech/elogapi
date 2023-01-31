@@ -135,6 +135,7 @@ export class ActivityService {
         const updatedActivity = await this.activityModel.findByIdAndUpdate(
             activityId,
             activityData,
+            { new: true }
         );
 
         if (!updatedActivity) {
@@ -161,6 +162,7 @@ export class ActivityService {
         const result = await this.activityModel.findByIdAndUpdate(
             activityId,
             activityDetails,
+            { new: true }
         );
 
         if (!result) {
@@ -336,7 +338,7 @@ export class ActivityService {
     async activitySerachCriteria(criteria: ActivitySearchCriteriaDto) {
         let result = [];
 
-        const search = { $and: [] };
+        const search: any = { $and: [{isArchive : false}] };
 
         if (criteria.organizations && criteria.organizations.length > 0) {
             const filters: any = [
