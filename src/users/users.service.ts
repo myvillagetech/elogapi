@@ -6,7 +6,7 @@ import {
     NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import mongoose, { Model, Types } from 'mongoose';
 import { MODEL_ENUMS } from 'src/shared/enums/model.enums';
 import {
     addOrganizationsToUserDto,
@@ -29,6 +29,17 @@ export class UsersService {
     @InjectModel(MODEL_ENUMS.USERS_ACTIVITY_LOG)
     private userActivityLogsModel: Model<UserActivityLogDocument>;
     constructor() {}
+
+    addOrganizationToUser(userId, orgId) {
+        return this.usersModel.updateOne(
+            {
+                _id: new mongoose.Types.ObjectId(userId),
+            },
+            {
+                organization: { $push: orgId },
+            },
+        );
+    }
 
     /**
      * To create new user
