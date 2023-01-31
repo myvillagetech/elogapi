@@ -51,7 +51,7 @@ export class ActivityService {
         const organizarion = organizarionDoc['_doc'];
         const identifier = `${
             organizarion.shortName ? organizarion.shortName : ''
-        } ${organizarion.orgActivityAutoIncrementId ? organizarion.orgActivityAutoIncrementId + 1 : 1}`;
+        }${organizarion.orgActivityAutoIncrementId ? organizarion.orgActivityAutoIncrementId + 1 : 1}`;
 
         const indentierUpdate = organizarion.orgActivityAutoIncrementId ? {
             $inc: { orgActivityAutoIncrementId: 1 },
@@ -305,7 +305,7 @@ export class ActivityService {
 
         const identifier = `${
             organizarion.shortName ? organizarion.shortName : ''
-        } ${organizarion.orgActivityAutoIncrementId + 1}`;
+        }${organizarion.orgActivityAutoIncrementId + 1}`;
 
         await this.organizationsModel.updateOne(
             {
