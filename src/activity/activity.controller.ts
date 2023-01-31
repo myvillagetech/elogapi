@@ -320,6 +320,12 @@ export class ActivityController {
     }
 
     @Put('update/moveOrganization')
+    @ApiParam({
+        name: 'Authorization',
+        required: false,
+        description:
+            '(Leave empty. Use lock icon on the top-right to authorize)',
+    })
     async updateActivityOrganizationDto(
         @Res() response,
         @Body() dto: UpdateActivityOrganizationDto,
@@ -370,14 +376,22 @@ export class ActivityController {
     }
 
     @Post('activitysearchPageHeaderCounts')
+    @ApiParam({
+        name: 'Authorization',
+        required: false,
+        description:
+            '(Leave empty. Use lock icon on the top-right to authorize)',
+    })
     async activitysearchPageHeaderCounts(
         @Body() criteria: ActivitySearchCriteriaDto,
         @Res() response,
+        @Headers('Authorization') authHeader: string,
     ) {
         try {
             const result =
                 await this.activityService.activitySerachPageHeaderCounts(
                     criteria,
+                    authHeader,
                 );
             // return result;
             return response.status(HttpStatus.OK).json({
