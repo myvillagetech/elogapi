@@ -148,6 +148,12 @@ export class OrganizationsService {
             });
         }
 
+        if (criteria.searchTerm && criteria.searchTerm.trim() !== '') {
+            search.$and.push({
+                $or: [{ organization: RegExp(criteria.searchTerm, 'i') }, { shortName: RegExp(criteria.searchTerm, 'i') }],
+            });
+        }
+
         let paginationProps: any = [
             { $match: search.$and.length > 0 ? search : {} },
         ];

@@ -214,6 +214,12 @@ export class UsersService {
             });
         }
 
+        if (criteria.searchTerm && criteria.searchTerm.trim() !== '') {
+            search.$and.push({
+                $or: [{ Name: RegExp(criteria.searchTerm, 'i') }],
+            });
+        }
+
         const paginationProps: any = [
             { $match: search.$and.length > 0 ? search : {} },
         ];

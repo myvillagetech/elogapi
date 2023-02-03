@@ -37,4 +37,9 @@ export class UserSearchCriteriaDto extends CriteriaWithPaginationAndSorting{
         type : String
     })
     readonly organizationSerach? : string;
+
+    @ApiProperty({
+        type: String,
+    })
+    readonly searchTerm: string;
 }
