@@ -1087,4 +1087,19 @@ export class ActivityService {
         ]);
         return result;
     }
+
+
+    async archiveMultipleActivities(activityIds  : string[],isArchive : boolean): Promise<any> {
+        const results = await this.activityModel.updateMany({ _id: { $in: activityIds } }, {isArchive : isArchive});
+        if (!results) {
+            throw new NotFoundException('Activities data not found');
+        }
+
+        return results;
+    }
+
+    async deleteMultipleActivities(activityIds: string[]): Promise<any> {
+        await this.activityModel.deleteMany({ _id: { $in: activityIds } });
+        return { success: true };
+    }
 }

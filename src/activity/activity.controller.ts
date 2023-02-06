@@ -478,4 +478,54 @@ export class ActivityController {
             });
         }
     }
+
+    @Post('archive/multiple')
+    async archiveMulitipleActivities(
+        @Res() response,
+        @Body() request : {activityIds : string[],isArchive : boolean}
+    ){
+        try { 
+            const result = 
+                await this.activityService.archiveMultipleActivities(
+                    request.activityIds,request.isArchive
+                );
+
+            return response.status(HttpStatus.OK).json({
+                message: 'updated activities Successfully',
+                data: result,
+                success: true,
+            });
+        } catch (error) {
+            return response.status(error.status).json({
+                message: 'Unable to archive activities',
+                error: error,
+                success: false,
+            });
+        }
+    }
+
+    @Post('delete/multiple')
+    async deleteMulitipleActivities(
+        @Res() response,
+        @Body() request : {activityIds : string[]}
+    ){
+        try { 
+            const result = 
+                await this.activityService.deleteMultipleActivities(
+                    request.activityIds
+                );
+
+            return response.status(HttpStatus.OK).json({
+                message: 'deleted activities Successfully',
+                data: result,
+                success: true,
+            });
+        } catch (error) {
+            return response.status(error.status).json({
+                message: 'Unable to delete activities',
+                error: error,
+                success: false,
+            });
+        }
+    }
 }
