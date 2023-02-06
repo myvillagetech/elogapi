@@ -764,6 +764,50 @@ export class ActivityService {
                         },
                         { $count: 'highPriority' },
                     ],
+                    activeActivities: [
+                        {
+                            $match: isSuperAdmin
+                                ? {
+                                      status: {
+                                          $in: ['INPROGRESS', 'NEW'],
+                                      },
+                                  }
+                                : {
+                                      $and: [
+                                          {
+                                              status: {
+                                                  $in: ['INPROGRESS', 'NEW'],
+                                              },
+                                          },
+                                          {
+                                              $or: [
+                                                  {
+                                                      assignTo: {
+                                                          $in: criteria.organizations.map(
+                                                              (s) =>
+                                                                  new Types.ObjectId(
+                                                                      s,
+                                                                  ),
+                                                          ),
+                                                      },
+                                                  },
+                                                  {
+                                                      createdByOrganization: {
+                                                          $in: criteria.organizations.map(
+                                                              (s) =>
+                                                                  new Types.ObjectId(
+                                                                      s,
+                                                                  ),
+                                                          ),
+                                                      },
+                                                  },
+                                              ],
+                                          },
+                                      ],
+                                  },
+                        },
+                        { $count: 'activeActivities' },
+                    ],
                 },
             },
         ]);
