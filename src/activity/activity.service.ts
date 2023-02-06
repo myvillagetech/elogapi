@@ -589,7 +589,7 @@ export class ActivityService {
             (role) => role === 'SuperAdmin',
         );
 
-        const search = { $and: [] };
+        const search: any = { $and: [{ isArchive: false }] };
 
         if (criteria.organizations && criteria.organizations.length > 0) {
             const filters: any = [
@@ -618,7 +618,7 @@ export class ActivityService {
         }
 
         result = await this.activityModel.aggregate([
-            { $match: search.$and.length > 0 ? search : {} },
+            { $match: search },
             {
                 $facet: {
                     all: [
