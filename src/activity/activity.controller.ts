@@ -352,13 +352,21 @@ export class ActivityController {
     }
 
     @Post('activitysearch')
+    @ApiParam({
+        name: 'Authorization',
+        required: false,
+        description:
+            '(Leave empty. Use lock icon on the top-right to authorize)',
+    })
     async getActivitiesBySearchCriteria(
         @Body() criteria: ActivitySearchCriteriaDto,
         @Res() response,
+        @Headers('Authorization') authHeader: string,
     ) {
         try {
             const result = await this.activityService.activitySerachCriteria(
                 criteria,
+                authHeader,
             );
             // return result;
             return response.status(HttpStatus.OK).json({
@@ -482,13 +490,13 @@ export class ActivityController {
     @Post('archive/multiple')
     async archiveMulitipleActivities(
         @Res() response,
-        @Body() request : {activityIds : string[],isArchive : boolean}
-    ){
-        try { 
-            const result = 
-                await this.activityService.archiveMultipleActivities(
-                    request.activityIds,request.isArchive
-                );
+        @Body() request: { activityIds: string[]; isArchive: boolean },
+    ) {
+        try {
+            const result = await this.activityService.archiveMultipleActivities(
+                request.activityIds,
+                request.isArchive,
+            );
 
             return response.status(HttpStatus.OK).json({
                 message: 'updated activities Successfully',
@@ -507,13 +515,12 @@ export class ActivityController {
     @Post('delete/multiple')
     async deleteMulitipleActivities(
         @Res() response,
-        @Body() request : {activityIds : string[]}
-    ){
-        try { 
-            const result = 
-                await this.activityService.deleteMultipleActivities(
-                    request.activityIds
-                );
+        @Body() request: { activityIds: string[] },
+    ) {
+        try {
+            const result = await this.activityService.deleteMultipleActivities(
+                request.activityIds,
+            );
 
             return response.status(HttpStatus.OK).json({
                 message: 'deleted activities Successfully',

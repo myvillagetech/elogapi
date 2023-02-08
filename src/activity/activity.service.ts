@@ -341,8 +341,17 @@ export class ActivityService {
         return result;
     }
 
-    async activitySerachCriteria(criteria: ActivitySearchCriteriaDto) {
+    async activitySerachCriteria(
+        criteria: ActivitySearchCriteriaDto,
+        authHeader: string,
+    ) {
         let result = [];
+
+        const decodedToken: any = this.authService.getDecodedToken(authHeader);
+
+        const isSuperAdmin = decodedToken.roles.some(
+            (role) => role === 'SuperAdmin',
+        );
 
         const search: any = { $and: [{ isArchive: false }] };
 
@@ -370,6 +379,12 @@ export class ActivityService {
                 });
             }
             search.$and.push({ $or: filters });
+        }
+
+        if (!isSuperAdmin && decodedToken.organization.length === 0) {
+            search.$and.push({
+                visibility: 'EVERYONE',
+            });
         }
 
         if (criteria.status && criteria.status.length > 0) {
@@ -1088,9 +1103,14 @@ export class ActivityService {
         return result;
     }
 
-
-    async archiveMultipleActivities(activityIds  : string[],isArchive : boolean): Promise<any> {
-        const results = await this.activityModel.updateMany({ _id: { $in: activityIds } }, {isArchive : isArchive});
+    async archiveMultipleActivities(
+        activityIds: string[],
+        isArchive: boolean,
+    ): Promise<any> {
+        const results = await this.activityModel.updateMany(
+            { _id: { $in: activityIds } },
+            { isArchive: isArchive },
+        );
         if (!results) {
             throw new NotFoundException('Activities data not found');
         }
