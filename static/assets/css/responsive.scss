@@ -1,0 +1,141 @@
+@media (max-width: 992px) {
+  .login-12 .logo-2 {
+    display: inherit;
+  }
+
+  .login-12 .bg-img {
+    display: none;
+  }
+
+  .login-12 .form-section {
+    padding: 30px 15px;
+  }
+
+  .org_mob_icon {
+    display: block;
+  }
+  .bread-crumb{
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 1199px) {
+
+  .header .search-bar {
+    position: fixed;
+    top: 50px;
+    left: 0;
+    right: 0;
+    padding: 20px;
+    box-shadow: 0px 0px 15px 0px rgba(1, 41, 112, 0.1);
+    background: white;
+    z-index: 9999;
+    transition: 0.3s;
+    visibility: hidden;
+    opacity: 0;
+  }
+
+  .header .search-bar-show {
+    top: 60px;
+    visibility: visible;
+    opacity: 1;
+  }
+
+  .sidebar {
+    left: -300px;
+  }
+
+  .main-panel {
+    margin-left: 0px;
+  }
+  .toggle_sidebar .sidebar {
+    left: 0;
+  }
+}
+
+@media (min-width: 1200px) {
+
+  .logo {
+    width: 150px;
+  }
+
+  .toggle_sidebar #main,
+  .toggle_sidebar #footer {
+    margin-left: 0;
+  }
+
+  .toggle_sidebar .sidebar {
+    left: -190px;
+  }
+  .toggle_sidebar .bread-crumb {
+    margin-left: 0px;
+  }
+
+  #main,
+  #footer {
+    margin-left: 190px;
+  }
+}
+
+@media (max-width: 576px) {
+  .pdr-0{
+    padding-right: calc(var(--bs-gutter-x) * 0.5) !important;
+  }
+  .toggle_sidebar {
+    .content-area{
+      &::before{
+        content: '';
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        inset: 0;
+        background: #00000059;
+        z-index: 99;
+      }
+    }
+  }
+  .bread-crumb{
+    margin-left: 0;
+  }
+  .ontime{
+    .ontime-right {
+      .overdue{
+        .round-box{
+          width: 50px;
+          height: 50px;
+          font-size: 15px;
+        }
+      }
+    }
+  }
+  .header-left{
+    flex-direction: row-reverse;
+  }
+  .hamburger{
+    margin-left: 5px;
+    margin-right: 10px;
+    i{
+      font-size: 30px;
+    }
+  }
+  .breadcrumb-panel{
+    min-height: 35px;
+  }
+  .breadcrumb-find .mat-form-field{
+    min-width: 190px;
+  }
+  .related,.activity,.user_met{
+    margin-bottom: 1rem;
+  }
+  .ontime {
+    flex-direction: column;
+    .ontime-left{
+      width: 100%;
+      margin-right: 0;
+      margin-bottom: 1rem;
+      h4{
+        margin-bottom: 0;
+      }
+    }
+  }
+ }
