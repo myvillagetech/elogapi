@@ -535,4 +535,23 @@ export class ActivityController {
             });
         }
     }
+
+    @Post('getAttchements')
+    async getAttachments(@Res() response) {
+        try {
+            const result = await this.activityService.getAttachments();
+
+            return response.status(HttpStatus.OK).json({
+                message: 'attachements retrived Successfully',
+                data: result,
+                success: true,
+            });
+        } catch (error) {
+            return response.status(error.status).json({
+                message: 'Unable to retrive attachemtns',
+                error: error,
+                success: false,
+            });
+        }
+    }
 }
