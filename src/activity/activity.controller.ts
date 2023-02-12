@@ -10,6 +10,7 @@ import {
     Delete,
     Headers,
     UseGuards,
+    HttpException,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
 import { response } from 'express';
@@ -18,6 +19,7 @@ import { ActivityService } from './activity.service';
 import { ActivityLogDto } from './dto/activity-log.dto';
 import { ActivityDto } from './dto/activity.dto';
 import { ActivitySearchCriteriaDto } from './dto/activity.searchCriteria.dto';
+import { AttachmentsSearchCriteria } from './dto/attachmentsSearchCriteria';
 import {
     ActivityMetricsRequest,
     DashboardBaseModel,
@@ -533,6 +535,44 @@ export class ActivityController {
                 error: error,
                 success: false,
             });
+        }
+    }
+
+    @Post('getAttchements')
+    @ApiParam({
+        name: 'Authorization',
+        required: false,
+        description:
+            '(Leave empty. Use lock icon on the top-right to authorize)',
+    })
+    async getAttachments(
+        @Res() response,
+        @Body() criteria: AttachmentsSearchCriteria,
+        @Headers('Authorization') authHeader: string,
+    ) {
+        try {
+            const result = await this.activityService.getAttachments(
+                criteria,
+                authHeader,
+            );
+
+            return response.status(HttpStatus.OK).json({
+                message: 'attachements retrived Successfully',
+                data: result,
+                success: true,
+            });
+        } catch (error) {
+
+            throw new HttpException(
+                {
+                    success: false,
+                    error: error.message,
+                },
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                {
+                    cause: error,
+                },
+            );
         }
     }
 }
