@@ -1,116 +1,105 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-    IsNotEmpty, IsOptional,
-} from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 import { Priority, Status } from '../enums/activity.enums';
-
 
 export class AttachmentsDto {
     @IsNotEmpty()
     @ApiProperty({
-        type: String
+        type: String,
     })
     readonly name: string;
 
     @IsNotEmpty()
     @ApiProperty({
-        type: String
+        type: String,
     })
     readonly size: string;
 
     @IsNotEmpty()
     @ApiProperty({
-        type: String
+        type: String,
     })
     readonly path: string;
 }
 
-export class ActivityDto{
+export class ActivityDto {
     @IsNotEmpty()
     @ApiProperty({
-        type: String
+        type: String,
     })
     readonly activityType: string;
 
     @IsNotEmpty()
     @ApiProperty({
-        type: String
+        type: String,
     })
     readonly activityRelatedTo: string;
 
     @IsNotEmpty()
     @ApiProperty({
-        type: Array<String>
+        type: Array<string>,
     })
     readonly organization: string[];
 
     @IsNotEmpty()
     @ApiProperty({
-        type: String
+        type: String,
     })
     readonly activitEntryType: string;
 
     @IsNotEmpty()
     @ApiProperty({
-        type: String
+        type: String,
     })
     readonly activitySector: string;
 
     @IsNotEmpty()
     @ApiProperty({
-        type: String
+        type: String,
     })
     readonly activityScope: string;
 
     @IsNotEmpty()
     @ApiProperty({
-        type: String
+        type: String,
     })
     readonly title: string;
 
     @IsNotEmpty()
     @ApiProperty({
-        type: String
+        type: String,
     })
     readonly description: string;
 
     @IsOptional()
     @ApiProperty({
-        type: [AttachmentsDto]
+        type: [AttachmentsDto],
     })
     readonly attachments: AttachmentsDto[];
 
     @IsNotEmpty()
     @ApiProperty({
         type: String,
-        enum : Priority
+        enum: Priority,
     })
     readonly priority: Priority;
 
     @IsNotEmpty()
     @ApiProperty({
         type: String,
-        enum : Status
+        enum: Status,
     })
     readonly status: Status;
 
     @ApiProperty({
-        type:Boolean,
-        default : false
+        type: Boolean,
+        default: false,
     })
-    readonly isArchive : boolean
+    readonly isArchive: boolean;
 
     @IsNotEmpty()
     @ApiProperty({
-        type : String
+        type: String,
     })
-    readonly createdByOrganization : string
-
-
+    readonly createdByOrganization: string;
 }
-
-
-
-
-
-

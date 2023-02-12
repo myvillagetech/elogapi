@@ -24,6 +24,7 @@ import {
 } from './dto/dashboard.dto';
 import { ActivityMasterdataService } from 'src/generic/activity-masterdata/activity-masterdata.service';
 import { OrganizationDocument } from 'src/organizations/schemas/organizations.schema';
+import { AttachmentsSearchCriteria } from './dto/attachmentsSearchCriteria';
 
 @Injectable()
 export class ActivityService {
@@ -1123,7 +1124,44 @@ export class ActivityService {
         return { success: true };
     }
 
-    async getAttachments() {
+    async getAttachments(
+        criteria: AttachmentsSearchCriteria,
+        authHeader: string,
+    ) {
+        const decodedToken: any = this.authService.getDecodedToken(authHeader);
+
+        const search: any = { $and: [] };
+
+        if (criteria.fileNameSearchText) {
+            search.$and.push({
+                'nestedAttchments.name': RegExp(
+                    criteria.fileNameSearchText,
+                    'i',
+                ),
+            });
+        }
+
+        const paginationProps: any = [
+            { $match: search.$and.length > 0 ? search : {} },
+        ];
+
+        if (
+            (criteria.pageSize || criteria.pageSize > 0) &&
+            (criteria.pageNumber || criteria.pageNumber === 0)
+        ) {
+            paginationProps.push({
+                $skip: criteria.pageNumber * criteria.pageSize,
+            });
+            paginationProps.push({ $limit: criteria.pageSize });
+        }
+
+        let sortObject;
+        if (criteria.sortField) {
+            sortObject = {};
+            sortObject[criteria.sortField] = criteria.sortOrder;
+            paginationProps.push({ $sort: sortObject });
+        }
+
         return await this.activityModel.aggregate([
             { $match: { _id: new Types.ObjectId('63e49b129eb7346a5cf29bd1') } },
             {
@@ -1146,8 +1184,21 @@ export class ActivityService {
             },
             { $unwind: '$nestedAttchments' },
             { $project: { nestedAttchments: 1 } },
-            { $skip: 4 },
-            { $limit: 10 },
+            // {
+            //     $replaceRoot: {
+            //         newRoot: '$nestedAttchments',
+            //     },
+            // },
+
+            {
+                $facet: {
+                    attachments: paginationProps,
+                    count: [
+                        { $match: search.$and.length > 0 ? search : {} },
+                        { $count: 'count' },
+                    ],
+                },
+            },
         ]);
     }
 }
