@@ -1165,6 +1165,22 @@ export class ActivityService {
         return await this.activityModel.aggregate([
             // { $match: { _id: new Types.ObjectId('63e49b129eb7346a5cf29bd1') } },
             {
+                $lookup: {
+                    from: 'organizations',
+                    localField: 'createdByOrganization',
+                    foreignField: '_id',
+                    as: 'createdByOrganizationObj',
+                },
+            },
+            {
+                $lookup: {
+                    from: 'organizations',
+                    localField: 'assignTo',
+                    foreignField: '_id',
+                    as: 'assignToObj',
+                },
+            },
+            {
                 $addFields: {
                     nestedAttchments: {
                         $reduce: {
@@ -1172,6 +1188,12 @@ export class ActivityService {
                             initialValue: [],
                             in: { $concatArrays: ['$$value', '$$this'] },
                         },
+                    },
+                    createdByOrganizationObj: {
+                        $arrayElemAt: ['$createdByOrganizationObj', 0],
+                    },
+                    assignToObj: {
+                        $arrayElemAt: ['$assignToObj', 0],
                     },
                 },
             },
@@ -1183,7 +1205,14 @@ export class ActivityService {
                 },
             },
             { $unwind: '$nestedAttchments' },
-            { $project: { nestedAttchments: 1 } },
+            {
+                $project: {
+                    nestedAttchments: 1,
+                    uniqIdentity: 1,
+                    createdByOrganizationObj: 1,
+                    assignToObj: 1,
+                },
+            },
             // {
             //     $replaceRoot: {
             //         newRoot: '$nestedAttchments',
