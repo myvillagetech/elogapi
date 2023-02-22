@@ -688,15 +688,7 @@ export class ActivityService {
                                                           new Types.ObjectId(s),
                                                   ),
                                               },
-                                          },
-                                          {
-                                              createdByOrganization: {
-                                                  $in: criteria.organizations.map(
-                                                      (s) =>
-                                                          new Types.ObjectId(s),
-                                                  ),
-                                              },
-                                          },
+                                          }
                                       ],
                                   },
                         },
