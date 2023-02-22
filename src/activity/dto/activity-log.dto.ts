@@ -1,44 +1,49 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty } from "class-validator";
-import { Priority, Status } from "../enums/activity.enums";
-import { AttachmentsDto } from "./activity.dto";
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty } from 'class-validator';
+import { Priority, Status } from '../enums/activity.enums';
+import { AttachmentsDto } from './activity.dto';
 
-export class ActivityLogDto{
+export class ActivityLogDto {
     @IsNotEmpty()
     @ApiProperty({
-        type : String
+        type: String,
     })
-    message : string;
+    message: string;
 
     @ApiProperty({
         type: String,
-        enum : Status
+        enum: Status,
     })
-    status : Status;
-
-    @ApiProperty({
-        type : String
-    })
-    assignTo : string
+    status: Status;
 
     @ApiProperty({
         type: String,
-        enum : Priority
     })
-    priority : Priority
+    assignTo: string;
 
     @ApiProperty({
-        type : String
+        type: String,
+        enum: Priority,
     })
-    visibility : string
+    priority: Priority;
 
     @ApiProperty({
-        type : [AttachmentsDto]
+        type: String,
     })
-    attachments : AttachmentsDto[]
+    visibility: string;
 
     @ApiProperty({
-        type : String
+        type: [AttachmentsDto],
     })
-    userId : string
+    attachments: AttachmentsDto[];
+
+    @ApiProperty({
+        type: String,
+    })
+    userId: string;
+
+    @ApiProperty({
+        type: String,
+    })
+    organizationId: string;
 }

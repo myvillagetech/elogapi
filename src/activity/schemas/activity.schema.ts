@@ -65,12 +65,17 @@ export class ActivityLog {
     })
     userId: UserSchemaCreator;
 
-    @Prop({type: mongoose.Schema.Types.ObjectId,
-        ref: 'user',})
+    @Prop({
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'organization',
+    })
+    organizationId: OrganizationSchemaCreator;
+
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'user' })
     createdBy: UserSchemaCreator;
 
     @Prop()
-    createdByUserName: string
+    createdByUserName: string;
 }
 
 export const ActivityLogSchema = SchemaFactory.createForClass(ActivityLog);
@@ -84,12 +89,11 @@ export class DueDateLog {
     })
     dueDate: Date;
 
-    @Prop({type: mongoose.Schema.Types.ObjectId,
-        ref: 'user',})
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'user' })
     createdBy: UserSchemaCreator;
 
     @Prop()
-    createdByUserName: string
+    createdByUserName: string;
 }
 
 export const DueDateLogSchema = SchemaFactory.createForClass(DueDateLog);

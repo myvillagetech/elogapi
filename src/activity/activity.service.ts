@@ -357,7 +357,7 @@ export class ActivityService {
         const search: any = { $and: [{ isArchive: false }] };
 
         if (criteria.organizations && criteria.organizations.length > 0) {
-            const filters: any = [
+            let filters: any = [
                 {
                     assignTo: {
                         $in: criteria.organizations.map(
@@ -374,18 +374,25 @@ export class ActivityService {
                 },
             ];
 
-            if (!criteria.onlyMyTasks) {
-                filters.push({
-                    visibility: 'EVERYONE',
-                });
+            if (criteria.onlyMyTasks) {
+                filters = [
+                    {
+                        assignTo: {
+                            $in: criteria.organizations.map(
+                                (s) => new Types.ObjectId(s),
+                            ),
+                        },
+                    },
+                ];
             }
             search.$and.push({ $or: filters });
         }
 
         if (!isSuperAdmin && decodedToken.organization.length === 0) {
-            search.$and.push({
-                visibility: 'EVERYONE',
-            });
+            return [];
+            // search.$and.push({
+            //     visibility: 'EVERYONE',
+            // });
         }
 
         if (criteria.status && criteria.status.length > 0) {
@@ -625,11 +632,11 @@ export class ActivityService {
                 },
             ];
 
-            if (!criteria.onlyMyTasks) {
-                filters.push({
-                    visibility: 'EVERYONE',
-                });
-            }
+            // if (!criteria.onlyMyTasks) {
+            //     filters.push({
+            //         visibility: 'EVERYONE',
+            //     });
+            // }
             search.$and.push({ $or: filters });
         }
 
@@ -659,9 +666,9 @@ export class ActivityService {
                                                   ),
                                               },
                                           },
-                                          {
-                                              visibility: 'EVERYONE',
-                                          },
+                                          //   {
+                                          //       visibility: 'EVERYONE',
+                                          //   },
                                       ],
                                   },
                         },
