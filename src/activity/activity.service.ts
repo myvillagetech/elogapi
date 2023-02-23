@@ -185,7 +185,7 @@ export class ActivityService {
         tokenHeader: string,
     ): Promise<any> {
         const decodedToken: any = this.authService.getDecodedToken(tokenHeader);
-        const queryObject = {
+        const object = {
             $push: {
                 activityLog: {
                     ...activityLog,
@@ -197,21 +197,22 @@ export class ActivityService {
         };
 
         if (activityLog.visibility) {
-            queryObject['visibility'] = activityLog.visibility;
+            object['visibility'] = activityLog.visibility;
         }
 
         if (activityLog.priority) {
-            queryObject['priority'] = activityLog.priority;
+            object['priority'] = activityLog.priority;
         }
 
         if (activityLog.status) {
-            queryObject['status'] = activityLog.status;
-            queryObject.$push['statusLog'] = { status: activityLog.status };
+            object['status'] = activityLog.status;
+            object.$push['statusLog'] = { status: activityLog.status };
         }
 
-        const result = await this.activityModel.updateOne(
+        const result = await this.activityModel.findOneAndUpdate(
             { _id: new Types.ObjectId(activityId) },
-            queryObject,
+            object,
+            { upsert: true, new : true }
         );
 
         if (!result) {
@@ -312,9 +313,8 @@ export class ActivityService {
             dto.organzation,
         );
 
-        const identifier = `${
-            organizarion.shortName ? organizarion.shortName : ''
-        }${organizarion.orgActivityAutoIncrementId + 1}`;
+        const identifier = `${organizarion.shortName ? organizarion.shortName : ''
+            }${organizarion.orgActivityAutoIncrementId + 1}`;
 
         await this.organizationsModel.updateOne(
             {
@@ -649,28 +649,28 @@ export class ActivityService {
                             $match: isSuperAdmin
                                 ? {}
                                 : {
-                                      $or: [
-                                          {
-                                              assignTo: {
-                                                  $in: criteria.organizations.map(
-                                                      (s) =>
-                                                          new Types.ObjectId(s),
-                                                  ),
-                                              },
-                                          },
-                                          {
-                                              createdByOrganization: {
-                                                  $in: criteria.organizations.map(
-                                                      (s) =>
-                                                          new Types.ObjectId(s),
-                                                  ),
-                                              },
-                                          },
-                                          //   {
-                                          //       visibility: 'EVERYONE',
-                                          //   },
-                                      ],
-                                  },
+                                    $or: [
+                                        {
+                                            assignTo: {
+                                                $in: criteria.organizations.map(
+                                                    (s) =>
+                                                        new Types.ObjectId(s),
+                                                ),
+                                            },
+                                        },
+                                        {
+                                            createdByOrganization: {
+                                                $in: criteria.organizations.map(
+                                                    (s) =>
+                                                        new Types.ObjectId(s),
+                                                ),
+                                            },
+                                        },
+                                        //   {
+                                        //       visibility: 'EVERYONE',
+                                        //   },
+                                    ],
+                                },
                         },
                         { $count: 'all' },
                     ],
@@ -680,17 +680,17 @@ export class ActivityService {
                             $match: isSuperAdmin
                                 ? {}
                                 : {
-                                      $or: [
-                                          {
-                                              assignTo: {
-                                                  $in: criteria.organizations.map(
-                                                      (s) =>
-                                                          new Types.ObjectId(s),
-                                                  ),
-                                              },
-                                          }
-                                      ],
-                                  },
+                                    $or: [
+                                        {
+                                            assignTo: {
+                                                $in: criteria.organizations.map(
+                                                    (s) =>
+                                                        new Types.ObjectId(s),
+                                                ),
+                                            },
+                                        }
+                                    ],
+                                },
                         },
                         { $count: 'myTasks' },
                     ],
@@ -699,45 +699,45 @@ export class ActivityService {
                         {
                             $match: isSuperAdmin
                                 ? {
-                                      dueDate: {
-                                          $lt: dayjs().startOf('day').toDate(),
-                                      },
-                                  }
+                                    dueDate: {
+                                        $lt: dayjs().startOf('day').toDate(),
+                                    },
+                                }
                                 : {
-                                      $and: [
-                                          {
-                                              dueDate: {
-                                                  $lt: dayjs()
-                                                      .startOf('day')
-                                                      .toDate(),
-                                              },
-                                          },
-                                          {
-                                              $or: [
-                                                  {
-                                                      assignTo: {
-                                                          $in: criteria.organizations.map(
-                                                              (s) =>
-                                                                  new Types.ObjectId(
-                                                                      s,
-                                                                  ),
-                                                          ),
-                                                      },
-                                                  },
-                                                  {
-                                                      createdByOrganization: {
-                                                          $in: criteria.organizations.map(
-                                                              (s) =>
-                                                                  new Types.ObjectId(
-                                                                      s,
-                                                                  ),
-                                                          ),
-                                                      },
-                                                  },
-                                              ],
-                                          },
-                                      ],
-                                  },
+                                    $and: [
+                                        {
+                                            dueDate: {
+                                                $lt: dayjs()
+                                                    .startOf('day')
+                                                    .toDate(),
+                                            },
+                                        },
+                                        {
+                                            $or: [
+                                                {
+                                                    assignTo: {
+                                                        $in: criteria.organizations.map(
+                                                            (s) =>
+                                                                new Types.ObjectId(
+                                                                    s,
+                                                                ),
+                                                        ),
+                                                    },
+                                                },
+                                                {
+                                                    createdByOrganization: {
+                                                        $in: criteria.organizations.map(
+                                                            (s) =>
+                                                                new Types.ObjectId(
+                                                                    s,
+                                                                ),
+                                                        ),
+                                                    },
+                                                },
+                                            ],
+                                        },
+                                    ],
+                                },
                         },
                         { $count: 'overDue' },
                     ],
@@ -746,36 +746,36 @@ export class ActivityService {
                             $match: isSuperAdmin
                                 ? { priority: 'HIGH' }
                                 : {
-                                      $and: [
-                                          {
-                                              priority: 'HIGH',
-                                          },
-                                          {
-                                              $or: [
-                                                  {
-                                                      assignTo: {
-                                                          $in: criteria.organizations.map(
-                                                              (s) =>
-                                                                  new Types.ObjectId(
-                                                                      s,
-                                                                  ),
-                                                          ),
-                                                      },
-                                                  },
-                                                  {
-                                                      createdByOrganization: {
-                                                          $in: criteria.organizations.map(
-                                                              (s) =>
-                                                                  new Types.ObjectId(
-                                                                      s,
-                                                                  ),
-                                                          ),
-                                                      },
-                                                  },
-                                              ],
-                                          },
-                                      ],
-                                  },
+                                    $and: [
+                                        {
+                                            priority: 'HIGH',
+                                        },
+                                        {
+                                            $or: [
+                                                {
+                                                    assignTo: {
+                                                        $in: criteria.organizations.map(
+                                                            (s) =>
+                                                                new Types.ObjectId(
+                                                                    s,
+                                                                ),
+                                                        ),
+                                                    },
+                                                },
+                                                {
+                                                    createdByOrganization: {
+                                                        $in: criteria.organizations.map(
+                                                            (s) =>
+                                                                new Types.ObjectId(
+                                                                    s,
+                                                                ),
+                                                        ),
+                                                    },
+                                                },
+                                            ],
+                                        },
+                                    ],
+                                },
                         },
                         { $count: 'highPriority' },
                     ],
@@ -783,43 +783,43 @@ export class ActivityService {
                         {
                             $match: isSuperAdmin
                                 ? {
-                                      status: {
-                                          $in: ['INPROGRESS', 'NEW'],
-                                      },
-                                  }
+                                    status: {
+                                        $in: ['INPROGRESS', 'NEW'],
+                                    },
+                                }
                                 : {
-                                      $and: [
-                                          {
-                                              status: {
-                                                  $in: ['INPROGRESS', 'NEW'],
-                                              },
-                                          },
-                                          {
-                                              $or: [
-                                                  {
-                                                      assignTo: {
-                                                          $in: criteria.organizations.map(
-                                                              (s) =>
-                                                                  new Types.ObjectId(
-                                                                      s,
-                                                                  ),
-                                                          ),
-                                                      },
-                                                  },
-                                                  {
-                                                      createdByOrganization: {
-                                                          $in: criteria.organizations.map(
-                                                              (s) =>
-                                                                  new Types.ObjectId(
-                                                                      s,
-                                                                  ),
-                                                          ),
-                                                      },
-                                                  },
-                                              ],
-                                          },
-                                      ],
-                                  },
+                                    $and: [
+                                        {
+                                            status: {
+                                                $in: ['INPROGRESS', 'NEW'],
+                                            },
+                                        },
+                                        {
+                                            $or: [
+                                                {
+                                                    assignTo: {
+                                                        $in: criteria.organizations.map(
+                                                            (s) =>
+                                                                new Types.ObjectId(
+                                                                    s,
+                                                                ),
+                                                        ),
+                                                    },
+                                                },
+                                                {
+                                                    createdByOrganization: {
+                                                        $in: criteria.organizations.map(
+                                                            (s) =>
+                                                                new Types.ObjectId(
+                                                                    s,
+                                                                ),
+                                                        ),
+                                                    },
+                                                },
+                                            ],
+                                        },
+                                    ],
+                                },
                         },
                         { $count: 'activeActivities' },
                     ],
