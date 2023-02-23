@@ -11,9 +11,14 @@ import {
     Headers,
     UseGuards,
     HttpException,
+    UseInterceptors,
 } from '@nestjs/common';
+import { UploadedFiles } from '@nestjs/common/decorators';
+import { AnyFilesInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
-import { response } from 'express';
+import { Response, response } from 'express';
+import { diskStorage, Multer } from 'multer';
+import { extname, join } from 'path';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { ActivityService } from './activity.service';
 import { ActivityLogDto } from './dto/activity-log.dto';
@@ -32,6 +37,8 @@ import {
     UpdateActivityOrganizationDto,
     UpdateActivityStatusDto,
 } from './dto/update-activity.dto';
+import * as fs from 'fs';
+import { readdirSync, existsSync } from 'fs';
 
 @Controller('activity')
 @ApiTags('activity')
@@ -39,6 +46,7 @@ import {
 @UseGuards(JwtAuthGuard)
 export class ActivityController {
     constructor(private activityService: ActivityService) {}
+    private multer: Multer;
 
     @Post()
     @ApiParam({
@@ -562,7 +570,6 @@ export class ActivityController {
                 success: true,
             });
         } catch (error) {
-
             throw new HttpException(
                 {
                     success: false,
@@ -574,5 +581,48 @@ export class ActivityController {
                 },
             );
         }
+    }
+
+    @Post('upload')
+    @UseInterceptors(
+        AnyFilesInterceptor({
+            storage: diskStorage({
+                destination: (req, file, cb) => {
+                    if (!fs.existsSync(`./uploads/${file.fieldname}`)) {
+                        fs.mkdirSync(`./uploads/${file.fieldname}`, {
+                            recursive: true,
+                        });
+                    }
+                    const path = `./uploads/${file.fieldname}`;
+                    cb(null, path);
+                },
+                filename: (req, file, callback) => {
+                    // generate a unique filename for the uploaded file
+                    const name = file.originalname.split('.')[0];
+                    const fileExtName = extname(file.originalname);
+                    const randomName = Array(4)
+                        .fill(null)
+                        .map(() => Math.round(Math.random() * 16).toString(16))
+                        .join('');
+                    callback(null, `${name}${fileExtName}`);
+                },
+            }),
+        }),
+    )
+    uploadFile(@UploadedFiles() files: Array<Express.Multer.File>) {
+        return files;
+    }
+
+    @Post('attachment/download')
+    getFile(@Body() fileDetails: any, @Res() res: Response) {
+          const filePath = join(__dirname, '..', '..', 'uploads', fileDetails.path, fileDetails.fileName);
+
+          if (!existsSync(filePath)) {
+            res.status(404).send('File not found');
+            return;
+          }
+
+          res.sendFile(filePath);
+
     }
 }
