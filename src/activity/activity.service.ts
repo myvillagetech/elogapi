@@ -843,7 +843,15 @@ export class ActivityService {
         );
 
         if (!isSuperAdmin && decodedToken.organization.length === 0) {
-            return [];
+            return [
+                {
+                    new: [{ newCount: 0 }],
+                    inProgress: [{ inProgressCount: 0 }],
+                    resolved: [],
+                    rejectedCount: [{ rejectedCount: 0 }],
+                    total: [{ total: 0 }],
+                },
+            ];
         }
         if (request.organizations && request.organizations.length > 0) {
             search.$and.push({
@@ -918,7 +926,15 @@ export class ActivityService {
         );
 
         if (!isSuperAdmin && decodedToken.organization.length === 0) {
-            return [];
+            return [
+                {
+                    oneWeek: [],
+                    oneToTwoWeek: [],
+                    twoWeeksToOneMonth: [{ twoWeeksToOneMonth: 0 }],
+                    moreThanAMonth: [],
+                    OnTime: [{ OnTime: 0 }],
+                },
+            ];
         }
         if (request.organizations && request.organizations.length > 0) {
             search.$and.push({
@@ -1053,7 +1069,15 @@ export class ActivityService {
         );
 
         if (!isSuperAdmin && decodedToken.organization.length === 0) {
-            return [];
+            return [
+                {
+                    total: [{ total: 0 }],
+                    singleMinistry: [{ singleMinistry: 0 }],
+                    multiMinistry: [{ multiMinistry: 0 }],
+                    others: [],
+                    none: [],
+                },
+            ];
         }
 
         if (request.organizations && request.organizations.length > 0) {
