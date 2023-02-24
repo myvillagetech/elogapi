@@ -185,7 +185,7 @@ export class ActivityService {
         tokenHeader: string,
     ): Promise<any> {
         const decodedToken: any = this.authService.getDecodedToken(tokenHeader);
-        const queryObject = {
+        const object = {
             $push: {
                 activityLog: {
                     ...activityLog,
@@ -197,21 +197,22 @@ export class ActivityService {
         };
 
         if (activityLog.visibility) {
-            queryObject['visibility'] = activityLog.visibility;
+            object['visibility'] = activityLog.visibility;
         }
 
         if (activityLog.priority) {
-            queryObject['priority'] = activityLog.priority;
+            object['priority'] = activityLog.priority;
         }
 
         if (activityLog.status) {
-            queryObject['status'] = activityLog.status;
-            queryObject.$push['statusLog'] = { status: activityLog.status };
+            object['status'] = activityLog.status;
+            object.$push['statusLog'] = { status: activityLog.status };
         }
 
-        const result = await this.activityModel.updateOne(
+        const result = await this.activityModel.findOneAndUpdate(
             { _id: new Types.ObjectId(activityId) },
-            queryObject,
+            object,
+            { upsert: true, new: true },
         );
 
         if (!result) {
