@@ -688,7 +688,7 @@ export class ActivityService {
                                                           new Types.ObjectId(s),
                                                   ),
                                               },
-                                          }
+                                          },
                                       ],
                                   },
                         },
@@ -829,11 +829,21 @@ export class ActivityService {
         return result;
     }
 
-    async getDashBoardActivityMetrics(request: ActivityMetricsRequest) {
+    async getDashBoardActivityMetrics(
+        request: ActivityMetricsRequest,
+        authHeader: string,
+    ) {
         // assignto must be part of  user organizarion
         // if organization
         const search = { $and: [] };
+        const decodedToken: any = this.authService.getDecodedToken(authHeader);
+        const isSuperAdmin = decodedToken.roles.some(
+            (role) => role === 'SuperAdmin',
+        );
 
+        if (!isSuperAdmin && decodedToken.organization.length === 0) {
+            return [];
+        }
         if (request.organizations && request.organizations.length > 0) {
             search.$and.push({
                 assignTo: {
@@ -895,9 +905,20 @@ export class ActivityService {
         return result;
     }
 
-    async getDashBoardDueDateMetrics(request: DashboardBaseModel) {
+    async getDashBoardDueDateMetrics(
+        request: DashboardBaseModel,
+        authHeader: string,
+    ) {
         const search = { $and: [] };
 
+        const decodedToken: any = this.authService.getDecodedToken(authHeader);
+        const isSuperAdmin = decodedToken.roles.some(
+            (role) => role === 'SuperAdmin',
+        );
+
+        if (!isSuperAdmin && decodedToken.organization.length === 0) {
+            return [];
+        }
         if (request.organizations && request.organizations.length > 0) {
             search.$and.push({
                 assignTo: {
@@ -1019,8 +1040,20 @@ export class ActivityService {
         return result;
     }
 
-    async getDashBoardRelatedToMetricsMetrics(request: DashboardBaseModel) {
+    async getDashBoardRelatedToMetricsMetrics(
+        request: DashboardBaseModel,
+        authHeader: string,
+    ) {
         const search = { $and: [] };
+
+        const decodedToken: any = this.authService.getDecodedToken(authHeader);
+        const isSuperAdmin = decodedToken.roles.some(
+            (role) => role === 'SuperAdmin',
+        );
+
+        if (!isSuperAdmin && decodedToken.organization.length === 0) {
+            return [];
+        }
 
         if (request.organizations && request.organizations.length > 0) {
             search.$and.push({

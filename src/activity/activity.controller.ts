@@ -419,13 +419,23 @@ export class ActivityController {
     }
 
     @Post('dashboard/getDashBoardActivityMetrics')
+    @ApiParam({
+        name: 'Authorization',
+        required: false,
+        description:
+            '(Leave empty. Use lock icon on the top-right to authorize)',
+    })
     async getDashBoardActivityMetrics(
         @Body() request: ActivityMetricsRequest,
         @Res() response,
+        @Headers('Authorization') authHeader: string,
     ) {
         try {
             const result =
-                await this.activityService.getDashBoardActivityMetrics(request);
+                await this.activityService.getDashBoardActivityMetrics(
+                    request,
+                    authHeader,
+                );
             // return result;
             return response.status(HttpStatus.OK).json({
                 message: 'fetched activities Successfully',
@@ -442,13 +452,23 @@ export class ActivityController {
     }
 
     @Post('dashboard/getDashBoardDueDateMetrics')
+    @ApiParam({
+        name: 'Authorization',
+        required: false,
+        description:
+            '(Leave empty. Use lock icon on the top-right to authorize)',
+    })
     async getDashBoardDueDateMetrics(
         @Res() response,
         @Body() request: DashboardBaseModel,
+        @Headers('Authorization') authHeader: string,
     ) {
         try {
             const result =
-                await this.activityService.getDashBoardDueDateMetrics(request);
+                await this.activityService.getDashBoardDueDateMetrics(
+                    request,
+                    authHeader,
+                );
             // return result;
             return response.status(HttpStatus.OK).json({
                 message: 'fetched activities Successfully',
@@ -465,14 +485,22 @@ export class ActivityController {
     }
 
     @Post('dashboard/getDashBoardRelatedToMetricsMetrics')
+    @ApiParam({
+        name: 'Authorization',
+        required: false,
+        description:
+            '(Leave empty. Use lock icon on the top-right to authorize)',
+    })
     async getDashBoardRelatedToMetricsMetrics(
         @Res() response,
         @Body() request: DashboardBaseModel,
+        @Headers('Authorization') authHeader: string,
     ) {
         try {
             const result =
                 await this.activityService.getDashBoardRelatedToMetricsMetrics(
                     request,
+                    authHeader,
                 );
             // return result;
             return response.status(HttpStatus.OK).json({
@@ -562,7 +590,6 @@ export class ActivityController {
                 success: true,
             });
         } catch (error) {
-
             throw new HttpException(
                 {
                     success: false,
