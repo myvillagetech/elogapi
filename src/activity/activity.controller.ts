@@ -643,14 +643,20 @@ export class ActivityController {
 
     @Post('attachment/download')
     getFile(@Body() fileDetails: any, @Res() res: Response) {
-          const filePath = join(__dirname, '..', '..', 'uploads', fileDetails.path, fileDetails.fileName);
+        const filePath = join(
+            __dirname,
+            '..',
+            '..',
+            'uploads',
+            fileDetails.path,
+            fileDetails.fileName,
+        );
 
-          if (!existsSync(filePath)) {
+        if (!existsSync(filePath)) {
             res.status(404).send('File not found');
             return;
-          }
+        }
 
-          res.sendFile(filePath);
-
+        res.sendFile(filePath);
     }
 }

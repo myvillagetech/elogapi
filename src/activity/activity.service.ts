@@ -1196,7 +1196,7 @@ export class ActivityService {
         }
 
         return await this.activityModel.aggregate([
-            // { $match: { _id: new Types.ObjectId('63e49b129eb7346a5cf29bd1') } },
+            { $match: { _id: new Types.ObjectId('63e49b129eb7346a5cf29bd1') } },
             {
                 $lookup: {
                     from: 'organizations',
@@ -1215,11 +1215,46 @@ export class ActivityService {
             },
             {
                 $addFields: {
+                    activityLog: {
+                        $map: {
+                            input: '$activityLog',
+                            as: 'log',
+                            in: {
+                                $mergeObjects: [
+                                    '$$log',
+                                    {
+                                        activityid: '$_id',
+                                        attachments: {
+                                            $map: {
+                                                input: '$$log.attachments',
+                                                as: 'attachment',
+                                                in: {
+                                                    $mergeObjects: [
+                                                        '$$attachment',
+                                                        {
+                                                            activityLogId:
+                                                                '$$log._id',
+                                                        },
+                                                    ],
+                                                },
+                                            },
+                                        },
+                                    },
+                                ],
+                            },
+                        },
+                    },
+                },
+            },
+            {
+                $addFields: {
                     nestedAttchments: {
                         $reduce: {
                             input: '$activityLog.attachments',
                             initialValue: [],
-                            in: { $concatArrays: ['$$value', '$$this'] },
+                            in: {
+                                $concatArrays: ['$$value', '$$this'],
+                            },
                         },
                     },
                     createdByOrganizationObj: {
@@ -1241,9 +1276,10 @@ export class ActivityService {
             {
                 $project: {
                     nestedAttchments: 1,
+                    // activityLog1: 1,
                     uniqIdentity: 1,
-                    createdByOrganizationObj: 1,
-                    assignToObj: 1,
+                    // createdByOrganizationObj: 1,
+                    // assignToObj: 1,
                 },
             },
             // {
