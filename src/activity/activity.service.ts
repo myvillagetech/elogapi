@@ -139,9 +139,9 @@ export class ActivityService {
         activityId: string,
         activityData: UpdateActivityDto,
     ): Promise<ActivityDocument> {
-        let data :any;
-        if(activityData?.organization){
-            data  = {...activityData, assignTo : activityData.organization[0]}
+        let data: any;
+        if (activityData?.organization) {
+            data = { ...activityData, assignTo: activityData.organization[0] };
         }
         const updatedActivity = await this.activityModel.findByIdAndUpdate(
             activityId,
@@ -1191,7 +1191,35 @@ export class ActivityService {
     ) {
         const decodedToken: any = this.authService.getDecodedToken(authHeader);
 
+        const isSuperAdmin = decodedToken.roles.some(
+            (role) => role === 'SuperAdmin',
+        );
+
         const search: any = { $and: [] };
+
+        if (!isSuperAdmin && decodedToken.organization.length === 0) {
+            return [];
+        }
+
+        if (criteria.organizations && criteria.organizations.length > 0) {
+            const filters: any = [
+                {
+                    assignTo: {
+                        $in: criteria.organizations.map(
+                            (s) => new Types.ObjectId(s),
+                        ),
+                    },
+                },
+                {
+                    createdByOrganization: {
+                        $in: criteria.organizations.map(
+                            (s) => new Types.ObjectId(s),
+                        ),
+                    },
+                },
+            ];
+            search.$and.push({ $or: filters });
+        }
 
         if (criteria.fileNameSearchText) {
             search.$and.push({
@@ -1225,6 +1253,7 @@ export class ActivityService {
 
         return await this.activityModel.aggregate([
             // { $match: { _id: new Types.ObjectId('63e49b129eb7346a5cf29bd1') } },
+            { $match: search.$and.length > 0 ? search : {} },
             {
                 $lookup: {
                     from: 'organizations',

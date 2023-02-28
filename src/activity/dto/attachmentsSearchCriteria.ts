@@ -6,4 +6,9 @@ export class AttachmentsSearchCriteria extends CriteriaWithPaginationAndSorting 
         type: String,
     })
     readonly fileNameSearchText: string;
+
+    @ApiProperty({
+        type: Array<string>,
+    })
+    readonly organizations: string[];
 }
