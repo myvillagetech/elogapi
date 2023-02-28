@@ -20,6 +20,18 @@ export class AttachmentsDto {
         type: String,
     })
     readonly path: string;
+
+    @IsNotEmpty()
+    @ApiProperty({
+        type: String,
+    })
+    readonly organization: string;
+
+    @IsNotEmpty()
+    @ApiProperty({
+        type: String,
+    })
+    readonly organizationId: string;
 }
 
 export class ActivityDto {

@@ -22,6 +22,12 @@ export class Attachment {
     size: string;
     @Prop({})
     path: string;
+    @Prop({
+        type: { type: mongoose.Schema.Types.ObjectId, ref: 'organization' },
+    })
+    organizationId: OrganizationSchemaCreator;
+    @Prop({})
+    organization: string;
 }
 
 export const AttachmentSchema = SchemaFactory.createForClass(Attachment);

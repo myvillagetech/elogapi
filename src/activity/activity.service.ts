@@ -139,9 +139,13 @@ export class ActivityService {
         activityId: string,
         activityData: UpdateActivityDto,
     ): Promise<ActivityDocument> {
+        let data :any;
+        if(activityData?.organization){
+            data  = {...activityData, assignTo : activityData.organization[0]}
+        }
         const updatedActivity = await this.activityModel.findByIdAndUpdate(
             activityId,
-            activityData,
+            data,
             { new: true },
         );
 
