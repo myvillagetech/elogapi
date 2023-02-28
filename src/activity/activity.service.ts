@@ -1235,7 +1235,7 @@ export class ActivityService {
         }
 
         const paginationProps: any = [
-            { $match: search.$and.length > 0 ? search : {} },
+            // { $match: search.$and.length > 0 ? search : {} },
         ];
 
         if (
@@ -1337,25 +1337,13 @@ export class ActivityService {
             {
                 $project: {
                     nestedAttchments: 1,
-                    // activityLog1: 1,
                     uniqIdentity: 1,
-                    // createdByOrganizationObj: 1,
-                    // assignToObj: 1,
                 },
             },
-            // {
-            //     $replaceRoot: {
-            //         newRoot: '$nestedAttchments',
-            //     },
-            // },
-
             {
                 $facet: {
                     attachments: paginationProps,
-                    count: [
-                        { $match: search.$and.length > 0 ? search : {} },
-                        { $count: 'count' },
-                    ],
+                    count: [{ $match: {} }, { $count: 'count' }],
                 },
             },
         ]);
