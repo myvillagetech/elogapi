@@ -23,7 +23,8 @@ export class Attachment {
     @Prop({})
     path: string;
     @Prop({
-        type: { type: mongoose.Schema.Types.ObjectId, ref: 'organization' },
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'organization',
     })
     organizationId: OrganizationSchemaCreator;
     @Prop({})
