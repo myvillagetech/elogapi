@@ -1201,6 +1201,10 @@ export class ActivityService {
             return [];
         }
 
+        if (!criteria.organizations && criteria.organizations.length === 0) {
+            criteria.organizations = decodedToken.organization;
+        }
+
         if (criteria.organizations && criteria.organizations.length > 0) {
             const filters: any = [
                 {

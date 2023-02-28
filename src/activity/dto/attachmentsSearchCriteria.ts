@@ -10,5 +10,5 @@ export class AttachmentsSearchCriteria extends CriteriaWithPaginationAndSorting 
     @ApiProperty({
         type: Array<string>,
     })
-    readonly organizations: string[];
+    organizations: string[];
 }
