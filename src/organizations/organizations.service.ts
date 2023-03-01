@@ -19,6 +19,7 @@ import {
 import { OrganizationDocument } from './schemas/organizations.schema';
 import * as dayjs from 'dayjs';
 import { AuthService } from 'src/auth/auth.service';
+import { OrganizationTypeService } from 'src/generic/organization-type/organization-type.service';
 
 @Injectable()
 export class OrganizationsService {
@@ -29,6 +30,7 @@ export class OrganizationsService {
     constructor(
         private userService: UsersService,
         private readonly authService: AuthService,
+        private organizationTypeService : OrganizationTypeService
     ) {}
 
     async createOrganization(
@@ -101,6 +103,9 @@ export class OrganizationsService {
     async organizationSearchCriteria(
         criteria: OrganizationSearchCriteriaDto,
     ): Promise<any> {
+        const organizationTypes = await this.organizationTypeService.getAllOrganizationsTypes();
+        const association : any = organizationTypes.filter((type)=>type.name === 'Association');
+        const ministry :any = organizationTypes.filter((type)=>type.name === 'Ministry/Department' );
         const search = { $and: [] };
 
         if (criteria.organization) {
@@ -208,7 +213,7 @@ export class OrganizationsService {
                     ministries: [
                         {
                             $match: {
-                                type: '63973bfb61ab6f49bfdd3c35',
+                                type: `${ministry[0]._id}`,
                                 isActive: true,
                             },
                         },
@@ -217,7 +222,7 @@ export class OrganizationsService {
                     associations: [
                         {
                             $match: {
-                                type: '63973c8961ab6f49bfdd3c38',
+                                type: `${association[0]._id}`,
                                 isActive: true,
                             },
                         },

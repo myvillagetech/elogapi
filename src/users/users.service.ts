@@ -22,13 +22,16 @@ import * as bcrypt from 'bcrypt';
 import { ResetPasswordDto } from './dto/resetPassword.dto';
 import { UserActivityLogDocument } from './schemas/user.activitylog';
 import * as dayjs from 'dayjs';
+import { OrganizationTypeService } from 'src/generic/organization-type/organization-type.service';
 
 @Injectable()
 export class UsersService {
     @InjectModel(MODEL_ENUMS.USERS) private usersModel: Model<UserDocument>;
     @InjectModel(MODEL_ENUMS.USERS_ACTIVITY_LOG)
     private userActivityLogsModel: Model<UserActivityLogDocument>;
-    constructor() {}
+    constructor(
+        private organizationTypeService : OrganizationTypeService
+    ) {}
 
     addOrganizationToUser(userId, orgId) {
         return this.usersModel.updateOne(
@@ -175,6 +178,9 @@ export class UsersService {
     // }
 
     async usersSearchCriteria(criteria: UserSearchCriteriaDto): Promise<any> {
+        const organizationTypes = await this.organizationTypeService.getAllOrganizationsTypes();
+        const association : any = organizationTypes.filter((type)=>type.name === 'Association');
+        const ministry :any = organizationTypes.filter((type)=>type.name === 'Ministry/Department' );
         const search = { $and: [] };
 
         if (criteria.user) {
@@ -264,7 +270,7 @@ export class UsersService {
                         {
                             $match: {
                                 'organizationsdata.type':
-                                    '63973bfb61ab6f49bfdd3c35',
+                                    ministry[0]._id,
                                 isActive: true,
                             },
                         },
@@ -274,7 +280,7 @@ export class UsersService {
                         {
                             $match: {
                                 'organizationsdata.type':
-                                    '63973c8961ab6f49bfdd3c38',
+                                    association[0]._id,
                                 isActive: true,
                             },
                         },
