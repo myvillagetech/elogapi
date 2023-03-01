@@ -108,6 +108,14 @@ export class ActivityService {
             {
                 $lookup: {
                     from: MODEL_ENUMS.ORGANIZATIONS,
+                    localField: 'assignTo',
+                    foreignField: '_id',
+                    as: 'assignToObj',
+                },
+            },
+            {
+                $lookup: {
+                    from: MODEL_ENUMS.ORGANIZATIONS,
                     localField: 'createdByOrganization',
                     foreignField: '_id',
                     as: 'createdByOrganizationData',
@@ -211,6 +219,10 @@ export class ActivityService {
         if (activityLog.status) {
             object['status'] = activityLog.status;
             object.$push['statusLog'] = { status: activityLog.status };
+        }
+
+        if (activityLog.assignTo) {
+            object['assignTo'] = activityLog.assignTo;
         }
 
         const result = await this.activityModel.findOneAndUpdate(
