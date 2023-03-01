@@ -270,7 +270,7 @@ export class UsersService {
                         {
                             $match: {
                                 'organizationsdata.type':
-                                    ministry[0]._id,
+                                    `${ministry[0]._id}`,
                                 isActive: true,
                             },
                         },
@@ -280,7 +280,7 @@ export class UsersService {
                         {
                             $match: {
                                 'organizationsdata.type':
-                                    association[0]._id,
+                                    `${association[0]._id}`,
                                 isActive: true,
                             },
                         },
