@@ -859,11 +859,22 @@ export class ActivityService {
         }
         if (request.organizations && request.organizations.length > 0) {
             search.$and.push({
-                assignTo: {
-                    $in: request.organizations.map(
-                        (s) => new Types.ObjectId(s),
-                    ),
-                },
+                $or: [
+                    {
+                        assignTo: {
+                            $in: request.organizations.map(
+                                (s) => new Types.ObjectId(s),
+                            ),
+                        },
+                    },
+                    {
+                        createdByOrganization: {
+                            $in: request.organizations.map(
+                                (s) => new Types.ObjectId(s),
+                            ),
+                        },
+                    },
+                ],
             });
         }
 
@@ -942,11 +953,22 @@ export class ActivityService {
         }
         if (request.organizations && request.organizations.length > 0) {
             search.$and.push({
-                assignTo: {
-                    $in: request.organizations.map(
-                        (s) => new Types.ObjectId(s),
-                    ),
-                },
+                $or: [
+                    {
+                        assignTo: {
+                            $in: request.organizations.map(
+                                (s) => new Types.ObjectId(s),
+                            ),
+                        },
+                    },
+                    {
+                        createdByOrganization: {
+                            $in: request.organizations.map(
+                                (s) => new Types.ObjectId(s),
+                            ),
+                        },
+                    },
+                ],
             });
         }
 
@@ -1086,11 +1108,22 @@ export class ActivityService {
 
         if (request.organizations && request.organizations.length > 0) {
             search.$and.push({
-                assignTo: {
-                    $in: request.organizations.map(
-                        (s) => new Types.ObjectId(s),
-                    ),
-                },
+                $or: [
+                    {
+                        assignTo: {
+                            $in: request.organizations.map(
+                                (s) => new Types.ObjectId(s),
+                            ),
+                        },
+                    },
+                    {
+                        createdByOrganization: {
+                            $in: request.organizations.map(
+                                (s) => new Types.ObjectId(s),
+                            ),
+                        },
+                    },
+                ],
             });
         }
         let relatedtoTypes =
