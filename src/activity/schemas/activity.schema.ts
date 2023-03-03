@@ -101,6 +101,13 @@ export class DueDateLog {
 
     @Prop()
     createdByUserName: string;
+
+    @Prop({
+        type : Boolean,
+        default : false
+    })
+    isInitialLog : boolean
+
 }
 
 export const DueDateLogSchema = SchemaFactory.createForClass(DueDateLog);

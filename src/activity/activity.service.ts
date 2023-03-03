@@ -77,6 +77,7 @@ export class ActivityService {
                 dueDate: dueDate,
                 createdBy: decodedToken._id,
                 createdByUserName: decodedToken.Name,
+                isInitialLog : true,
             },
             assignTo: activityDto.organization[0],
             createdBy: decodedToken._id,
