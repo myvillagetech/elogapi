@@ -1379,6 +1379,7 @@ export class ActivityService {
                 },
             },
             { $unwind: '$nestedAttchments' },
+            
             {
                 $project: {
                     nestedAttchments: 1,
@@ -1386,11 +1387,42 @@ export class ActivityService {
                 },
             },
             {
+                $match: criteria.organizations.length > 0 ?{
+                    "nestedAttchments.organizationId": {
+                        $in: criteria.organizations.map(
+                            (s) => new Types.ObjectId(s),
+                        ),
+                    },
+                } : {},
+            },
+            {
+                $lookup: {
+                    from: 'organizations',
+                    localField: 'nestedAttchments.organizationId',
+                    foreignField: '_id',
+                    as: 'docOrg',
+                },
+            },
+            // {
+            //     $addFields: {
+            //         'nestedAttchments.organization': '$docOrg[0].organization'
+            //     },
+            // },
+            {
                 $facet: {
                     attachments: paginationProps,
                     count: [{ $match: {} }, { $count: 'count' }],
                 },
             },
+            // {
+            //     $match: {
+            //         "attachments.organizationId": {
+            //             $in: criteria.organizations.map(
+            //                 (s) => new Types.ObjectId(s),
+            //             ),
+            //         },
+            //     },
+            // },
         ]);
     }
 }
