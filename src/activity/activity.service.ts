@@ -1358,6 +1358,18 @@ export class ActivityService {
 
         if (criteria.isArchived) {
             isArchiveQuery.$match['nestedAttchments.isArchived'] = true;
+        } else {
+            isArchiveQuery.$match['$or'] = [
+                {
+                    'nestedAttchments.isArchived': false,
+                },
+                {
+                    'nestedAttchments.isArchived': null,
+                },
+                {
+                    'nestedAttchments.isArchived': { $exists: false },
+                },
+            ];
         }
         if (!isSuperAdmin && decodedToken.organization.length === 0) {
             return [];
