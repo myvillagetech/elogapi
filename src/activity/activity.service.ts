@@ -77,7 +77,7 @@ export class ActivityService {
                 dueDate: dueDate,
                 createdBy: decodedToken._id,
                 createdByUserName: decodedToken.Name,
-                isInitialLog : true,
+                isInitialLog: true,
             },
             assignTo: activityDto.organization[0],
             createdBy: decodedToken._id,
@@ -1211,6 +1211,60 @@ export class ActivityService {
         return result;
     }
 
+    async archiveDocument(data: any): Promise<any> {
+        return await this.updateDocumentArchival(data, true);
+    }
+
+    async revertDocumentArchival(data: any): Promise<any> {
+        return await this.updateDocumentArchival(data, false);
+    }
+
+    async updateDocumentArchival(data: any, value): Promise<any> {
+        const result = data.activityLogId
+            ? await this.activityModel.update(
+                  {
+                      _id: new Types.ObjectId(data.activityId),
+                  },
+                  {
+                      $set: {
+                          'activityLog.$[log].attachments.$[att].isArchived':
+                              value,
+                      },
+                  },
+                  {
+                      arrayFilters: [
+                          {
+                              'log._id': new Types.ObjectId(data.activityLogId),
+                          },
+                          {
+                              'att._id': new Types.ObjectId(data.attchmentId),
+                          },
+                      ],
+                  },
+              )
+            : await this.activityModel.update(
+                  {
+                      _id: new Types.ObjectId(data.activityId),
+                  },
+                  {
+                      $set: {
+                          'attachments.$[att].isArchived': value,
+                      },
+                  },
+                  {
+                      arrayFilters: [
+                          {
+                              'att._id': new Types.ObjectId(data.attchmentId),
+                          },
+                      ],
+                  },
+              );
+
+        if (!result) {
+            throw new NotFoundException('Activity data not found');
+        }
+    }
+
     async archiveMultipleActivities(
         activityIds: string[],
         isArchive: boolean,
@@ -1241,7 +1295,15 @@ export class ActivityService {
             (role) => role === 'SuperAdmin',
         );
 
-        const search: any = { $and: [] };
+        const search: any = {
+            $and: [
+                {
+                    _id: new mongoose.Types.ObjectId(
+                        '63ff1b7d663d3cc5aaabf53a',
+                    ),
+                },
+            ],
+        };
 
         if (!isSuperAdmin && decodedToken.organization.length === 0) {
             return [];
@@ -1341,6 +1403,7 @@ export class ActivityService {
                                                         {
                                                             activityLogId:
                                                                 '$$log._id',
+                                                            activityId: '$_id',
                                                         },
                                                     ],
                                                 },
@@ -1380,7 +1443,7 @@ export class ActivityService {
                 },
             },
             { $unwind: '$nestedAttchments' },
-            
+
             {
                 $project: {
                     nestedAttchments: 1,
@@ -1388,13 +1451,16 @@ export class ActivityService {
                 },
             },
             {
-                $match: criteria.organizations.length > 0 ?{
-                    "nestedAttchments.organizationId": {
-                        $in: criteria.organizations.map(
-                            (s) => new Types.ObjectId(s),
-                        ),
-                    },
-                } : {},
+                $match:
+                    criteria.organizations.length > 0
+                        ? {
+                              'nestedAttchments.organizationId': {
+                                  $in: criteria.organizations.map(
+                                      (s) => new Types.ObjectId(s),
+                                  ),
+                              },
+                          }
+                        : {},
             },
             {
                 $lookup: {

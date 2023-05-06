@@ -39,6 +39,7 @@ import {
 } from './dto/update-activity.dto';
 import * as fs from 'fs';
 import { readdirSync, existsSync } from 'fs';
+import { ActivityAttchementArchiveDto } from './dto/activity-attachment-archive.dto';
 
 @Controller('activity')
 @ApiTags('activity')
@@ -658,5 +659,49 @@ export class ActivityController {
         }
 
         res.sendFile(filePath);
+    }
+
+    @Post('/document/archive')
+    async archiveDocument(
+        @Res() response,
+        @Body() data: ActivityAttchementArchiveDto,
+    ) {
+        try {
+            const activity = await this.activityService.archiveDocument(data);
+            return response.status(HttpStatus.OK).json({
+                message: 'Document archived Successfully',
+                data: activity,
+                success: true,
+            });
+        } catch (error) {
+            return response.status(error.status).json({
+                message: 'Unable to Fetch Activity',
+                error: error,
+                success: false,
+            });
+        }
+    }
+
+    @Post('/document/archive/revert')
+    async revertDocumentArchival(
+        @Res() response,
+        @Body() data: ActivityAttchementArchiveDto,
+    ) {
+        try {
+            const activity = await this.activityService.revertDocumentArchival(
+                data,
+            );
+            return response.status(HttpStatus.OK).json({
+                message: 'Document archival reverted Successfully',
+                data: activity,
+                success: true,
+            });
+        } catch (error) {
+            return response.status(error.status).json({
+                message: 'Unable to Fetch Activity',
+                error: error,
+                success: false,
+            });
+        }
     }
 }
