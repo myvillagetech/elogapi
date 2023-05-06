@@ -664,10 +664,10 @@ export class ActivityController {
     @Post('/document/archive')
     async archiveDocument(
         @Res() response,
-        @Body() data: ActivityAttchementArchiveDto,
+        @Body() data: ActivityAttchementArchiveDto[],
     ) {
         try {
-            const activity = await this.activityService.archiveDocument(data);
+            const activity = await this.activityService.archiveDocuments(data);
             return response.status(HttpStatus.OK).json({
                 message: 'Document archived Successfully',
                 data: activity,
@@ -685,10 +685,10 @@ export class ActivityController {
     @Post('/document/archive/revert')
     async revertDocumentArchival(
         @Res() response,
-        @Body() data: ActivityAttchementArchiveDto,
+        @Body() data: ActivityAttchementArchiveDto[],
     ) {
         try {
-            const activity = await this.activityService.revertDocumentArchival(
+            const activity = await this.activityService.revertDocumentArchivals(
                 data,
             );
             return response.status(HttpStatus.OK).json({
@@ -708,10 +708,10 @@ export class ActivityController {
     @Post('/document/delete')
     async deleteDocument(
         @Res() response,
-        @Body() data: ActivityAttchementArchiveDto,
+        @Body() data: ActivityAttchementArchiveDto[],
     ) {
         try {
-            const activity = await this.activityService.deleteDocument(data);
+            const activity = await this.activityService.deleteDocuments(data);
             return response.status(HttpStatus.OK).json({
                 message: 'Document archival reverted Successfully',
                 data: activity,

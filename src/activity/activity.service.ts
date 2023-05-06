@@ -1225,12 +1225,16 @@ export class ActivityService {
         return result;
     }
 
-    async archiveDocument(data: any): Promise<any> {
-        return await this.updateDocumentArchival(data, true);
+    async archiveDocuments(items: any): Promise<any> {
+        return await Promise.allSettled(
+            items.map((i: any) => this.updateDocumentArchival(i, true)),
+        );
     }
 
-    async revertDocumentArchival(data: any): Promise<any> {
-        return await this.updateDocumentArchival(data, false);
+    async revertDocumentArchivals(items: any): Promise<any> {
+        return await Promise.allSettled(
+            items.map((i: any) => this.updateDocumentArchival(i, false)),
+        );
     }
 
     async updateDocumentArchival(data: any, value): Promise<any> {
@@ -1277,6 +1281,12 @@ export class ActivityService {
         if (!result) {
             throw new NotFoundException('Activity data not found');
         }
+    }
+
+    async deleteDocuments(items: any[]) {
+        return Promise.allSettled(
+            items.map((i: any) => this.deleteDocument(i)),
+        );
     }
 
     async deleteDocument(data: any): Promise<any> {
