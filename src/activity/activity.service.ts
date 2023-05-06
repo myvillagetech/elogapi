@@ -1265,6 +1265,45 @@ export class ActivityService {
         }
     }
 
+    async deleteDocument(data: any): Promise<any> {
+        const result = data.activityLogId
+            ? await this.activityModel.update(
+                  {
+                      _id: new Types.ObjectId(data.activityId),
+                  },
+                  {
+                      $pull: {
+                          'activityLog.$[log].attachments': {
+                              _id: new Types.ObjectId(data.attchmentId),
+                          },
+                      },
+                  },
+                  {
+                      arrayFilters: [
+                          {
+                              'log._id': new Types.ObjectId(data.activityLogId),
+                          },
+                      ],
+                  },
+              )
+            : await this.activityModel.update(
+                  {
+                      _id: new Types.ObjectId(data.activityId),
+                  },
+                  {
+                      $pull: {
+                          attachments: {
+                              _id: new Types.ObjectId(data.attchmentId),
+                          },
+                      },
+                  },
+              );
+
+        if (!result) {
+            throw new NotFoundException('Activity data not found');
+        }
+    }
+
     async archiveMultipleActivities(
         activityIds: string[],
         isArchive: boolean,

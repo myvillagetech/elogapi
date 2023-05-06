@@ -704,4 +704,25 @@ export class ActivityController {
             });
         }
     }
+
+    @Post('/document/delete')
+    async deleteDocument(
+        @Res() response,
+        @Body() data: ActivityAttchementArchiveDto,
+    ) {
+        try {
+            const activity = await this.activityService.deleteDocument(data);
+            return response.status(HttpStatus.OK).json({
+                message: 'Document archival reverted Successfully',
+                data: activity,
+                success: true,
+            });
+        } catch (error) {
+            return response.status(error.status).json({
+                message: 'Unable to Fetch Activity',
+                error: error,
+                success: false,
+            });
+        }
+    }
 }
