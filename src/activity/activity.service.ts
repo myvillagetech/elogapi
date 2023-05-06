@@ -1352,6 +1352,13 @@ export class ActivityService {
             $and: [],
         };
 
+        const isArchiveQuery = {
+            $match: {},
+        };
+
+        if (criteria.isArchived) {
+            isArchiveQuery.$match['nestedAttchments.isArchived'] = true;
+        }
         if (!isSuperAdmin && decodedToken.organization.length === 0) {
             return [];
         }
@@ -1517,11 +1524,7 @@ export class ActivityService {
                     as: 'docOrg',
                 },
             },
-            // {
-            //     $addFields: {
-            //         'nestedAttchments.organization': '$docOrg[0].organization'
-            //     },
-            // },
+            isArchiveQuery,
             {
                 $facet: {
                     attachments: paginationProps,
