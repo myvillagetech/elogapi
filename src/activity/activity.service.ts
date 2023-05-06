@@ -1335,13 +1335,7 @@ export class ActivityService {
         );
 
         const search: any = {
-            $and: [
-                {
-                    _id: new mongoose.Types.ObjectId(
-                        '63ff1b7d663d3cc5aaabf53a',
-                    ),
-                },
-            ],
+            $and: [],
         };
 
         if (!isSuperAdmin && decodedToken.organization.length === 0) {
