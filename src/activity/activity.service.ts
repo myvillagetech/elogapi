@@ -72,6 +72,13 @@ export class ActivityService {
 
         const newActivity = await new this.activityModel({
             ...activityDto,
+            attachments: activityDto.attachments.map((a: any) => {
+                return {
+                    ...a,
+                    createdBy: decodedToken._id,
+                    createdByUserName: decodedToken.Name,
+                };
+            }),
             dueDate: dueDate,
             dueDateLog: {
                 dueDate: dueDate,
@@ -202,6 +209,13 @@ export class ActivityService {
             $push: {
                 activityLog: {
                     ...activityLog,
+                    attachments: activityLog.attachments.map((a: any) => {
+                        return {
+                            ...a,
+                            createdBy: decodedToken._id,
+                            createdByUserName: decodedToken.Name,
+                        };
+                    }),
                     userId: new Types.ObjectId(activityLog.userId),
                     createdBy: decodedToken._id,
                     createdByUserName: decodedToken.Name,
