@@ -72,12 +72,19 @@ export class ActivityService {
 
         const newActivity = await new this.activityModel({
             ...activityDto,
+            attachments: activityDto.attachments.map((a: any) => {
+                return {
+                    ...a,
+                    createdBy: decodedToken._id,
+                    createdByUserName: decodedToken.Name,
+                };
+            }),
             dueDate: dueDate,
             dueDateLog: {
                 dueDate: dueDate,
                 createdBy: decodedToken._id,
                 createdByUserName: decodedToken.Name,
-                isInitialLog : true,
+                isInitialLog: true,
             },
             assignTo: activityDto.organization[0],
             createdBy: decodedToken._id,
@@ -202,6 +209,13 @@ export class ActivityService {
             $push: {
                 activityLog: {
                     ...activityLog,
+                    attachments: activityLog.attachments.map((a: any) => {
+                        return {
+                            ...a,
+                            createdBy: decodedToken._id,
+                            createdByUserName: decodedToken.Name,
+                        };
+                    }),
                     userId: new Types.ObjectId(activityLog.userId),
                     createdBy: decodedToken._id,
                     createdByUserName: decodedToken.Name,
@@ -1211,6 +1225,109 @@ export class ActivityService {
         return result;
     }
 
+    async archiveDocuments(items: any): Promise<any> {
+        return await Promise.allSettled(
+            items.map((i: any) => this.updateDocumentArchival(i, true)),
+        );
+    }
+
+    async revertDocumentArchivals(items: any): Promise<any> {
+        return await Promise.allSettled(
+            items.map((i: any) => this.updateDocumentArchival(i, false)),
+        );
+    }
+
+    async updateDocumentArchival(data: any, value): Promise<any> {
+        const result = data.activityLogId
+            ? await this.activityModel.update(
+                  {
+                      _id: new Types.ObjectId(data.activityId),
+                  },
+                  {
+                      $set: {
+                          'activityLog.$[log].attachments.$[att].isArchived':
+                              value,
+                      },
+                  },
+                  {
+                      arrayFilters: [
+                          {
+                              'log._id': new Types.ObjectId(data.activityLogId),
+                          },
+                          {
+                              'att._id': new Types.ObjectId(data.attchmentId),
+                          },
+                      ],
+                  },
+              )
+            : await this.activityModel.update(
+                  {
+                      _id: new Types.ObjectId(data.activityId),
+                  },
+                  {
+                      $set: {
+                          'attachments.$[att].isArchived': value,
+                      },
+                  },
+                  {
+                      arrayFilters: [
+                          {
+                              'att._id': new Types.ObjectId(data.attchmentId),
+                          },
+                      ],
+                  },
+              );
+
+        if (!result) {
+            throw new NotFoundException('Activity data not found');
+        }
+    }
+
+    async deleteDocuments(items: any[]) {
+        return Promise.allSettled(
+            items.map((i: any) => this.deleteDocument(i)),
+        );
+    }
+
+    async deleteDocument(data: any): Promise<any> {
+        const result = data.activityLogId
+            ? await this.activityModel.update(
+                  {
+                      _id: new Types.ObjectId(data.activityId),
+                  },
+                  {
+                      $pull: {
+                          'activityLog.$[log].attachments': {
+                              _id: new Types.ObjectId(data.attchmentId),
+                          },
+                      },
+                  },
+                  {
+                      arrayFilters: [
+                          {
+                              'log._id': new Types.ObjectId(data.activityLogId),
+                          },
+                      ],
+                  },
+              )
+            : await this.activityModel.update(
+                  {
+                      _id: new Types.ObjectId(data.activityId),
+                  },
+                  {
+                      $pull: {
+                          attachments: {
+                              _id: new Types.ObjectId(data.attchmentId),
+                          },
+                      },
+                  },
+              );
+
+        if (!result) {
+            throw new NotFoundException('Activity data not found');
+        }
+    }
+
     async archiveMultipleActivities(
         activityIds: string[],
         isArchive: boolean,
@@ -1241,8 +1358,29 @@ export class ActivityService {
             (role) => role === 'SuperAdmin',
         );
 
-        const search: any = { $and: [] };
+        const search: any = {
+            $and: [],
+        };
 
+        const isArchiveQuery = {
+            $match: {},
+        };
+
+        if (criteria.isArchived) {
+            isArchiveQuery.$match['nestedAttchments.isArchived'] = true;
+        } else {
+            isArchiveQuery.$match['$or'] = [
+                {
+                    'nestedAttchments.isArchived': false,
+                },
+                {
+                    'nestedAttchments.isArchived': null,
+                },
+                {
+                    'nestedAttchments.isArchived': { $exists: false },
+                },
+            ];
+        }
         if (!isSuperAdmin && decodedToken.organization.length === 0) {
             return [];
         }
@@ -1341,6 +1479,7 @@ export class ActivityService {
                                                         {
                                                             activityLogId:
                                                                 '$$log._id',
+                                                            activityId: '$_id',
                                                         },
                                                     ],
                                                 },
@@ -1380,7 +1519,7 @@ export class ActivityService {
                 },
             },
             { $unwind: '$nestedAttchments' },
-            
+
             {
                 $project: {
                     nestedAttchments: 1,
@@ -1388,13 +1527,16 @@ export class ActivityService {
                 },
             },
             {
-                $match: criteria.organizations.length > 0 ?{
-                    "nestedAttchments.organizationId": {
-                        $in: criteria.organizations.map(
-                            (s) => new Types.ObjectId(s),
-                        ),
-                    },
-                } : {},
+                $match:
+                    criteria.organizations.length > 0
+                        ? {
+                              'nestedAttchments.organizationId': {
+                                  $in: criteria.organizations.map(
+                                      (s) => new Types.ObjectId(s),
+                                  ),
+                              },
+                          }
+                        : {},
             },
             {
                 $lookup: {
@@ -1404,11 +1546,7 @@ export class ActivityService {
                     as: 'docOrg',
                 },
             },
-            // {
-            //     $addFields: {
-            //         'nestedAttchments.organization': '$docOrg[0].organization'
-            //     },
-            // },
+            isArchiveQuery,
             {
                 $facet: {
                     attachments: paginationProps,

@@ -22,6 +22,8 @@ export class Attachment {
     size: string;
     @Prop({})
     path: string;
+    @Prop({ default: false })
+    isArchived: boolean;
     @Prop({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'organization',
@@ -103,11 +105,10 @@ export class DueDateLog {
     createdByUserName: string;
 
     @Prop({
-        type : Boolean,
-        default : false
+        type: Boolean,
+        default: false,
     })
-    isInitialLog : boolean
-
+    isInitialLog: boolean;
 }
 
 export const DueDateLogSchema = SchemaFactory.createForClass(DueDateLog);
