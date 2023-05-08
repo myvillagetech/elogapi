@@ -205,17 +205,19 @@ export class ActivityService {
         tokenHeader: string,
     ): Promise<any> {
         const decodedToken: any = this.authService.getDecodedToken(tokenHeader);
+
+        const attachments = activityLog.attachments.map((a: any) => {
+            return {
+                ...a,
+                createdBy: decodedToken._id,
+                createdByUserName: decodedToken.Name,
+            };
+        });
         const object = {
             $push: {
                 activityLog: {
                     ...activityLog,
-                    attachments: activityLog.attachments.map((a: any) => {
-                        return {
-                            ...a,
-                            createdBy: decodedToken._id,
-                            createdByUserName: decodedToken.Name,
-                        };
-                    }),
+                    attachments: attachments,
                     userId: new Types.ObjectId(activityLog.userId),
                     createdBy: decodedToken._id,
                     createdByUserName: decodedToken.Name,
