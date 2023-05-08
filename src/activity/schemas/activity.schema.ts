@@ -37,6 +37,8 @@ export class Attachment {
 
     @Prop({})
     createdByUserName: string;
+    @Prop({ type: String })
+    type: string;
 }
 
 export const AttachmentSchema = SchemaFactory.createForClass(Attachment);
