@@ -1549,10 +1549,14 @@ export class ActivityService {
             isArchiveQuery,
             {
                 $facet: {
-                    attachments: paginationProps,
+                    attachments: [
+                        ...paginationProps,
+                        { $sort: { 'nestedAttchments.updatedAt': -1 } },
+                    ],
                     count: [{ $match: {} }, { $count: 'count' }],
                 },
             },
+            // { $sort: { 'nestedAttchments.updatedAt': -1 } },
             // {
             //     $match: {
             //         "attachments.organizationId": {
