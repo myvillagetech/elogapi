@@ -32,6 +32,13 @@ export class AttachmentsDto {
         type: String,
     })
     readonly organizationId: string;
+
+
+    @IsNotEmpty()
+    @ApiProperty({
+        type : String,
+    })
+    readonly type : string
 }
 
 export class ActivityDto {

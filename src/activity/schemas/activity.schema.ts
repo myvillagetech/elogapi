@@ -31,6 +31,8 @@ export class Attachment {
     organizationId: OrganizationSchemaCreator;
     @Prop({})
     organization: string;
+    @Prop({type : String})
+    type : string
 }
 
 export const AttachmentSchema = SchemaFactory.createForClass(Attachment);
