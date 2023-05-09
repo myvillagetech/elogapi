@@ -30,7 +30,7 @@ export class OrganizationsService {
     constructor(
         private userService: UsersService,
         private readonly authService: AuthService,
-        private organizationTypeService : OrganizationTypeService
+        private organizationTypeService: OrganizationTypeService,
     ) {}
 
     async createOrganization(
@@ -42,8 +42,11 @@ export class OrganizationsService {
             ...createOrganizationDto,
             orgActivityAutoIncrementId: 0,
         });
-        await this.userService.addOrganizationToUser(decodedToken._id, newOrganization._id.toString())
-        
+        await this.userService.addOrganizationToUser(
+            decodedToken._id,
+            newOrganization._id.toString(),
+        );
+
         return newOrganization.save();
     }
 
@@ -103,9 +106,14 @@ export class OrganizationsService {
     async organizationSearchCriteria(
         criteria: OrganizationSearchCriteriaDto,
     ): Promise<any> {
-        const organizationTypes = await this.organizationTypeService.getAllOrganizationsTypes();
-        const association : any = organizationTypes.filter((type)=>type.name === 'Association');
-        const ministry :any = organizationTypes.filter((type)=>type.name === 'Ministry/Department' );
+        const organizationTypes =
+            await this.organizationTypeService.getAllOrganizationsTypes();
+        const association: any = organizationTypes.filter(
+            (type) => type.name === 'Association',
+        );
+        const ministry: any = organizationTypes.filter(
+            (type) => type.name === 'Ministry/Department',
+        );
         const search = { $and: [] };
 
         if (criteria.organization) {
@@ -155,7 +163,10 @@ export class OrganizationsService {
 
         if (criteria.searchTerm && criteria.searchTerm.trim() !== '') {
             search.$and.push({
-                $or: [{ organization: RegExp(criteria.searchTerm, 'i') }, { shortName: RegExp(criteria.searchTerm, 'i') }],
+                $or: [
+                    { organization: RegExp(criteria.searchTerm, 'i') },
+                    { shortName: RegExp(criteria.searchTerm, 'i') },
+                ],
             });
         }
 
@@ -197,6 +208,8 @@ export class OrganizationsService {
                     pipeline: [{ $project: { password: 0 } }],
                 },
             },
+            //UserActivityLog
+
             {
                 $match: matchQuery,
             },
@@ -252,6 +265,20 @@ export class OrganizationsService {
             {
                 $addFields: {
                     activities: { $size: '$activities' },
+                },
+            },
+            {
+                $lookup: {
+                    from: MODEL_ENUMS.USERS_ACTIVITY_LOG,
+                    localField: '_id',
+                    foreignField: 'organization',
+                    as: 'latestLog',
+                    pipeline: [{ $project: { _id: 0, user: 1, updatedAt: 1 } }],
+                },
+            },
+            {
+                $addFields: {
+                    latestLog: { $max: '$latestLog.updatedAt' },
                 },
             },
             {

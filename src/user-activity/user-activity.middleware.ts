@@ -10,10 +10,12 @@ export class UserActivityMiddleware implements NestMiddleware {
     ) {}
     use(req: any, res: any, next: () => void) {
         if (req.headers.authorization) {
-            const user = this.authService.getDecodedToken(
+            const user: any = this.authService.getDecodedToken(
                 req.headers.authorization,
             );
-            user && this.usersService.logUserActvity(user);
+            if (user && user.roles[0] !== 'SuperAdmin') {
+                this.usersService.logUserActvity(user);
+            }
         }
 
         next();
