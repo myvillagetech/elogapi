@@ -1462,6 +1462,24 @@ export class ActivityService {
             },
             {
                 $addFields: {
+                    attachments: {
+                        $map: {
+                            input: '$attachments',
+                            as: 'attach',
+                            in: {
+                                $mergeObjects: [
+                                    '$$attach',
+                                    {
+                                        activityid: '$_id',
+                                    },
+                                ],
+                            },
+                        },
+                    },
+                },
+            },
+            {
+                $addFields: {
                     activityLog: {
                         $map: {
                             input: '$activityLog',
