@@ -525,6 +525,6 @@ export class UsersService {
                 user: new mongoose.Types.ObjectId(userId),
             },
             'updatedAt',
-        );
+        ).lean()
     }
 }
