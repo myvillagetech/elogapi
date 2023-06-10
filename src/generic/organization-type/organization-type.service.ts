@@ -25,7 +25,7 @@ export class OrganizationTypeService {
     }
 
     async getAllOrganizationsTypes(): Promise<OrganizationTypeDocument[]> {
-        const organizationTypes = await this.organizationTypeModel.find();
+        const organizationTypes : any = await this.organizationTypeModel.find().lean();
         if (!organizationTypes || organizationTypes.length == 0) {
             throw new NotFoundException('organization data not found!');
         }

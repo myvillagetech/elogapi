@@ -146,7 +146,7 @@ export class OrganizationsService {
         }
 
         if (criteria.type) {
-            search.$and.push({ type: criteria.type });
+            search.$and.push({ type: new Types.ObjectId(criteria.type) });
         }
 
         if (criteria.userId) {
@@ -226,7 +226,7 @@ export class OrganizationsService {
                     ministries: [
                         {
                             $match: {
-                                type: `${ministry[0]._id}`,
+                                type: new Types.ObjectId(ministry[0]._id),
                                 isActive: true,
                             },
                         },
@@ -235,7 +235,7 @@ export class OrganizationsService {
                     associations: [
                         {
                             $match: {
-                                type: `${association[0]._id}`,
+                                type: new Types.ObjectId(association[0]._id),
                                 isActive: true,
                             },
                         },
