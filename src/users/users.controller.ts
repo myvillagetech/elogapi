@@ -315,4 +315,18 @@ export class UsersController {
             });
         }
     }
+
+    @Get('activity/getuserActivity/:userId')
+    async getuserActivity(@Param('userId') userId: string) {
+        try {
+            const result = await this.userService.getUserActivity(userId);
+            return result;
+        } catch (error) {
+            return response.status(HttpStatus.BAD_REQUEST).json({
+                message: 'Faild to retrieve user activity',
+                success: false,
+                error,
+            });
+        }
+    }
 }

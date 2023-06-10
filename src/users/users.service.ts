@@ -29,9 +29,7 @@ export class UsersService {
     @InjectModel(MODEL_ENUMS.USERS) private usersModel: Model<UserDocument>;
     @InjectModel(MODEL_ENUMS.USERS_ACTIVITY_LOG)
     private userActivityLogsModel: Model<UserActivityLogDocument>;
-    constructor(
-        private organizationTypeService : OrganizationTypeService
-    ) {}
+    constructor(private organizationTypeService: OrganizationTypeService) {}
 
     addOrganizationToUser(userId, orgId) {
         return this.usersModel.updateOne(
@@ -39,7 +37,7 @@ export class UsersService {
                 _id: new mongoose.Types.ObjectId(userId),
             },
             {
-                $push: { organization:  new mongoose.Types.ObjectId(orgId) }
+                $push: { organization: new mongoose.Types.ObjectId(orgId) },
             },
         );
     }
@@ -178,9 +176,14 @@ export class UsersService {
     // }
 
     async usersSearchCriteria(criteria: UserSearchCriteriaDto): Promise<any> {
-        const organizationTypes = await this.organizationTypeService.getAllOrganizationsTypes();
-        const association : any = organizationTypes.filter((type)=>type.name === 'Association');
-        const ministry :any = organizationTypes.filter((type)=>type.name === 'Ministry/Department' );
+        const organizationTypes =
+            await this.organizationTypeService.getAllOrganizationsTypes();
+        const association: any = organizationTypes.filter(
+            (type) => type.name === 'Association',
+        );
+        const ministry: any = organizationTypes.filter(
+            (type) => type.name === 'Ministry/Department',
+        );
         const search = { $and: [] };
 
         if (criteria.user) {
@@ -269,8 +272,9 @@ export class UsersService {
                     ministries: [
                         {
                             $match: {
-                                'organizationsdata.type':
-                                new Types.ObjectId(ministry[0]._id),
+                                'organizationsdata.type': new Types.ObjectId(
+                                    ministry[0]._id,
+                                ),
                                 isActive: true,
                             },
                         },
@@ -279,8 +283,9 @@ export class UsersService {
                     associations: [
                         {
                             $match: {
-                                'organizationsdata.type':
-                                new Types.ObjectId(association[0]._id),
+                                'organizationsdata.type': new Types.ObjectId(
+                                    association[0]._id,
+                                ),
                                 isActive: true,
                             },
                         },
@@ -502,11 +507,24 @@ export class UsersService {
         return result;
     }
 
-    async logUserActvity(user) {
+    async logUserActvity(user, isSuperAdmin) {
+        const object = { user: user._id, organization: user.organization };
+        if (!isSuperAdmin) {
+            object['organization'] = user.organization;
+        }
         await this.userActivityLogsModel.findOneAndUpdate(
             { user: user._id },
-            { user: user._id, organization: user.organization },
+            object,
             { upsert: true },
+        );
+    }
+
+    async getUserActivity(userId) {
+        return await this.userActivityLogsModel.findOne(
+            {
+                user: new mongoose.Types.ObjectId(userId),
+            },
+            'updatedAt',
         );
     }
 }
