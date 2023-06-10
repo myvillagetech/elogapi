@@ -1424,6 +1424,7 @@ export class ActivityService {
             // { $match: search.$and.length > 0 ? search : {} },
         ];
 
+        paginationProps.push({ $sort: { 'nestedAttchments.createdAt': -1 } });
         if (
             (criteria.pageSize || criteria.pageSize > 0) &&
             (criteria.pageNumber || criteria.pageNumber === 0)
@@ -1434,12 +1435,6 @@ export class ActivityService {
             paginationProps.push({ $limit: criteria.pageSize });
         }
 
-        let sortObject;
-        if (criteria.sortField) {
-            sortObject = {};
-            sortObject[criteria.sortField] = criteria.sortOrder;
-            paginationProps.push({ $sort: sortObject });
-        }
 
         return await this.activityModel.aggregate([
             // { $match: { _id: new Types.ObjectId('63e49b129eb7346a5cf29bd1') } },
@@ -1571,7 +1566,7 @@ export class ActivityService {
                 $facet: {
                     attachments: [
                         ...paginationProps,
-                        { $sort: { 'nestedAttchments.updatedAt': -1 } },
+                        // { $sort: { 'nestedAttchments.createdAt': -1 } },
                     ],
                     count: [{ $match: {} }, { $count: 'count' }],
                 },
