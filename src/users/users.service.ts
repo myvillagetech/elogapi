@@ -207,7 +207,7 @@ export class UsersService {
 
         if (criteria.type) {
             search.$and.push({
-                'organizationsdata.type': criteria.type,
+                'organizationsdata.type': new Types.ObjectId(criteria.type),
             });
         }
 
@@ -270,7 +270,7 @@ export class UsersService {
                         {
                             $match: {
                                 'organizationsdata.type':
-                                    `${ministry[0]._id}`,
+                                new Types.ObjectId(ministry[0]._id),
                                 isActive: true,
                             },
                         },
@@ -280,7 +280,7 @@ export class UsersService {
                         {
                             $match: {
                                 'organizationsdata.type':
-                                    `${association[0]._id}`,
+                                new Types.ObjectId(association[0]._id),
                                 isActive: true,
                             },
                         },
