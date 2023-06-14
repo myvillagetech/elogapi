@@ -501,6 +501,7 @@ export class ActivityService {
                         dueDate: {
                             $lte: dayjs().startOf('day').toDate(),
                         },
+                        status: 'INPROGRESS',
                     });
                 }
             } else {
