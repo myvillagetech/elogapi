@@ -508,6 +508,9 @@ export class UsersService {
     }
 
     async logUserActvity(user, isSuperAdmin) {
+        if (!user) {
+            return;
+        }
         const object = { user: user._id, organization: user.organization };
         if (!isSuperAdmin) {
             object['organization'] = user.organization;
@@ -520,11 +523,13 @@ export class UsersService {
     }
 
     async getUserActivity(userId) {
-        return await this.userActivityLogsModel.findOne(
-            {
-                user: new mongoose.Types.ObjectId(userId),
-            },
-            'updatedAt',
-        ).lean()
+        return await this.userActivityLogsModel
+            .findOne(
+                {
+                    user: new mongoose.Types.ObjectId(userId),
+                },
+                'updatedAt',
+            )
+            .lean();
     }
 }
