@@ -593,6 +593,8 @@ export class ActivityService {
             sortObject = {};
             sortObject[criteria.sortField] = criteria.sortOrder;
             paginationProps.push({ $sort: sortObject });
+        } else {
+            paginationProps.push({ $sort: { createdAt: -1 } });
         }
 
         result = await this.activityModel.aggregate([
@@ -736,6 +738,7 @@ export class ActivityService {
                                       dueDate: {
                                           $lt: dayjs().startOf('day').toDate(),
                                       },
+                                      status: 'INPROGRESS',
                                   }
                                 : {
                                       $and: [
@@ -746,6 +749,7 @@ export class ActivityService {
                                                       .toDate(),
                                               },
                                           },
+                                          { status: 'INPROGRESS' },
                                           {
                                               $or: [
                                                   {
@@ -1434,7 +1438,6 @@ export class ActivityService {
             });
             paginationProps.push({ $limit: criteria.pageSize });
         }
-
 
         return await this.activityModel.aggregate([
             // { $match: { _id: new Types.ObjectId('63e49b129eb7346a5cf29bd1') } },
