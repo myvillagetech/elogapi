@@ -572,6 +572,15 @@ export class ActivityService {
             { $match: search.$and.length > 0 ? search : {} },
         ];
 
+        let sortObject;
+        if (criteria.sortField) {
+            sortObject = {};
+            sortObject[criteria.sortField] = criteria.sortOrder;
+            paginationProps.push({ $sort: sortObject });
+        } else {
+            paginationProps.push({ $sort: { createdAt: -1 } });
+        }
+
         if (
             (criteria.pageSize || criteria.pageSize > 0) &&
             (criteria.pageNumber || criteria.pageNumber === 0)
@@ -588,15 +597,6 @@ export class ActivityService {
                 createdByOrganization: '$createdByOrganizationObj',
             },
         });
-
-        let sortObject;
-        if (criteria.sortField) {
-            sortObject = {};
-            sortObject[criteria.sortField] = criteria.sortOrder;
-            paginationProps.push({ $sort: sortObject });
-        } else {
-            paginationProps.push({ $sort: { createdAt: -1 } });
-        }
 
         result = await this.activityModel.aggregate([
             { $match: search.$and.length > 0 ? search : {} },
