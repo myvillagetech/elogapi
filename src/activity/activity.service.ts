@@ -206,13 +206,17 @@ export class ActivityService {
     ): Promise<any> {
         const decodedToken: any = this.authService.getDecodedToken(tokenHeader);
 
-        const attachments = activityLog.attachments.map((a: any) => {
-            return {
-                ...a,
-                createdBy: decodedToken._id,
-                createdByUserName: decodedToken.Name,
-            };
-        });
+        let attachments = activityLog.attachments;
+        if (activityLog.attachments && activityLog.attachments.length > 0) {
+            attachments = activityLog.attachments.map((a: any) => {
+                return {
+                    ...a,
+                    createdBy: decodedToken._id,
+                    createdByUserName: decodedToken.Name,
+                };
+            });
+        }
+
         const object = {
             $push: {
                 activityLog: {
